@@ -10,15 +10,27 @@ Hashsite’s primary philosophy is 5.5-bit alphadecimal encoding. It sounds comp
 
 Start with a 6x6 grid:
 
+![](grid2.png)
+
 Fill in the numbers and letters (capital letters only):
+
+![](grid3.png)
 
 And this is mostly it.
 
 Every hashsite location has a prefix of “#$”.  The prefix is optional, but lends itself well toward identifying what is intended.
 
-So let’s start with applying our 6x6 grid to our old friend the Mercator projection:
+Consider the Mercator projection (including the parts Mercator left off):
+
+![](mercator1.png)
+
+Let’s start with applying our 6x6 grid to our old friend the Mercator projection:
+
+![](mercator3.png)
 
 This works, but it overrepresents the area at the poles and underrepresents the area at the equator.  By using the 6x6 grid, we can tweak this a bit to make each area equal:
+
+![](mercator4.png)
 
 The lines are at 0°, 19.47°, and 41.81°.
 Now no matter the first character, we’re talking about the same amount of area.
