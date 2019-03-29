@@ -18,7 +18,7 @@ Fill in the numbers and letters (capital letters only):
 
 And this is mostly it.
 
-Every hashsite location has a prefix of “#$”.  The prefix is optional, but lends itself well toward identifying what is intended.
+Every hashsite location has a prefix of “#”, and ends with "^".  The "#" and "^" are optional, but lend themselves well toward identifying what is intended.
 
 Consider the Mercator projection (including the parts Mercator left off):
 
@@ -32,26 +32,46 @@ This works, but it overrepresents the area at the poles and underrepresents the 
 
 ![](mercator4.png)
 
-The lines are at 0°, 19.47°, and 41.81°.
+The latitude lines are at 0°, 19.47°, and 41.81°, splitting the Earth into six equally-sized slices.
 Now no matter the first character, we’re talking about the same amount of area.
 
-So let’s take #$F and split it into a 6x6 grid:
+So let’s take #B^:
+
+![](gridb.png)
+
+And split it into a 6x6 grid:
+
+![](gridb2.png)
 
 These aren’t very square, so for tropical and mid latitudes, we use a 9x4 grid, 9/9/9/9:
 
+![](gridb3.png)
+
+accordingly with #BA^:
+
+![](gridc.png)
+
 For the third digit on, we go back to the 6x6 grid:
 
-accordingly with #$F6:
+![](gridc2.png)
 
-And #$F6N:
+And #BA3^:
 
-And #$F6NZ:
+![](gridd.png)
 
-There. Compare #$F6NZ with these other encoding systems:
+![](gridd2.png)
+
+And #BA3U^:
+
+![](gride.png)
+
+There. Compare #BA3U^ with these other encoding systems:
+
+GeoHash:
 
 There’s one more thing to remember with Hashsite: the polar regions.
 
-If we split a polar region (say, #$2) into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously accurate longitudes and ridiculously inaccurate latitudes:
+If we split a polar region (say, #2^) into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously accurate longitudes and ridiculously inaccurate latitudes:
 
 So for polar regions only, we split it differently; instead of 9/9/9/9, we use 1/1/2/3/3/4/5/5/6/6:
 
@@ -71,30 +91,30 @@ All Hashsite letters are CAPITAL. It’s not yelling, it’s practical.
 
 This means no problems with lowercase L: getting a 1 and a capital L confused is not likely. Getting a capital O and a numeric 0 with a slash should be also unlikely. Nonetheless, we can add dots into a hashsite to help avoid the difference. Dots can and should go before any number (0 and 1 in particular) but never before any letter. They are not required, but they help people understand the difference between:
 
-#$L.1L.0OL (20 miles NE of Moscow):
+#L.1L.0OL^ (20 miles NE of Moscow):
 
-and #$LLLO.0.1 (30 miles NW of Abu Dhabi):
+and #LLLO.0.1^ (30 miles NW of Abu Dhabi):
 
 So if you’re going to tweet where the party at the old quarry is going to be, you can leave the dots in there and ignore them when punching them into your Hashsite-enabled map app.
 
 *Vertical space
 
-To add a message regarding vertical space, we add a carat to the end:
+To add a message regarding vertical space, we add after the carat to the end:
 
-#$F.6NZ^
+#F.6NZ^
 
 Then we use the same 6x6 grid in the following manner:
 
-So #$F.6NZ^I would mean 1 meter below street level, and #$F.6NZ^H would mean 1 meter above street level. This covers -18m to 18m inclusively (#$F.6NZ^, the carat followed by no character, handles the 0m case). This covers most everyday wayfinding situations involving up to 6-story buildings.
+So #F.6NZ^I would mean 1 meter below street level, and #F.6NZ^H would mean 1 meter above street level. This covers -18m to 18m inclusively (#F.6NZ^, the carat followed by no character, handles the 0m case). This covers most everyday wayfinding situations involving up to 6-story buildings.
 
 As soon as you precede the initial post-carat character with a second character, it acts as a sort of conventional “tens digit”, multiplying each value by 18:
 
-#$F.6NZ^.1H would thus be 19 (1 x 18 + 1) meters above street level.  How would we do 18 meters above street level? #$F.6NZ^00, the first zero being a special case indicating we’re at exactly 18. #$F.6NZ^0Z would equal exactly 18 meters beneath street level.
+#F.6NZ^.1H would thus be 19 (1 x 18 + 1) meters above street level.  How would we do 18 meters above street level? #F.6NZ^00, the first zero being a special case indicating we’re at exactly 18. #F.6NZ^0Z would equal exactly 18 meters beneath street level.
 
-Finally, trailing the entire hashsite with a second carat means that the vertical number is relative to sea level, not street level. #$F.6NZ^^ means we’re at sea level, #$F.6NZ^H^ means 1 meter above sea level.
+Finally, trailing the entire hashsite with a second carat means that the vertical number is relative to sea level, not street level. #F.6NZ^^ means we’re at sea level, #F.6NZ^H^ means 1 meter above sea level.
 
 *Word mode
 
 Unlike What3Words’ patented scheme for deriving three words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order.
 
-#$DF28 might end up being #$eager-badger.  #$DF28ML might be #$eager-badger-possum. All the words are 2-7 letters long, common, without spaces or punctuation, alphabetical, and we don’t use plurals to confuse people.  Best off, if you get #$eager-badger and #$eager-badge confused, you’re still close enough to have a shot at figuring things out.
+#DF28^ might end up being #eager-badger^.  #DF28ML^ might be #eager-badger-possum^. All the words are 2-7 letters long, common, without spaces or punctuation, alphabetical, and we don’t use plurals to confuse people.  Best off, if you get #eager-badger^ and #eager-badge^ confused, you’re still close enough to have a shot at figuring things out.
