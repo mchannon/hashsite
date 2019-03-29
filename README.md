@@ -75,11 +75,11 @@ W3W: galaxies.gift.issue
 
 There’s one more thing to remember with Hashsite: the polar regions.
 
-If took a polar region (say, #1^):
+If you took a polar region (say, #1^):
 
 ![](gridf.png)
 
-and split it into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously accurate longitudes and ridiculously inaccurate latitudes:
+and split it into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously precise longitudes and ridiculously imprecise latitudes:
 
 ![](gridf2.png)
 
@@ -103,9 +103,9 @@ All Hashsite letters are CAPITAL. It’s not yelling, it’s practical.
 
 This means no problems with lowercase L: getting a 1 and a capital L confused is not likely. Getting a capital O and a numeric 0 with a slash should be also unlikely. Nonetheless, we can add dots into a hashsite to help avoid the difference. Dots can and should go before any number (0 and 1 in particular) but never before any letter. They are not required, but they help people understand the difference between:
 
-#L.1L.0OL^ (20 miles NE of Moscow):
+#L.1L.0OI^ (20 miles NE of Moscow):
 
-and #LLLO.0.1^ (30 miles NW of Abu Dhabi):
+and #ILLO.0.1^ (30 miles NW of Abu Dhabi):
 
 So if you’re going to tweet where the party at the old quarry is going to be, you can leave the dots in there and ignore them when punching them into your Hashsite-enabled map app.
 
@@ -123,10 +123,48 @@ As soon as you precede the initial post-carat character with a second character,
 
 #F.6NZ^.1H would thus be 19 (1 x 18 + 1) meters above street level.  How would we do 18 meters above street level? #F.6NZ^00, the first zero being a special case indicating we’re at exactly 18. #F.6NZ^0Z would equal exactly 18 meters beneath street level.
 
-Finally, trailing the entire hashsite with a second carat means that the vertical number is relative to sea level, not street level. #F.6NZ^^ means we’re at sea level, #F.6NZ^H^ means 1 meter above sea level.
+Finally, trailing the entire hashsite with a second carat means that the vertical number is relative to sea level, not street level. #F.6NZ^^ means we’re at sea level, #F.6NZ^H^ means 1 meter above sea level. #F.6NZ^H^G means 2 meters above a street level that is itself 1 meter above sea level.
+
+Do we decide to go big or go small? Someone might want finer than 1m precision in terms of the height or depth of a location, and they may also want to describe the altitude of a geosynchronous satellite tens of thousands of km above a given point. Or scarily enough, both. In the event we're dealing with >1km of distance from street level and/or <1m of precision, we use the two carats differently:
+
+
 
 *Word mode
 
-Unlike What3Words’ patented scheme for deriving three words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order.
+Unlike What3Words’ patented scheme for deriving three disjointed words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order, to construct a sentence.
 
-#DF28^ might end up being #eager-badger^.  #DF28ML^ might be #eager-badger-possum^. All the words are 4 letters long, common, without spaces or punctuation, alphabetical, and we don’t use plurals to confuse people.  Best off, if you get #eager-badger^ and #eager-badge^ confused, you’re still close enough to have a shot at figuring things out.
+It's much easier to remember "John's green raincoat is dirty" than "precautions.green.raincoat"
+
+Word mode uses separate dictionaries for different parts of speech.
+
+1: Nouns
+2: Adjectives
+3: Possessives
+4: Verbs
+5: Predicate Objects or Predicate Adjectives (Nouns or Adjectives)
+
+So a detailed hashsite like #M2DE3200ZZ^ would follow the dictionary as #1122334455, but the sentence would follow:
+
+33 22 11 44 55
+
+Noun M2: Raincoat
+Adjective DE: Green
+Possessive 32: John's
+Verb 00: is (predicate adjective form)
+Predicate Adjective ZZ: dirty
+
+Vertical components following the carat symbol (^) take the form of a proper name at the end of the sentence.  So if #M2DE3200ZZ^ is "John's green raincoat is dirty", #M2DE3200ZZ^2I would be "John's green raincoat is dirty, Michelle."  
+
+While mnemonics are handy, they don't do all that well for error consistency. Say the postal service in a country adopts this system and the carrier has trouble reading the handwriting, interpreting the above as "John's green raincoat is dry". This could correspond to a few houses down from the intended recipient, and is a bad outcome.
+
+So "obfuscated mode" is also supported, where if it's not exact, it's quite clear it's wrong. The postal carrier will type the phrase into his computer and come up with the middle of the South Atlantic ocean instead of the wrong house on the right street.
+
+We achieve obfuscated mode by changing the order around to a question. Something like "Is John's green raincoat dirty?", only we need to reorder the input string.
+
+So keeping #M2DE3200ZZ^, for this mode only, we would first reorder it to put the odd characters first followed by the evens: MD30Z2E20Z, reverse it, Z02E2Z03DM, then run it through our sentence generator function:
+
+Paula's Angry Yak Will Cost Irving.  In the form of a question: #Will Paula's Angry Yak Cost Irving?^
+
+Not the easiest mnemonic to remember, but a heckuva lot better than #M2DE3200ZZ^.
+
+All the words are 4-7 letters long, common, without spaces or punctuation, alphabetically sequenced, and we're careful not to use plurals where they might confuse people.  
