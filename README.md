@@ -67,8 +67,10 @@ And #BA3U^:
 
 There. Compare #BA3U^ with these other encoding systems:
 
-GeoHash: xn73 (twice as wide)
+GeoHash: xn73 (twice as wide, and not square)
+
 Plus.Codes: 8Q7XCJ00+ (or CJFF+XX Yokohama)
+
 W3W: galaxies.gift.issue
 
 There’s one more thing to remember with Hashsite: the polar regions.
@@ -85,7 +87,7 @@ So for polar regions only, we split it differently; instead of 9/9/9/9, we use 1
 
 ![](gridf3.png)
 
-And from there, we also go back to the 6x6 grid:
+These don't look square because of the projection, but they're all very similar in size. From here, we also go back to the 6x6 grid:
 
 Any two-character hashsite, regardless of where it is on Earth, should be approx. 600x600 km, with each additional character taking off a power of 6x6, so 100x100km, ~16x16km, and so on. Eight characters will describe approx. 13x13m, and nine will describe a 2 meter square.
 
@@ -127,4 +129,4 @@ Finally, trailing the entire hashsite with a second carat means that the vertica
 
 Unlike What3Words’ patented scheme for deriving three words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order.
 
-#DF28^ might end up being #eager-badger^.  #DF28ML^ might be #eager-badger-possum^. All the words are 2-7 letters long, common, without spaces or punctuation, alphabetical, and we don’t use plurals to confuse people.  Best off, if you get #eager-badger^ and #eager-badge^ confused, you’re still close enough to have a shot at figuring things out.
+#DF28^ might end up being #eager-badger^.  #DF28ML^ might be #eager-badger-possum^. All the words are 4 letters long, common, without spaces or punctuation, alphabetical, and we don’t use plurals to confuse people.  Best off, if you get #eager-badger^ and #eager-badge^ confused, you’re still close enough to have a shot at figuring things out.
