@@ -127,6 +127,21 @@ Finally, trailing the entire hashsite with a second carat means that the vertica
 
 Do we decide to go big or go small? Someone might want finer than 1m precision in terms of the height or depth of a location, and they may also want to describe the altitude of a geosynchronous satellite tens of thousands of km above a given point. Or scarily enough, both. In the event we're dealing with >1km of distance from street level and/or <1m of precision, we use the two carats differently:
 
+As soon as we have three characters after a carat, the first "street level" becomes fractional meters, and the second "sea level" becomes decimal meters, stored much as conventional numbers are stored, except with base-36 numbers.
+
+So to represent 1 cm below street level at #F.6NZ^, we reserve the highest bit for signing and use the rest of the first character to indicate the number of 18ths of a meter we mean.  Since 1/100th is less than a single 1/18th, the rest is zero, but the signing bit makes this "I".
+
+The second character is in terms of 1/18/36, or 648ths of a meter. For 1/100, this means we're at 6/648ths and change, or "6".
+
+The third character has to account for the remaining .48/648ths in the next unit, 18x36x36 = 23328ths of a meter, or 17, a.k.a. "H".
+
+The fourth character has to account for the remaining .28/23328ths in the next unit, 18x36x36x36 = 839808ths of a meter, or 10, a.k.a. "A".
+
+We could go on for a while, but suffice it to say, we're really close to 1 cm after four characters:
+
+#F.6NZ^I6HA
+
+Similar math ensues for after the second carat, except we start with the smallest numbers first (including the signing bit) and work our way rightward until the last character represents the most significant bits. 
 
 
 *Word mode
