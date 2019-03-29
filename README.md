@@ -1,5 +1,5 @@
 ![](hashsitebanner.png)
-
+v
 Open-source Geocoding Library
 
 Paradigm/How-to
@@ -131,16 +131,20 @@ Do we decide to go big or go small? Someone might want finer than 1m precision i
 
 *Word mode
 
-Unlike What3Words’ patented scheme for deriving three disjointed words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order, to construct a sentence.
+Unlike What3Words’ patented scheme for deriving three disjointed words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single integer number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order, to construct a sentence.
 
-It's much easier to remember "John's green raincoat is dirty" than "precautions.green.raincoat"
+It's much easier to remember "John's green raincoat is dirty" than "precautions.green.raincoat", but it's also much easier to come up with it.
 
 Word mode uses separate dictionaries for different parts of speech.
 
 1: Nouns
+
 2: Adjectives
+
 3: Possessives
+
 4: Verbs
+
 5: Predicate Objects or Predicate Adjectives (Nouns or Adjectives)
 
 So a detailed hashsite like #M2DE3200ZZ^ would follow the dictionary as #1122334455, but the sentence would follow:
@@ -148,9 +152,13 @@ So a detailed hashsite like #M2DE3200ZZ^ would follow the dictionary as #1122334
 33 22 11 44 55
 
 Noun M2: Raincoat
+
 Adjective DE: Green
+
 Possessive 32: John's
+
 Verb 00: is (predicate adjective form)
+
 Predicate Adjective ZZ: dirty
 
 Vertical components following the carat symbol (^) take the form of a proper name at the end of the sentence.  So if #M2DE3200ZZ^ is "John's green raincoat is dirty", #M2DE3200ZZ^2I would be "John's green raincoat is dirty, Michelle."  
@@ -168,3 +176,12 @@ Paula's Angry Yak Will Cost Irving.  In the form of a question: #Will Paula's An
 Not the easiest mnemonic to remember, but a heckuva lot better than #M2DE3200ZZ^.
 
 All the words are 4-7 letters long, common, without spaces or punctuation, alphabetically sequenced, and we're careful not to use plurals where they might confuse people.  
+
+
+To Do:
+
+Finalize All Conditions
+Upload Open Source Dictionaries
+Upload Codecs
+???
+Profit (from MIT-licensed open source)
