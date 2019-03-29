@@ -1,4 +1,4 @@
-![](hashsitebanner.png)
+![](img/hashsitebanner.png)
 
 Open-source Geocoding Library
 
@@ -10,7 +10,7 @@ Hashsite’s primary philosophy is 5.1-bit alphadecimal encoding. It sounds comp
 
 Start with a 6x6 grid:
 
-![](grid2.png)
+![](img/grid2.png)
 
 Fill in the numbers and letters (capital letters only):
 
@@ -22,48 +22,48 @@ Every hashsite location has a prefix of “#”, and ends with "^".  The "#" and
 
 Consider the Mercator projection (including the parts Mercator left off):
 
-![](mercator1.png)
+![](img/mercator1.png)
 
 Let’s start with applying our 6x6 grid to our old friend the Mercator projection:
 
-![](mercator3.png)
+![](img/mercator3.png)
 
 This works, but it overrepresents the area at the poles and underrepresents the area at the equator.  By using the 6x6 grid, we can tweak this a bit to make each area equal:
 
-![](mercator4.png)
+![](img/mercator4.png)
 
 The latitude lines are at 0°, 19.47°, and 41.81°, splitting the Earth into six equally-sized slices.
 Now no matter the first character, we’re talking about the same amount of area.
 
 So let’s take #B^:
 
-![](gridb.png)
+![](img/gridb.png)
 
 And split it into a 6x6 grid:
 
-![](gridb2.png)
+![](img/gridb2.png)
 
 These aren’t very square, so for tropical and mid latitudes, we use a 9x4 grid, 9/9/9/9:
 
-![](gridb3.png)
+![](img/gridb3.png)
 
 accordingly with #BA^:
 
-![](gridc.png)
+![](img/gridc.png)
 
 For the third digit on, we go back to the 6x6 grid:
 
-![](gridc2.png)
+![](img/gridc2.png)
 
 And #BA3^:
 
-![](gridd.png)
+![](img/gridd.png)
 
-![](gridd2.png)
+![](img/gridd2.png)
 
 And #BA3U^:
 
-![](gride.png)
+![](img/gride.png)
 
 There. Compare #BA3U^ with these other encoding systems:
 
@@ -77,15 +77,15 @@ There’s one more thing to remember with Hashsite: the polar regions.
 
 If you took a polar region (say, #1^):
 
-![](gridf.png)
+![](img/gridf.png)
 
 and split it into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously precise longitudes and ridiculously imprecise latitudes:
 
-![](gridf2.png)
+![](img/gridf2.png)
 
 So for polar regions only, we split it differently; instead of 9/9/9/9, we use 1/1/2/3/3/4/5/5/6/6:
 
-![](gridf3.png)
+![](img/gridf3.png)
 
 These don't look square because of the projection, but they're all very similar in size. From here, we also go back to the 6x6 grid:
 
