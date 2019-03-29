@@ -6,7 +6,7 @@ Paradigm/How-to
 
 Geocoding is all about representing a fixed point in space in as short and reproducible a way as possible. If it can be done simply, so much the better.
 
-Hashsite’s primary philosophy is 5.5-bit alphadecimal encoding. It sounds complicated but it’s actually quite simple.
+Hashsite’s primary philosophy is 5.1-bit alphadecimal encoding. It sounds complicated but it’s actually quite simple.
 
 Start with a 6x6 grid:
 
@@ -67,13 +67,23 @@ And #BA3U^:
 
 There. Compare #BA3U^ with these other encoding systems:
 
-GeoHash:
+GeoHash: xn73 (twice as wide)
+Plus.Codes: 8Q7XCJ00+ (or CJFF+XX Yokohama)
+W3W: galaxies.gift.issue
 
 There’s one more thing to remember with Hashsite: the polar regions.
 
-If we split a polar region (say, #2^) into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously accurate longitudes and ridiculously inaccurate latitudes:
+If took a polar region (say, #1^):
+
+![](gridf.png)
+
+and split it into a 9x4 or even a 6x6 grid, we’d find ourselves with ridiculously accurate longitudes and ridiculously inaccurate latitudes:
+
+![](gridf2.png)
 
 So for polar regions only, we split it differently; instead of 9/9/9/9, we use 1/1/2/3/3/4/5/5/6/6:
+
+![](gridf3.png)
 
 And from there, we also go back to the 6x6 grid:
 
