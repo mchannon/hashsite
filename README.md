@@ -151,15 +151,11 @@ So a detailed hashsite like #M2DE3200ZZ^ would follow the dictionary as #1122334
 
 33 22 11 44 55
 
-Noun M2: Raincoat
-
-Adjective DE: Green
-
-Possessive 32: John's
-
-Verb 00: is (predicate adjective form)
-
-Predicate Adjective ZZ: dirty
+1. Noun M2: Raincoat
+1. Adjective DE: Green
+1. Possessive 32: John's
+1. Verb 00: is (predicate adjective form)
+1. Predicate Adjective ZZ: dirty
 
 Vertical components following the carat symbol (^) take the form of a proper name at the end of the sentence.  So if #M2DE3200ZZ^ is "John's green raincoat is dirty", #M2DE3200ZZ^2I would be "John's green raincoat is dirty, Michelle."  
 
@@ -180,12 +176,11 @@ All the words are 4-7 letters long, common, without spaces or punctuation, alpha
 
 To Do:
 
-Finalize All Conditions
+1. Finalize All Conditions
+1. Upload Open Source Dictionaries
+1. Upload Codecs
+1. ???
+1. Profit (from MIT-licensed open source)
 
-Upload Open Source Dictionaries
 
-Upload Codecs
-
-???
-
-Profit (from MIT-licensed open source)
+To hear a bunch of HN readers opine on this without seeing it, visit [https://news.ycombinator.com/item?id=19511917](https://news.ycombinator.com/item?id=19511917), do a find for "mchannon".
