@@ -181,7 +181,11 @@ All the words are 4-7 letters long, common, without spaces or punctuation, alpha
 To Do:
 
 Finalize All Conditions
+
 Upload Open Source Dictionaries
+
 Upload Codecs
+
 ???
+
 Profit (from MIT-licensed open source)
