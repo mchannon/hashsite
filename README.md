@@ -1,5 +1,5 @@
 ![](hashsitebanner.png)
-v
+
 Open-source Geocoding Library
 
 Paradigm/How-to
@@ -14,7 +14,7 @@ Start with a 6x6 grid:
 
 Fill in the numbers and letters (capital letters only):
 
-![](grid3.png)
+![](img/grid3.png)
 
 And this is mostly it.
 
