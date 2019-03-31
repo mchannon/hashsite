@@ -1,6 +1,6 @@
 ![](img/hashsitebanner.png)
 
-Open-source Geocoding Library
+Open-source Fractal Geocoding Library
 
 by Matt Channon
 
@@ -120,15 +120,15 @@ To add a message regarding vertical space, we add after the carat to the end:
 
 Then we use the same 6x6 grid in the following manner:
 
-So #F.6NZ^I would mean 1 meter below street level, and #F.6NZ^H would mean 1 meter above street level. This covers -18m to 18m inclusively (#F.6NZ^, the carat followed by no character, handles the 0m case). This covers most everyday wayfinding situations involving up to 6-story buildings.
+So #F.6NZ^J would mean 1 meter below street level, and #F.6NZ^1 would mean 1 meter above street level. This covers -17m to 17m inclusively (#F.6NZ^0, the carat followed by a zero, handles the 0m case). This covers most everyday wayfinding situations involving up to 6-story buildings.
 
 As soon as you precede the initial post-carat character with a second character, it acts as a sort of conventional “tens digit”, multiplying each value by 18:
 
-#F.6NZ^.1H would thus be 19 (1 x 18 + 1) meters above street level.  How would we do 18 meters above street level? #F.6NZ^00, the first zero being a special case indicating we’re at exactly 18. #F.6NZ^0Z would equal exactly 18 meters beneath street level.
+#F.6NZ^.1.1 would thus be 19 (1 x 18 + 1) meters above street level.  How would we do 18 meters above street level? #F.6NZ^.1.0, the first zero being a special case indicating we’re at exactly 18. #F.6NZ^.1I would equal exactly 18 meters beneath street level.
 
-Finally, trailing the entire hashsite with a second carat means that the vertical number is relative to sea level, not street level. #F.6NZ^^ means we’re at sea level, #F.6NZ^H^ means 1 meter above sea level. #F.6NZ^H^G means 2 meters above a street level that is itself 1 meter above sea level.
+Finally, trailing the entire hashsite with a second carat means that the vertical number is relative to sea level, not street level. #F.6NZ^^ means we’re at sea level, #F.6NZ^1^ means 1 meter above sea level. #F.6NZ^2^J means 2 meters above a street level that is itself 1 meter beneath sea level.
 
-Do we decide to go big or go small? Someone might want finer than 1m precision in terms of the height or depth of a location, and they may also want to describe the altitude of a geosynchronous satellite tens of thousands of km above a given point. Or scarily enough, both. In the event we're dealing with >1km of distance from street level and/or <1m of precision, we use the two carats differently:
+Do we decide to go big or go small? Someone might want finer than 1m precision in terms of the height or depth of a location, and they may also want to describe the altitude of a geosynchronous satellite tens of thousands of km above a given point. Or scarily enough, both. In the event we're dealing with >1km of distance from sea level and/or <1m of precision, we use the two carats differently:
 
 As soon as we have three characters after a carat, the first "street level" becomes fractional meters, and the second "sea level" becomes decimal meters, stored much as conventional numbers are stored, except with base-36 numbers.
 
@@ -142,7 +142,7 @@ The fourth character has to account for the remaining .28/23328ths in the next u
 
 We could go on for a while, but suffice it to say, we're really close to 1 cm after four characters:
 
-#F.6NZ^I6HA
+#F.6NZ^I.6HA
 
 Similar math ensues for after the second carat, except we start with the smallest numbers first (including the signing bit) and work our way rightward until the last character represents the most significant bits. 
 
@@ -159,7 +159,7 @@ Lowercase. Hashsites don't contain lowercase letters, so a lowercase checksum ma
 
 #2A0E78^ would thus be checksummed as #2A0E78j^.
 
-#2AEB71^ might be a bit of a problem, as that would be #2AEB71l^, which someone might confuse with #2AEB711^ if they handwrote it or made a poor choice of font. Nevertheless, a checksum misinterpreted is a minor risk.
+#2AEB71^ might be a bit of a problem, as that would be #2AEB71l^, which someone might confuse with #2AEB711^ if they handwrote it or made a poor choice of font. Nevertheless, a checksum misinterpreted poses a minor risk.
 
 
 *Word mode
@@ -207,6 +207,24 @@ Not the easiest mnemonic to remember, but a heckuva lot better than #M2DE3200ZZ^
 All the words are 4-7 letters long, common, without spaces or punctuation, alphabetically sequenced, and we're careful not to use plurals where they might confuse people.  
 
 
+
+Frequently Asked Questions (FAQ)
+
+
+Can't you make your "hashtags" smaller?
+
+Have given this a lot of thought, and the brief answer is probably not. Consider if somehow I decided that only land area could be represented by hashsite. And that I had a quick clean function that tidily represented the 1/6 of Earth's area that's covered by land. That would still only take off half a character. For that half a letter, you'd lose not only the oceans but also the ability to do everything with pen and paper.
+Expanding the character set beyond capital letters and numbers, like base64, could help, but a 9-digit HashSite would still only be 8-digits with base64. Not worth the added confusion between capital and lowercase letters.
+In the end, this is about completeness and human-readability.
+
+
+Do we really need another one of these?
+
+I think we do, because although the other systems are pretty admirable, none offers all the features and advantages I was able to put together.
+
+
+
+
 To Do:
 
 1. Finalize All Conditions
@@ -217,3 +235,4 @@ To Do:
 
 
 To hear a bunch of HN readers opine on this without seeing it, visit [https://news.ycombinator.com/item?id=19511917](https://news.ycombinator.com/item?id=19511917), do a find for "mchannon".
+
