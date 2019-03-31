@@ -2,6 +2,9 @@
 
 Open-source Geocoding Library
 
+by Matt Channon
+
+
 Paradigm/How-to
 
 Geocoding is all about representing a fixed point in space in as short and reproducible a way as possible. If it can be done simply, so much the better.
