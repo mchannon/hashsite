@@ -144,6 +144,21 @@ We could go on for a while, but suffice it to say, we're really close to 1 cm af
 Similar math ensues for after the second carat, except we start with the smallest numbers first (including the signing bit) and work our way rightward until the last character represents the most significant bits. 
 
 
+*Error correction
+
+None of the existing approaches actually employs an error correction system like a checksum. While obfuscating systems like What3Words can reduce potential errors, they can also introduce them, since precaution.green.raincoat is very easy to confuse with precautions.green.raincoat.
+
+Hashsite uses a tried-and-true approach: the Luhn Algorithm. While you may not have heard of the Luhn, your credit card has. We take every character, doubling every other one, and add them together, multiply by X (X = 9 for credit cards, X = 25 for our purposes), and take the last result digit. This is referred to as a "checksum". It ensures that even hand-entered credit cards are very unlikely to be run through the system if not keyed in properly.
+
+Adding one more character on the end sounds great, but we like our codes short, and our error corrections optional. If we're going to make the error correction optional, and don't want to add a symbol, how can we tell our error correction code isn't part of our hashsite code?
+
+Lowercase. Hashsites don't contain lowercase letters, so a lowercase checksum makes it clear what that character is doing. One other thing: turning an alphadecimal checksum into lowercase works great for letters, but for numbers? There's no lowercase number 7. We adjust for this by making the checksum strictly alphabetical instead of alphadecimal (26-value instead of 36-value).
+
+#2A0E78^ would thus be checksummed as #2A0E78j^.
+
+#2AEB71^ might be a bit of a problem, as that would be #2AEB71l^, which someone might confuse with #2AEB711^ if they handwrote it or made a poor choice of font. Nevertheless, a checksum misinterpreted is a minor risk.
+
+
 *Word mode
 
 Unlike What3Words’ patented scheme for deriving three disjointed words from a location, the hashsite approach isn’t to take spatial coordinates and squish them into a huge single integer number which we bust apart again. We simply take the 2-character alphadecimal “bytes” (1332 unique values, 1296 for each possible pair and another 36 for single characters) and run them through an open-source alphabetic dictionary, in alphabetical order, to construct a sentence.
