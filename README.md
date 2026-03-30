@@ -14,7 +14,7 @@ Hashsite is a public-source geocoding system designed to fix that.
 
 It is built around a 5.1-bit alphadecimal multifractal notation that is compact, human-usable, offline-friendly, and simple enough that many of its spatial operations can be reasoned about with pencil and paper.
 
-A short Hashsite can identify an area. A longer one can identify a doorway. Add vertical information and it can identify the correct floor. Add a **hashpath** and it can describe not just a point, but the actual sequence of arrival decisions that gets a person, package, or ambulance to the right place.
+A short Hashsite can identify an area. A longer one can identify a doorway. Add the optional **Z-axis** extension and it can identify the correct floor. Add a **hashpath** and it can describe not just a point, but the actual sequence of arrival decisions that gets a person, package, or ambulance to the right place.
 
 **Start here:**
 
@@ -119,7 +119,7 @@ Fill in the numbers and letters:
 
 That is most of the system.
 
-Every Hashsite location may be written with a leading `#` and trailing `^`. These are optional, but helpful for recognition in plain text.
+Every Hashsite location may be written with a leading `#`. The `#` is optional, but helpful for recognition in plain text. Vertical information is handled separately in the optional **Z-axis** extension described below.
 
 The point is not novelty for novelty’s sake. The point is to create a location language that is:
 
@@ -225,7 +225,7 @@ Hashpath is the missing layer between raw coordinates and actual arrival.
 
 Instead of only this:
 
-`#9E3ZDC4AX^`
+`#9E3ZDC4AX`
 
 you send a hashpath conceptually equivalent to:
 
@@ -357,7 +357,7 @@ The latitude lines are at `0°`, `19.47°`, and `41.81°`, splitting the Earth i
 
 Now no matter the first character, we are talking about the same amount of area.
 
-Take `#B^`:
+Take `#B`:
 
 ![](img/gridb.png)
 
@@ -369,7 +369,7 @@ For tropical and mid-latitudes, these are not very square, so we instead use a 9
 
 ![](img/gridb3.png)
 
-Accordingly with `#BA^`:
+Accordingly with `#BA`:
 
 ![](img/gridc.png)
 
@@ -377,13 +377,13 @@ From the third digit onward, we return to the 6x6 grid:
 
 ![](img/gridc2.png)
 
-And `#BA3^`:
+And `#BA3`:
 
 ![](img/gridd.png)
 
 ![](img/gridd2.png)
 
-And `#BA3U^`:
+And `#BA3U`:
 
 ![](img/gride.png)
 
@@ -395,7 +395,7 @@ The goal is not just elegance. The goal is fairer area representation, shorter u
 
 The poles require different handling.
 
-If you took a polar region such as `#1^`:
+If you took a polar region such as `#1`:
 
 ![](img/gridf.png)
 
@@ -431,11 +431,11 @@ To reduce ambiguity:
 
 For example:
 
-`#L.1L.0OI^`
+`#L.1L.0OI`
 
 and
 
-`#ILLO.0.1^`
+`#ILLO.0.1`
 
 remain distinguishable in ordinary use.
 
@@ -443,15 +443,21 @@ That matters when the system is being relayed in text messages, notes, signs, sc
 
 ---
 
-## Vertical space
+## Z-axis
 
 A real location system should not pretend the world is flat.
 
 The difference between the first floor and the fiftieth floor is not trivia. In an emergency, a delivery, or a meetup, it can be the difference between success and failure.
 
-Hashsite includes a vertical component after the carat.
+By default, a Hashsite describes an XY location only.
 
-For example:
+When you want to add vertical information, you may append an optional `^` and then encode the Z-axis payload after it.
+
+So the core placestamp stays simple:
+
+`#F.6NZ`
+
+And the Z-axis extension begins only when needed:
 
 `#F.6NZ^J` means 1 meter below street level  
 `#F.6NZ^1` means 1 meter above street level  
@@ -459,7 +465,7 @@ For example:
 
 This covers most everyday building-navigation situations.
 
-If a second post-carat character is added, it acts like a higher-order digit, multiplying by 18.
+If a second post-caret character is added, it acts like a higher-order digit, multiplying each value by 18.
 
 Examples:
 
@@ -467,7 +473,7 @@ Examples:
 `#F.6NZ^.1.0` = exactly 18 meters above street level  
 `#F.6NZ^.1I` = exactly 18 meters below street level
 
-A second trailing carat switches the frame to sea level rather than street level.
+A trailing `^` at the end of the Z-axis payload is also optional. When present, it switches the reference frame from street level to sea level.
 
 Examples:
 
@@ -475,9 +481,9 @@ Examples:
 `#F.6NZ^1^` = 1 meter above sea level  
 `#F.6NZ^2^J` = 2 meters above a street level that is itself 1 meter below sea level
 
-The system can also extend below 1-meter resolution and above kilometer-scale elevation ranges using additional post-carat characters.
+The system can also extend below 1-meter resolution and above kilometer-scale elevation ranges using additional post-caret characters.
 
-In short: Hashsite is designed to describe the actual place, not a flattened cartoon of it.
+In short: Hashsite is designed to describe the actual place, not a flattened cartoon of it. The base code does not require `^`; the Z-axis extension introduces it only when vertical data matters.
 
 ---
 
@@ -491,11 +497,11 @@ The checksum is optional, short, and intended to catch common entry mistakes wit
 
 For example:
 
-`#2A0E78^`
+`#2A0E78`
 
 could be checksummed as:
 
-`#2A0E78j^`
+`#2A0E78j`
 
 The goal is not perfection. The goal is reducing avoidable human error in ordinary relay.
 
