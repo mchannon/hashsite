@@ -46,6 +46,15 @@ For developers inside a government, military, or large enterprise who need a qui
 
 Read the full terms in [WELCOME-KIT.md](WELCOME-KIT.md).
 
+
+## Public-interest waivers
+
+For selected mission-aligned projects that would otherwise fall into the paid buckets, Hashsite may offer a no-cost or reduced-cost license.
+
+Typical examples include conservation and parks, humanitarian demining, search and rescue, accessibility, education, and public-interest research.
+
+See [PUBLIC-INTEREST-WAIVER.md](PUBLIC-INTEREST-WAIVER.md) for the request policy.
+
 ## Broader commercial terms
 
 For broader deployment, OEM use, affiliate use, source redistribution rights, or organization-wide rollout, see [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md) or contact **licensing@hashsite.org**.

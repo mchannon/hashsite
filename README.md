@@ -22,6 +22,7 @@ A short Hashsite can identify an area. A longer one can identify a doorway. Add 
 - [Buy the Hashsite Developer Welcome Kit](/buy/)
 - [Full commercial licensing terms](COMMERCIAL-LICENSE.md)
 - [Welcome Kit terms](WELCOME-KIT.md)
+- [Public-interest fee waiver policy](PUBLIC-INTEREST-WAIVER.md)
 
 ---
 
@@ -99,6 +100,7 @@ See:
 - [NOTICE](NOTICE)
 - [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md)
 - [WELCOME-KIT.md](WELCOME-KIT.md)
+- [PUBLIC-INTEREST-WAIVER.md](PUBLIC-INTEREST-WAIVER.md)
 - [Buy the Hashsite Developer Welcome Kit](/buy/)
 
 Licensing contact: **licensing@hashsite.org**

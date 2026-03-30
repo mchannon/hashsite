@@ -15,6 +15,8 @@ You may purchase and use this Welcome Kit only if:
 
 If you are eligible for the free public license, you do **not** need this kit.
 
+If your project is mission-aligned but budget-constrained, a waiver or reduced-fee path may be available under [PUBLIC-INTEREST-WAIVER.md](PUBLIC-INTEREST-WAIVER.md).
+
 ## Grant
 
 Subject to payment of the fee and compliance with these terms, the copyright holder grants the purchasing legal entity a non-exclusive, non-transferable, non-sublicensable license for 3 years to:
@@ -98,6 +100,6 @@ THE WORK IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND.
 
 ## Contact
 
-For renewals, upgrades, broader deployment, or procurement questions:
+For renewals, upgrades, broader deployment, procurement questions, or public-interest waiver requests:
 
 **licensing@hashsite.org**
