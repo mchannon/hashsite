@@ -6,15 +6,9 @@
 
 by Matt Channon
 
-Location still sucks.
+Hashsite is a compact, human-usable placestamp system for describing where something actually is.
 
-Latitudes and longitudes are precise, but awkward for ordinary people to read, repeat, compare, shorten, and authenticate. Street addresses are familiar, but they are often vague, discontinuous, misleading, building-centric rather than door-centric, and terrible at campuses, hospitals, airports, apartment complexes, industrial sites, new construction, rural land, and anywhere the real problem is not *the parcel* but *the path from where you are to where you need to be*.
-
-Hashsite is a public-source geocoding system designed to fix that.
-
-It is built around a 5.1-bit alphadecimal multifractal notation that is compact, human-usable, offline-friendly, and simple enough that many of its spatial operations can be reasoned about with pencil and paper.
-
-A short Hashsite can identify an area. A longer one can identify a doorway. Add the optional **Z-axis** extension and it can identify the correct floor. Add a **hashpath** and it can describe not just a point, but the actual sequence of arrival decisions that gets a person, package, or ambulance to the right place.
+Short codes describe broad areas. Longer codes describe precise handoff points. Add the optional **Z-axis** extension and a Hashsite can describe the correct floor. Add a **hashpath** and it can describe not just a point, but the actual sequence of arrival decisions that gets a person, package, or ambulance to the right place.
 
 **Start here:**
 
@@ -26,7 +20,11 @@ A short Hashsite can identify an area. A longer one can identify a doorway. Add 
 
 ---
 
-## Why Hashsite exists
+## 1. Why Hashsite exists
+
+Location still sucks.
+
+Latitudes and longitudes are precise, but awkward for ordinary people to read, repeat, compare, shorten, and authenticate. Street addresses are familiar, but they are often vague, discontinuous, misleading, building-centric rather than door-centric, and terrible at campuses, hospitals, airports, apartment complexes, industrial sites, new construction, rural land, and anywhere the real problem is not *the parcel* but *the path from where you are to where you need to be*.
 
 The biggest failure of existing location systems is not that they cannot describe a point.
 
@@ -46,9 +44,7 @@ Traditional street addresses solve this badly. Pure coordinate systems solve onl
 
 Hashsite is designed to solve the whole arrival problem.
 
----
-
-## What Hashsite is for
+### What Hashsite is for
 
 Hashsite is intended for:
 
@@ -66,115 +62,11 @@ The ideal output is not “close enough.”
 
 The ideal output is “nobody calls back to say they can’t find it.”
 
----
-
-## License
-
-Hashsite is **public-source**, not OSI open source.
-
-Hashsite is free for **Free-Tier Users** under the [Hashsite Public License v2.0](LICENSE).
-
-A paid commercial license is required for:
-
-- governments
-- militaries
-- intelligence agencies
-- law-enforcement agencies
-- public-sector bodies
-- contractors acting on their behalf
-- large commercial enterprises
-
-A low-friction **Developer Welcome Kit** is available for users in those paid buckets who need a quick, lawful on-ramp:
-
-- **$999**
-- **3-year term**
-- **up to 5 named developers**
-- **one legal entity**
-- **one product, service, or internal program**
-- **limited production use**
-
-See:
-
-- [licensing.md](licensing.md)
-- [LICENSE](LICENSE)
-- [NOTICE](NOTICE)
-- [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md)
-- [WELCOME-KIT.md](WELCOME-KIT.md)
-- [PUBLIC-INTEREST-WAIVER.md](PUBLIC-INTEREST-WAIVER.md)
-- [Buy the Hashsite Developer Welcome Kit](/buy/)
-
-Licensing contact: **licensing@hashsite.org**
-
----
-
-## The basic idea
-
-Hashsite starts from a simple 6x6 grid using capital letters and digits.
-
-![](img/grid2.png)
-
-Fill in the numbers and letters:
-
-![](img/grid3.png)
-
-That is most of the system.
-
-Every Hashsite location may be written with a leading `#`. The `#` is optional, but helpful for recognition in plain text. Vertical information is handled separately in the optional **Z-axis** extension described below.
-
-The point is not novelty for novelty’s sake. The point is to create a location language that is:
-
-- compact
-- scalable in precision
-- spatially logical
-- human-usable
-- offline-friendly
-- extensible beyond a flat point on a map
-
----
-
-## Why this is better than “just use lat/lon”
-
-Latitude and longitude are important and are not going away. They remain the machine room underneath modern GPS.
-
-But for ordinary human communication they have several obvious drawbacks:
-
-- they are verbose
-- they use a centuries-old notation convention that is not intuitive for most people
-- they rely on punctuation and directional conventions that are easy to garble
-- they are not naturally social
-- they are poor at progressive shortening
-- they do not themselves express an arrival workflow
-- most people cannot compare two lat/lon strings by eye in a useful everyday way
-
-Hashsite is designed to be easier to shorten, easier to relay, easier to compare, and easier to use as a social or logistical placestamp.
-
----
-
-## Why this is better than “just use a street address”
-
-Street addresses are often adequate when:
-
-- there is one obvious entrance
-- the building has sane numbering
-- the map data is up to date
-- there are no gates, barriers, pickup decks, service entrances, parking constraints, or internal routing issues
-
-That is not the world we actually live in.
-
-A building address is often not a usable delivery point, a usable pickup point, a usable patient entrance, a usable ambulance entrance, or a usable parking location.
-
-Hashsite is not trying to replace every ordinary address in the world.
-
-It is trying to solve the cases where the ordinary address is not enough.
-
----
-
-## Hashpath: the real point
+### Hashpath: the real point
 
 A **single point** is often inadequate for real navigation.
 
-A delivery driver does not just need “the property.”  
-They need:
+A delivery driver does not just need “the property.” They need:
 
 1. where to turn in
 2. which gate or driveway to use
@@ -186,8 +78,6 @@ They need:
 That is the main pain point in modern wayfinding.
 
 Hashsite addresses this with **hashpath**.
-
-### What is a hashpath?
 
 A hashpath is a compact route description built from:
 
@@ -221,7 +111,9 @@ A static point works badly for:
 
 Hashpath is the missing layer between raw coordinates and actual arrival.
 
-### Example: apartment complex
+### A few real-world examples
+
+#### Apartment complex
 
 Instead of only this:
 
@@ -239,7 +131,7 @@ The final door is still a point.
 
 But the success of the trip depends on the path.
 
-### Example: hospital
+#### Hospital
 
 A hospital visit usually has at least four distinct relevant places:
 
@@ -248,11 +140,11 @@ A hospital visit usually has at least four distinct relevant places:
 - correct desk or elevator bank
 - correct clinic door
 
-A street address gives you none of that.  
-A point gives you only one of those.  
+A street address gives you none of that.
+A point gives you only one of those.
 A hashpath can give you all of them.
 
-### Example: airport pickup
+#### Airport pickup
 
 “Door 08” is useless if there are two Door 08s on different levels.
 
@@ -263,12 +155,12 @@ A hashpath can specify:
 - exact standing point
 - fallback pickup point if traffic control moves you
 
-### Example: delivery
+#### Delivery
 
 For delivery platforms, the last 30 meters are where the waste happens.
 
-The address got the driver to the parcel.  
-The app got the driver to the curb.  
+The address got the driver to the parcel.
+The app got the driver to the curb.
 The customer still gets the text:
 
 > “I’m here.”
@@ -277,11 +169,36 @@ Hashpath is meant to eliminate that text.
 
 ---
 
-## Precision and shortening
+## 2. How Hashsite works
+
+### The basic idea
+
+Hashsite starts from a simple 6x6 grid using capital letters and digits.
+
+![](img/grid2.png)
+
+Fill in the numbers and letters:
+
+![](img/grid3.png)
+
+That is most of the system.
+
+Every Hashsite location may be written with a leading `#`. The `#` is optional, but helpful for recognition in plain text. Vertical information is handled separately in the optional **Z-axis** extension described below.
+
+The point is not novelty for novelty’s sake. The point is to create a location language that is:
+
+- compact
+- scalable in precision
+- spatially logical
+- human-usable
+- offline-friendly
+- extensible beyond a flat point on a map
+
+### Precision and shortening
 
 Hashsite is designed so that shorter codes describe larger areas and longer codes describe more precise ones.
 
-If one character is good enough, use one character.  
+If one character is good enough, use one character.
 If you need the correct doorway or handoff point, use more.
 
 A properly designed location system should not force unnecessary length when the use case is broad, or unnecessary vagueness when the use case is precise.
@@ -298,9 +215,7 @@ This means the same notation can be used for:
 - doors
 - curbside handoff points
 
----
-
-## Human logic matters
+### Human logic matters
 
 A major complaint about many alternative addressing systems is that nearby places do not look nearby, and changing one element can teleport you across the globe.
 
@@ -323,9 +238,7 @@ That matters for:
 - fallback operation
 - emergencies
 
----
-
-## Pencil-and-paper friendliness
+### Pencil-and-paper friendliness
 
 Hashsite is designed so that many directional adjustments can be reasoned about directly.
 
@@ -337,9 +250,7 @@ That is a real advantage.
 
 A location system should not become useless the moment a company server disappears, a lookup API is rate-limited, or a user loses connectivity.
 
----
-
-## Spheroid optimization
+### Spheroid optimization
 
 Consider the Mercator projection, including the parts Mercator left off:
 
@@ -389,9 +300,7 @@ And `#BA3U`:
 
 The goal is not just elegance. The goal is fairer area representation, shorter useful codes, and more human-coherent subdivision.
 
----
-
-## Polar regions
+### Polar regions
 
 The poles require different handling.
 
@@ -413,37 +322,47 @@ These do not look square in the projection, but they are much closer in actual r
 
 From there, the system again returns to the ordinary 6x6 grid.
 
----
-
-## Decimals and visual ambiguity
-
-It is well known that `O` and `0` can be confused, and that `I`, `l`, and `1` can be confused.
-
-Most systems solve this by throwing away characters.
+### Checkdots
 
 Hashsite keeps the full 36-value set because the density gain matters.
 
-To reduce ambiguity:
+It also gives decimal points a second job: they act as built-in **checkdots**.
+
+In the base XY code, a Hashsite uses **exactly two decimal points**. Their positions are not chosen by the user and are not tied to whether the nearby characters are digits or letters. Instead, the two checkdots are placed according to a Luhn-style checksum run across the characters in order.
+
+That means:
 
 - letters are always CAPITAL
-- optional dots may be placed before digits
-- dots are advisory for readability, not semantic
+- exactly two decimal points appear in the base code
+- dot placement is checksum-driven, not cosmetic
+- the same underlying code always yields the same two dot positions
 
-For example:
+This helps in two ways at once:
 
-`#L.1L.0OI`
+- it breaks up visually ambiguous runs of letters and numbers
+- it provides a lightweight typo check when a code is copied, typed, or read aloud
 
-and
+For short codes, the checkdots do little or no work because there are too few places to put them. For longer codes, they become more useful because there are more possible placements and therefore more wrong versions to reject.
 
-`#ILLO.0.1`
+#### Concrete example
 
-remain distinguishable in ordinary use.
+Suppose the underlying base code characters are:
 
-That matters when the system is being relayed in text messages, notes, signs, screenshots, tweets, and speech.
+`#BA3U7K9`
 
----
+After the checkdot routine runs, the rendered Hashsite might be:
 
-## Z-axis
+`#BA.3U7.K9`
+
+If someone mistypes or swaps characters and writes:
+
+`#BA.37U.K9`
+
+the checkdots will usually no longer line up with where they are supposed to be for that character sequence. So even before looking the code up on a map, software can notice that the formatting no longer matches the checksum and warn the user that something is probably wrong.
+
+The point is not to make Hashsite impossible to mistype. The point is to catch ordinary human errors early, without making the code longer.
+
+### Z-axis
 
 A real location system should not pretend the world is flat.
 
@@ -459,8 +378,8 @@ So the core placestamp stays simple:
 
 And the Z-axis extension begins only when needed:
 
-`#F.6NZ^J` means 1 meter below street level  
-`#F.6NZ^1` means 1 meter above street level  
+`#F.6NZ^J` means 1 meter below street level
+`#F.6NZ^1` means 1 meter above street level
 `#F.6NZ^0` handles the 0m case
 
 This covers most everyday building-navigation situations.
@@ -469,16 +388,16 @@ If a second post-caret character is added, it acts like a higher-order digit, mu
 
 Examples:
 
-`#F.6NZ^.1.1` = 19 meters above street level  
-`#F.6NZ^.1.0` = exactly 18 meters above street level  
+`#F.6NZ^.1.1` = 19 meters above street level
+`#F.6NZ^.1.0` = exactly 18 meters above street level
 `#F.6NZ^.1I` = exactly 18 meters below street level
 
 A trailing `^` at the end of the Z-axis payload is also optional. When present, it switches the reference frame from street level to sea level.
 
 Examples:
 
-`#F.6NZ^^` = sea level  
-`#F.6NZ^1^` = 1 meter above sea level  
+`#F.6NZ^^` = sea level
+`#F.6NZ^1^` = 1 meter above sea level
 `#F.6NZ^2^J` = 2 meters above a street level that is itself 1 meter below sea level
 
 The system can also extend below 1-meter resolution and above kilometer-scale elevation ranges using additional post-caret characters.
@@ -487,85 +406,46 @@ In short: Hashsite is designed to describe the actual place, not a flattened car
 
 ---
 
-## Error correction
+## 3. Licensing and project status
 
-Human-entered location strings should have optional error checking.
+### License
 
-Hashsite uses the Luhn Algorithm as the basis for a checksum approach.
+Hashsite is **public-source**, not OSI open source.
 
-The checksum is optional, short, and intended to catch common entry mistakes without bloating the code unnecessarily.
+Hashsite is free for **Free-Tier Users** under the [Hashsite Public License v2.0](LICENSE).
 
-For example:
+A paid commercial license is required for:
 
-`#2A0E78`
+- governments
+- militaries
+- intelligence agencies
+- law-enforcement agencies
+- public-sector bodies
+- contractors acting on their behalf
+- large commercial enterprises
 
-could be checksummed as:
+A low-friction **Developer Welcome Kit** is available for users in those paid buckets who need a quick, lawful on-ramp:
 
-`#2A0E78j`
+- **$999**
+- **3-year term**
+- **up to 5 named developers**
+- **one legal entity**
+- **one product, service, or internal program**
+- **limited production use**
 
-The goal is not perfection. The goal is reducing avoidable human error in ordinary relay.
+See:
 
----
+- [licensing.md](licensing.md)
+- [LICENSE](LICENSE)
+- [NOTICE](NOTICE)
+- [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md)
+- [WELCOME-KIT.md](WELCOME-KIT.md)
+- [PUBLIC-INTEREST-WAIVER.md](PUBLIC-INTEREST-WAIVER.md)
+- [Buy the Hashsite Developer Welcome Kit](/buy/)
 
-## Examples of real-world use
+Licensing contact: **licensing@hashsite.org**
 
-### Friend’s apartment
-
-A friend in a badly marked complex sends you:
-
-- the preferred gate
-- the correct parking spot
-- the applicable staircase
-- the correct floor
-- the actual door
-
-You arrive once, not twice.
-
-### Doctor’s office or hospital
-
-Your appointment message includes:
-
-- parking
-- the correct entrance
-- the correct clinic node
-- the final room or desk
-
-No “which building is this?” call.
-
-### Delivery
-
-A customer provides:
-
-- curbside anchor
-- service gate
-- loading point or lobby
-- final handoff
-
-No “I’m here” deadlock.
-
-### Towing or emergency response
-
-A stranded driver sends one precise placestamp from the shoulder of a highway, or a broader one if that is all they have time to verify.
-
-An ambulance is sent to the actual scene, not the nearest misleading address.
-
----
-
-## Why public-source matters
-
-Location is basic infrastructure.
-
-A good placestamp system should not depend on a single company deciding who may resolve it, who may implement it, which languages matter, what the lookup terms are, or whether users are allowed to build on top of it.
-
-Hashsite is intended to be public enough to spread, clear enough to implement, and extensible enough that new apps, platforms, maps, logistics products, and accessibility tools can adopt it without begging for permission first.
-
-The long-term goal is not to create a novelty code.
-
-It is to create a durable public location layer.
-
----
-
-## What a full Hashsite ecosystem looks like
+### What a full Hashsite ecosystem looks like
 
 Hashsite is not just a notation. It needs tooling.
 
@@ -587,19 +467,17 @@ The ideal user base is not “mapping enthusiasts.”
 
 It is everybody.
 
----
+### FAQ
 
-## Frequently Asked Questions
-
-### Do we really need another one of these?
+#### Do we really need another one of these?
 
 Yes, because the problem is still not solved.
 
-Street addresses solve one part of the problem.  
-Coordinates solve another.  
+Street addresses solve one part of the problem.
+Coordinates solve another.
 A practical human placestamp system should solve more of it at once.
 
-### Can’t existing systems already do this?
+#### Can’t existing systems already do this?
 
 Some of the pieces exist elsewhere.
 
@@ -616,7 +494,7 @@ But the combination usually does not:
 
 Hashsite is an attempt to put those in one system.
 
-### Can’t you make the codes smaller?
+#### Can’t you make the codes smaller?
 
 Only up to a point.
 
@@ -624,13 +502,13 @@ You can always trade completeness or clarity for a shorter token, but that often
 
 Hashsite tries to be short without becoming magical nonsense.
 
-### Isn’t the real problem just bad signage?
+#### Isn’t the real problem just bad signage?
 
 Sometimes, yes.
 
 But bad signage is everywhere, and software should help people survive the world as it is, not the world as a facilities manager imagines it to be.
 
-### Why not just send a pin?
+#### Why not just send a pin?
 
 Pins work until they don’t.
 
@@ -638,9 +516,7 @@ Pins are brittle in screenshots, speech, paper relay, and repeated reuse. They d
 
 Hashsite is meant to be a portable placestamp, not merely a UI gesture inside one app.
 
----
-
-## Roadmap
+### Roadmap
 
 1. Finalize the core specification
 2. Finalize hashpath notation and delta conventions
