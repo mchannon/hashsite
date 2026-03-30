@@ -1,21 +1,124 @@
-MIT License
+Hashsite Public License v1.0
 
-Copyright (c) 2019 Matt Channon
+Copyright (c) 2019-2026 Matt Channon. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This license governs the public availability and use of the Hashsite source code,
+documentation, specifications, tables, images, examples, and related materials
+made available by the copyright holder (collectively, the "Work").
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+By using, copying, accessing, or redistributing any part of the Work, you agree
+to this license.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. Definitions
+
+"Restricted User" means:
+(a) any national, state, provincial, county, municipal, tribal, territorial, or
+    other government body or instrumentality;
+(b) any military branch, defense ministry, armed service, paramilitary unit,
+    intelligence service, law-enforcement agency, prison authority, border or
+    customs authority, or public-security body;
+(c) any public university, public laboratory, or other public-sector entity;
+(d) any government-owned, government-controlled, or military-controlled entity;
+(e) any contractor, subcontractor, consultant, reseller, systems integrator,
+    or other person or entity acting for, on behalf of, or in support of any of
+    the foregoing.
+
+"Non-Restricted User" means any person or entity that is not a Restricted User.
+
+"Original Source" means the official Hashsite source repository or the official
+Hashsite website designated by the copyright holder.
+
+2. Limited License Grant to Non-Restricted Users
+
+Subject to the terms of this license, each Non-Restricted User is granted a
+worldwide, non-exclusive, non-transferable, revocable copyright license to:
+
+(a) access, read, study, and internally use the Work;
+(b) download and store copies of the Work;
+(c) copy and redistribute complete, unmodified copies of the Work, provided that:
+    (i) this license is included in full,
+    (ii) all copyright and notice text is preserved,
+    (iii) the attribution requirements in Section 3 are satisfied,
+    (iv) no fee is charged for the Work itself except reasonable pass-through
+         media, bandwidth, or hosting costs.
+
+3. Attribution Requirement
+
+Any public use, publication, or redistribution permitted under this license must
+prominently include the following attribution:
+
+"Hashsite by Matt Channon — used under the Hashsite Public License v1.0"
+
+Where reasonably possible, the attribution must also include a link or clear
+reference to the Original Source.
+
+4. No Distribution of Modified Versions
+
+You may not publicly distribute, publish, sublicense, sell, offer as a hosted
+service, or otherwise make available any modified, adapted, translated,
+transformed, enhanced, forked, or derivative version of the Work without prior
+written permission from the copyright holder.
+
+For clarity:
+(a) private internal modification by a Non-Restricted User for that user's own
+    internal use is allowed;
+(b) any public release or third-party sharing of a modified version is prohibited
+    unless separately authorized in writing.
+
+5. No License for Restricted Users
+
+No license is granted under this public license to any Restricted User.
+
+A Restricted User must obtain a separate written commercial license from the
+copyright holder before any use whatsoever, including evaluation, testing,
+internal review, procurement analysis, integration, deployment, training,
+modification, or derivative development.
+
+Any purported use of the Work by a Restricted User without a separate written
+commercial license is unauthorized and infringing.
+
+6. No Trademark or Branding Rights
+
+This license does not grant any right to use any trademark, service mark, trade
+dress, project name, logo, or branding of Hashsite, except as minimally required
+for truthful attribution under Section 3.
+
+7. No Patent License
+
+No patent license is granted by this license, whether express, implied, by
+estoppel, or otherwise.
+
+8. Compliance and Termination
+
+Any rights granted under this license terminate automatically and immediately if
+you violate any term of this license.
+
+Upon termination, you must cease all use and redistribution of the Work.
+Sections 5, 6, 7, 9, 10, and 11 survive termination.
+
+9. No Warranty
+
+THE WORK IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, OR THAT THE
+WORK WILL BE ERROR-FREE OR UNINTERRUPTED.
+
+10. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL THE COPYRIGHT HOLDER
+BE LIABLE FOR ANY CLAIM, DAMAGES, LOSSES, OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
+WITH THE WORK OR THIS LICENSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+11. Governing Interpretation
+
+If any provision of this license is held unenforceable, the remaining provisions
+shall remain in effect to the maximum extent permitted by law.
+
+12. Commercial Licensing Contact
+
+For Restricted User licensing, modification rights, OEM rights, hosted-service
+rights, or other commercial terms, contact:
+
+licensing@hashsite.org
