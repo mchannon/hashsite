@@ -1,13 +1,13 @@
-Hashsite Public License v1.0
+Hashsite Public License v2.0
 
 Copyright (c) 2019-2026 Matt Channon. All rights reserved.
 
 This license governs the public availability and use of the Hashsite source code,
-documentation, specifications, tables, images, examples, and related materials
-made available by the copyright holder (collectively, the "Work").
+documentation, specifications, examples, diagrams, tables, images, and related
+materials made available by the copyright holder (collectively, the "Work").
 
-By using, copying, accessing, or redistributing any part of the Work, you agree
-to this license.
+By using, copying, accessing, modifying, compiling, or redistributing any part of
+the Work, you agree to this license.
 
 1. Definitions
 
@@ -23,19 +23,32 @@ to this license.
     or other person or entity acting for, on behalf of, or in support of any of
     the foregoing.
 
-"Non-Restricted User" means any person or entity that is not a Restricted User.
+"Large Commercial User" means any for-profit entity that, alone or together with
+its affiliates, satisfies one or more of the following:
+(a) more than 250 employees;
+(b) more than USD $50,000,000 in annual gross revenue;
+(c) publicly traded status;
+(d) majority ownership or control by an entity described in (a), (b), or (c).
 
-"Original Source" means the official Hashsite source repository or the official
+"Free-Tier User" means any person or entity that is neither a Restricted User nor
+a Large Commercial User.
+
+"Original Source" means the official Hashsite repository or the official
 Hashsite website designated by the copyright holder.
 
-2. Limited License Grant to Non-Restricted Users
+2. Free-Tier License Grant
 
-Subject to the terms of this license, each Non-Restricted User is granted a
-worldwide, non-exclusive, non-transferable, revocable copyright license to:
+Subject to the terms of this license, each Free-Tier User is granted a worldwide,
+non-exclusive, non-transferable, revocable copyright license to:
 
-(a) access, read, study, and internally use the Work;
+(a) access, read, and study the Work;
 (b) download and store copies of the Work;
-(c) copy and redistribute complete, unmodified copies of the Work, provided that:
+(c) use the Work internally and in production;
+(d) compile, link, or embed unmodified portions of the Work into the Free-Tier
+    User's own applications, services, devices, or products;
+(e) make private internal modifications for the Free-Tier User's own internal or
+    production use;
+(f) copy and redistribute complete, unmodified copies of the Work, provided that:
     (i) this license is included in full,
     (ii) all copyright and notice text is preserved,
     (iii) the attribution requirements in Section 3 are satisfied,
@@ -44,38 +57,55 @@ worldwide, non-exclusive, non-transferable, revocable copyright license to:
 
 3. Attribution Requirement
 
-Any public use, publication, or redistribution permitted under this license must
-prominently include the following attribution:
+Any public use or redistribution permitted under this license must prominently
+include the following attribution:
 
-"Hashsite by Matt Channon — used under the Hashsite Public License v1.0"
+"Hashsite by Matt Channon — used under the Hashsite Public License v2.0"
 
 Where reasonably possible, the attribution must also include a link or clear
 reference to the Original Source.
 
-4. No Distribution of Modified Versions
+For software products, a suitable attribution may appear in:
+(a) an About screen,
+(b) a settings/legal screen,
+(c) end-user documentation,
+(d) a NOTICE file,
+(e) a credits page.
 
-You may not publicly distribute, publish, sublicense, sell, offer as a hosted
-service, or otherwise make available any modified, adapted, translated,
-transformed, enhanced, forked, or derivative version of the Work without prior
-written permission from the copyright holder.
+4. No Public Redistribution of Modified Source Versions
+
+You may not publicly distribute, publish, sublicense, sell, or otherwise make
+available any modified source-code version of the Work without prior written
+permission from the copyright holder.
 
 For clarity:
-(a) private internal modification by a Non-Restricted User for that user's own
-    internal use is allowed;
-(b) any public release or third-party sharing of a modified version is prohibited
-    unless separately authorized in writing.
+(a) private internal modification by a licensed user for its own internal or
+    production use is allowed if that user otherwise has a license to use the Work;
+(b) public redistribution of modified source code, modified reference
+    implementations, modified documentation, or modified derivative source
+    packages is prohibited unless separately authorized in writing;
+(c) Free-Tier Users may ship products or services that incorporate unmodified
+    portions of the Work, provided the Work itself is not redistributed in a
+    modified source form and the attribution requirement is met.
 
-5. No License for Restricted Users
+5. No Free License for Restricted Users or Large Commercial Users
 
-No license is granted under this public license to any Restricted User.
+No license is granted under this public license to any Restricted User or Large
+Commercial User.
 
-A Restricted User must obtain a separate written commercial license from the
-copyright holder before any use whatsoever, including evaluation, testing,
-internal review, procurement analysis, integration, deployment, training,
-modification, or derivative development.
+A Restricted User or Large Commercial User must obtain a separate written
+commercial license from the copyright holder before any use whatsoever,
+including evaluation, testing, internal review, procurement analysis,
+integration, deployment, training, modification, derivative development,
+or production use.
 
-Any purported use of the Work by a Restricted User without a separate written
-commercial license is unauthorized and infringing.
+A commercial license may be:
+(a) a separately negotiated agreement, or
+(b) the Hashsite Developer Welcome Kit, if the user qualifies for and complies
+    with its terms.
+
+Any purported use of the Work by a Restricted User or Large Commercial User
+without a separate written commercial license is unauthorized and infringing.
 
 6. No Trademark or Branding Rights
 
@@ -93,15 +123,17 @@ estoppel, or otherwise.
 Any rights granted under this license terminate automatically and immediately if
 you violate any term of this license.
 
-Upon termination, you must cease all use and redistribution of the Work.
+Upon termination, you must cease all use and redistribution of the Work except
+to the extent you have a separate written commercial license that remains in force.
+
 Sections 5, 6, 7, 9, 10, and 11 survive termination.
 
 9. No Warranty
 
 THE WORK IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, OR THAT THE
-WORK WILL BE ERROR-FREE OR UNINTERRUPTED.
+FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, OR THAT
+THE WORK WILL BE ERROR-FREE OR UNINTERRUPTED.
 
 10. Limitation of Liability
 
@@ -111,14 +143,10 @@ ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
 WITH THE WORK OR THIS LICENSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGES.
 
-11. Governing Interpretation
+11. Commercial Licensing Contact
 
-If any provision of this license is held unenforceable, the remaining provisions
-shall remain in effect to the maximum extent permitted by law.
-
-12. Commercial Licensing Contact
-
-For Restricted User licensing, modification rights, OEM rights, hosted-service
-rights, or other commercial terms, contact:
+For Restricted User licensing, Large Commercial User licensing, modification
+rights, OEM rights, hosted-service rights, support, or other commercial terms,
+contact:
 
 licensing@hashsite.org
