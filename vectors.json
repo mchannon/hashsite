@@ -1,5 +1,5 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "description": "Hashsite test vectors \u2014 canonical reference for port verification and patent exhibit",
   "author": "Matt Channon",
   "license": "Hashsite Public License v2.0",
@@ -1089,5 +1089,88 @@
     ],
     "assembled": "#7.B.A2CRNSQ^Agc4729#pSoCXdQL^I1I",
     "reconstruction_rule": "To reconstruct full code for waypoint N: take the full code of waypoint N-1, replace chars from prefix_len onward with differential."
+  },
+  "closest": {
+    "description": "$ uses the first 3 chars of the user's position as prefix, appends SUFFIX. Result length = 3 + len(SUFFIX). % uses the first 5 chars as prefix. Result length = 5 + len(SUFFIX). User position length is irrelevant to result length. The nearest matching code is found geographically \u2014 not by naive prefix substitution. Example: $Y2 from #7BA2CSoDZ gives #7B4Y2, not #7BAY2.",
+    "cases": [
+      {
+        "label": "$ from 9-char: 3+2=5 char result, nearest ending Y2",
+        "user": "#7BA2CSoDZ",
+        "pattern": "$Y2",
+        "result": "#7B4Y2",
+        "result_len": 5,
+        "expected_len": 5,
+        "len_correct": true,
+        "ends_with_suffix": true,
+        "prefix_used": "7B4",
+        "naive_prefix_would_be": "7BA",
+        "geographic_not_naive": true
+      },
+      {
+        "label": "% from 9-char: 5+2=7 char result, nearest ending Y2",
+        "user": "#7BA2CSoDZ",
+        "pattern": "%Y2",
+        "result": "#7BA2CY2",
+        "result_len": 7,
+        "expected_len": 7,
+        "len_correct": true,
+        "ends_with_suffix": true,
+        "prefix_used": "7BA2C",
+        "naive_prefix_would_be": "7BA2C",
+        "geographic_not_naive": false
+      },
+      {
+        "label": "$ from 9-char: 3+3=6 char result, nearest ending CSo",
+        "user": "#7BA2CSoDZ",
+        "pattern": "$CSo",
+        "result": "#7BACSo",
+        "result_len": 6,
+        "expected_len": 6,
+        "len_correct": true,
+        "ends_with_suffix": true,
+        "prefix_used": "7BA",
+        "naive_prefix_would_be": "7BA",
+        "geographic_not_naive": false
+      },
+      {
+        "label": "$ from 10-char: 3+3=6 char result, nearest ending XB8",
+        "user": "#7B663IHXB8",
+        "pattern": "$XB8",
+        "result": "#7A5XB8",
+        "result_len": 6,
+        "expected_len": 6,
+        "len_correct": true,
+        "ends_with_suffix": true,
+        "prefix_used": "7A5",
+        "naive_prefix_would_be": "7B6",
+        "geographic_not_naive": true
+      },
+      {
+        "label": "% from 10-char: 5+3=8 char result, nearest ending XB8",
+        "user": "#7B663IHXB8",
+        "pattern": "%XB8",
+        "result": "#7B663XB8",
+        "result_len": 8,
+        "expected_len": 8,
+        "len_correct": true,
+        "ends_with_suffix": true,
+        "prefix_used": "7B663",
+        "naive_prefix_would_be": "7B663",
+        "geographic_not_naive": false
+      },
+      {
+        "label": "$ from 8-char: 3+5=8 char result, nearest ending 00009",
+        "user": "#62AZZ492",
+        "pattern": "$00009",
+        "result": "#62B00009",
+        "result_len": 8,
+        "expected_len": 8,
+        "len_correct": true,
+        "ends_with_suffix": true,
+        "prefix_used": "62B",
+        "naive_prefix_would_be": "62A",
+        "geographic_not_naive": true
+      }
+    ]
   }
 }

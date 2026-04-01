@@ -6,12 +6,12 @@ A C library and coordinate format for encoding real-world locations as short, hu
 
 | Code | Lat, Lon | Notes |
 |---|---|---|
-| `#7BA2CS` | 35.223°N, 101.829°W | Amarillo, TX — 6-char, ~1000m precision |
-| `#7BA2CSoDZ` | 35.222°N, 101.831°W | Amarillo, TX — 9-char, ~4m precision |
-| `#7BA2CSoDZ^2` | 35.222°N, 101.831°W | Same as above, 2m above street level |
-| `#7B6.63IH.XB8` | 35.124°N, 106.569°W | Albuquerque — 10-char with Luhn readability dots |
-| `$Y2` | 35.221°N, 101.829°W | ~220m SE of `#7BA2CSoDZ` — short for `#7BA2CY2`; same prefix, shorter to send |
-| `#7BA2CRNSQgc4729#pSoCXsQ9dL^2` | 35.222°N, 101.831°W | Hashpath: gate → gate code → parking → stairs → door (+2m) |
+| `#7BA2CS` | 35.22°N, 101.83°W | Amarillo, TX — 6-char, ~1000m precision |
+| `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Amarillo, TX — 9-char, ~5m precision |
+| `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same, 2m above street level |
+| `$Y2` | 35.4364°N, 101.4043°W | From `#7BA2CSoDZ`: prefix = first 3 chars = `7BA`, find nearest 5-char ending `Y2` → `#7B4Y2`. Not `#7BAY2` — nearest is geographic, not a naive prefix swap |
+| `#7BA2CRNSQgc4729#pSoCXsQ9dL^2` | 35.2225°N, 101.8315°W | Hashpath: gate (35.2225°N, 101.8315°W) → gate code 4729# → parking (35.2220°N, 101.8312°W) → stairs (35.2218°N, 101.8309°W) → door +2m (35.2218°N, 101.8309°W) |
+| `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
 
 ---
 
@@ -257,18 +257,19 @@ hashsite luhncheck 7B6.63IH.XB8       # exits 1 — dots were computed without ^
 
 `closest` finds the geographically nearest Hashsite matching a suffix pattern.
 
-| Pattern | Prefix | Result length |
+| Pattern | Prefix used | Result length |
 |---|---|---|
-| `$SUFFIX` | user_len − suf_len | user_len |
-| `$$SUFFIX` | 2 | 2 + suf_len |
-| `$$$SUFFIX` | 3 | 3 + suf_len |
-| `%SUFFIX` | user_len − 5 − suf_len | user_len − 5 |
-| `SUFFIX` | none | suf_len |
+| `$SUFFIX` | first 3 chars of your position | 3 + len(SUFFIX) |
+| `%SUFFIX` | first 5 chars of your position | 5 + len(SUFFIX) |
+| `SUFFIX` | none (fixed location) | len(SUFFIX) |
+
+Your position length doesn't affect the result length — only the prefix length (3 or 5) and suffix length matter. The nearest match is found geographically, not by naive prefix substitution: `$Y2` from `#7BA2CSoDZ` gives `#7B4Y2` (prefix `7B4`), not `#7BAY2` (prefix `7BA`).
 
 ```bash
-hashsite closest 7B663IHXB8 '$XB8'    # nearest ...XB8 at same precision
-hashsite closest 62AZZ492 '$00009'    # -> #62H00009
-hashsite closest 7B663IHXB8 '%XB8'   # broader search, 5 chars shorter
+hashsite closest 7BA2CSoDZ '$Y2'     # prefix=7BA2C[0:3]=7BA -> nearest 5-char -> #7B4Y2
+hashsite closest 7BA2CSoDZ '%Y2'     # prefix=7BA2CSoDZ[0:5]=7BA2C -> nearest 7-char -> #7BA2CY2
+hashsite closest 7B663IHXB8 '$XB8'  # prefix=7B6 -> nearest 6-char ending XB8 -> #7A5XB8
+hashsite closest 62AZZ492 '$00009'  # prefix=62A -> nearest 8-char ending 00009 -> #62B00009
 ```
 
 ---
