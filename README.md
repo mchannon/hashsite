@@ -6,10 +6,12 @@ A C library and coordinate format for encoding real-world locations as short, hu
 
 | Code | Lat, Lon | Notes |
 |---|---|---|
+| `#7BA2CS` | 35.223°N, 101.829°W | Amarillo, TX — 6-char, ~1000m precision |
 | `#7BA2CSoDZ` | 35.222°N, 101.831°W | Amarillo, TX — 9-char, ~4m precision |
-| `#7B6.63IH.XB8` | 35.124°N, 106.569°W | Albuquerque with Luhn readability dots |
-| `#7BA2CSoDZ^I1I` | 35.222°N, 101.831°W | Same location as row 1, 1.5m above street level |
-| `#7.B.A2CRNSQ^Agc4729#pSoCXdQL^I1I` | 35.222°N, 101.831°W | Hashpath: gate (+10m) → gate code → parking → door (+1.5m) |
+| `#7BA2CSoDZ^2` | 35.222°N, 101.831°W | Same as above, 2m above street level |
+| `#7B6.63IH.XB8` | 35.124°N, 106.569°W | Albuquerque — 10-char with Luhn readability dots |
+| `$Y2` | 35.221°N, 101.829°W | ~220m SE of `#7BA2CSoDZ` — short for `#7BA2CY2`; same prefix, shorter to send |
+| `#7BA2CRNSQgc4729#pSoCXsQ9dL^2` | 35.222°N, 101.831°W | Hashpath: gate → gate code → parking → stairs → door (+2m) |
 
 ---
 
@@ -39,9 +41,9 @@ A building address is a billing artifact designed for mail sorting. It does not 
 
 ### The failure of lat/lon
 
-Latitude and longitude are precise, globally consistent, and machine-readable. They are also verbose, non-hierarchical, easy to transpose, impossible to shorten meaningfully, and flat. Swapping two digits in a coordinate produces a different but plausible-looking location with no indication of error. Reading `35.2220, -101.8310` aloud over a phone in a noisy environment or while injured is a meaningful failure mode.
+Latitude and longitude are globally consistent and machine-readable. They are also verbose, non-hierarchical, easy to transpose, impossible to shorten meaningfully, and flat. Swapping two digits produces a different but plausible-looking location with no indication of error. Their precision is deceptive — most people have no intuition for what a difference of 0.001° means on the ground, so coordinates imply false exactness while simultaneously being impossible to sanity-check by eye. Reading `35.2220, -101.8310` aloud over a phone in a noisy environment or while injured is a meaningful failure mode.
 
-### The failure of word-based geocoding
+### What3Words sucks — and why that matters
 
 One company has raised over £150 million on the premise of assigning three random English words to every 3-meter cell on Earth and marketing it to emergency services.
 
@@ -54,6 +56,8 @@ It has also:
 - Convinced 85% of UK emergency services to depend on a system whose offline function requires payment and whose terms can change
 
 That is not infrastructure. That is a hostage.
+
+There is a long tradition of empires charging people for what they could make themselves — taxing salt, outlawing spinning wheels, requiring permits to collect rainwater. What3Words is that tradition applied to location data: a thing that costs nothing to produce, artificially enclosed, then rented back at a price set by the encloser. The Gandhi parallel is not an overstatement. Emergency services in Britain have been told they need a private company's permission slip to tell an ambulance where to go.
 
 ### What Hashsite does instead
 
@@ -100,16 +104,16 @@ Each character subdivides the current cell by 6×6. Approximate equatorial preci
 
 | Characters | Cell size | Use |
 |---|---:|---|
-| 1 | ~6679 km | Continental |
-| 2 | ~1113 km | Country |
-| 3 | ~186 km | Metro area |
-| 4 | ~31 km | City |
-| 5 | ~5 km | District |
-| 6 | ~859 m | Neighborhood |
-| 7 | ~143 m | City block |
-| 8 | ~24 m | Building entrance |
-| 9 | ~4 m | Person-scale |
-| 10 | ~0.7 m | Sub-meter |
+| 1 | 7000 km | Continental |
+| 2 | 1200 km | Country |
+| 3 | 200 km | Metro area |
+| 4 | 40 km | City |
+| 5 | 5 km | District |
+| 6 | 1000 m | Neighborhood |
+| 7 | 200 m | City block |
+| 8 | 25 m | Building entrance |
+| 9 | 5 m | Person-scale |
+| 10 | 1 m | Sub-meter |
 
 Cells narrow toward the poles. Use `hashsite precision N lat` for latitude-aware dimensions.
 
@@ -172,19 +176,20 @@ Big-endian — most significant digit first. 1 char: ±17m, 2 chars: ±647m, 3 c
 An ordered arrival sequence. All waypoints normalize to the same precision. The first waypoint is a full code; each subsequent waypoint encodes only the characters that differ from the previous one. Single lowercase letter labels precede each differential segment. `c` is reserved for non-spatial data (gate codes, door PINs) and is never a mappable location.
 
 ```
-#7.B.A2CRNSQ^Agc4729#pSoCXdQL^I1I
+#7BA2CRNSQgc4729#pSoCXsQ9dL^2
 ```
 
 Breaking that down:
 
 | Segment | Label | Meaning | Full code |
 |---|---|---|---|
-| `#7.B.A2CRNSQ^A` | `g` (gate) | First waypoint, full 9-char code, Luhn-dotted, +10m altitude | `#7BA2CRNSQ^A` |
+| `#7BA2CRNSQ` | `g` (gate) | First waypoint, full 9-char code | `#7BA2CRNSQ` |
 | `c4729#` | `c` (code) | Non-spatial gate PIN — not a location | — |
 | `pSoCX` | `p` (parking) | Shares first 5 chars with gate; only `SoCX` differs | `#7BA2CSoCX` |
-| `dQL^I1I` | `d` (door) | Shares first 7 chars with parking; only `QL` differs, +1.5m altitude | `#7BA2CSoQL^I1I` |
+| `sQ9` | `s` (stairs) | Shares first 7 chars with parking; only `Q9` differs | `#7BA2CSoQ9` |
+| `dL^2` | `d` (door) | Shares first 8 chars with stairs; only `L` differs, +2m altitude | `#7BA2CSoQL^2` |
 
-Luhn dots on the first waypoint are computed over the full segment including altitude — `7BA2CRNSQ^A` — so the dots change if the altitude changes.
+Each waypoint is reconstructed by taking the previous full code and replacing from the divergence point onward with the differential segment.
 
 ---
 
