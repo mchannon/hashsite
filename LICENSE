@@ -1,154 +1,65 @@
-Hashsite Public License v2.0 (HPL-2.0)
-Custom public-source / commercial license.
-Not MIT. Not OSI open source.
+# Hashsite Public License v2.0 (HPL-2.0)
 
-Copyright (c) 2019-2026 Matt Channon. All rights reserved.
+**Not MIT. Not OSI open source.**
 
-This license governs the public availability and use of the Hashsite source code,
-documentation, specifications, examples, diagrams, tables, images, and related
-materials made available by the copyright holder (collectively, the "Work").
+Copyright © 2019–2026 Matt Channon. All rights reserved.
 
-By using, copying, accessing, modifying, compiling, or redistributing any part of
-the Work, you agree to this license.
+---
 
-1. Definitions
+## Free use
 
-"Restricted User" means:
-(a) any national, state, provincial, county, municipal, tribal, territorial, or
-    other government body or instrumentality;
-(b) any military branch, defense ministry, armed service, paramilitary unit,
-    intelligence service, law-enforcement agency, prison authority, border or
-    customs authority, or public-security body;
-(c) any public university, public laboratory, or other public-sector entity;
-(d) any government-owned, government-controlled, or military-controlled entity;
-(e) any contractor, subcontractor, consultant, reseller, systems integrator,
-    or other person or entity acting for, on behalf of, or in support of any of
-    the foregoing.
+The following are permitted without payment or separate agreement:
 
-"Large Commercial User" means any for-profit entity that, alone or together with
-its affiliates, satisfies one or more of the following:
-(a) more than 250 employees;
-(b) more than USD $50,000,000 in annual gross revenue;
-(c) publicly traded status;
-(d) majority ownership or control by an entity described in (a), (b), or (c).
+- Personal use
+- Academic and research use
+- Non-commercial open-source projects
+- Small commercial use (fewer than 10 full-time employees and annual revenue under $1 million USD)
+- Non-governmental non-profit organizations
+- Journalism and public-interest investigation
+- Individual developers building personal tools and side projects
 
-"Free-Tier User" means any person or entity that is neither a Restricted User nor
-a Large Commercial User.
+Under free use, you may use, modify, and distribute the software, provided:
 
-"Original Source" means the official Hashsite repository or the official
-Hashsite website designated by the copyright holder.
+1. This license notice is retained in all copies and substantial portions of the software.
+2. You do not remove or obscure attribution to the original author.
+3. You do not represent the software as your own original work.
 
-2. Free-Tier License Grant
+---
 
-Subject to the terms of this license, each Free-Tier User is granted a worldwide,
-non-exclusive, non-transferable, revocable copyright license to:
+## Commercial and government use
 
-(a) access, read, and study the Work;
-(b) download and store copies of the Work;
-(c) use the Work internally and in production;
-(d) compile, link, or embed unmodified portions of the Work into the Free-Tier
-    User's own applications, services, devices, or products;
-(e) make private internal modifications for the Free-Tier User's own internal or
-    production use;
-(f) copy and redistribute complete, unmodified copies of the Work, provided that:
-    (i) this license is included in full,
-    (ii) all copyright and notice text is preserved,
-    (iii) the attribution requirements in Section 3 are satisfied,
-    (iv) no fee is charged for the Work itself except reasonable pass-through
-         media, bandwidth, or hosting costs.
+A separate written license is required for:
 
-3. Attribution Requirement
+- Governments at any level (federal, state, provincial, municipal)
+- Military and defense agencies
+- Intelligence agencies and related contractors
+- Law enforcement agencies
+- Public-sector bodies and authorities
+- Any entity contracting on behalf of the above
+- Commercial enterprises with 10 or more full-time employees or annual revenue above $1 million USD
 
-Any public use or redistribution permitted under this license must prominently
-include the following attribution:
+**Developer Welcome Kit: $999**
 
-"Hashsite by Matt Channon — used under the Hashsite Public License v2.0"
+- 3-year term
+- Up to 5 named developers
+- One legal entity
+- One product, service, or internal program
+- Limited production deployment
 
-Where reasonably possible, the attribution must also include a link or clear
-reference to the Original Source.
+See [licensing.md](licensing.md) for full commercial terms and purchasing.
 
-For software products, a suitable attribution may appear in:
-(a) an About screen,
-(b) a settings/legal screen,
-(c) end-user documentation,
-(d) a NOTICE file,
-(e) a credits page.
+---
 
-4. No Public Redistribution of Modified Source Versions
+## No warranty
 
-You may not publicly distribute, publish, sublicense, sell, or otherwise make
-available any modified source-code version of the Work without prior written
-permission from the copyright holder.
+The software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
 
-For clarity:
-(a) private internal modification by a licensed user for its own internal or
-    production use is allowed if that user otherwise has a license to use the Work;
-(b) public redistribution of modified source code, modified reference
-    implementations, modified documentation, or modified derivative source
-    packages is prohibited unless separately authorized in writing;
-(c) Free-Tier Users may ship products or services that incorporate unmodified
-    portions of the Work, provided the Work itself is not redistributed in a
-    modified source form and the attribution requirement is met.
+In no event shall the author be liable for any claim, damages, or other liability arising from the use of the software.
 
-5. No Free License for Restricted Users or Large Commercial Users
+---
 
-No license is granted under this public license to any Restricted User or Large
-Commercial User.
+## Contact
 
-A Restricted User or Large Commercial User must obtain a separate written
-commercial license from the copyright holder before any use whatsoever,
-including evaluation, testing, internal review, procurement analysis,
-integration, deployment, training, modification, derivative development,
-or production use.
+Licensing inquiries: **licensing@hashsite.org**
 
-A commercial license may be:
-(a) a separately negotiated agreement, or
-(b) the Hashsite Developer Welcome Kit, if the user qualifies for and complies
-    with its terms.
-
-Any purported use of the Work by a Restricted User or Large Commercial User
-without a separate written commercial license is unauthorized and infringing.
-
-6. No Trademark or Branding Rights
-
-This license does not grant any right to use any trademark, service mark, trade
-dress, project name, logo, or branding of Hashsite, except as minimally required
-for truthful attribution under Section 3.
-
-7. No Patent License
-
-No patent license is granted by this license, whether express, implied, by
-estoppel, or otherwise.
-
-8. Compliance and Termination
-
-Any rights granted under this license terminate automatically and immediately if
-you violate any term of this license.
-
-Upon termination, you must cease all use and redistribution of the Work except
-to the extent you have a separate written commercial license that remains in force.
-
-Sections 5, 6, 7, 9, 10, and 11 survive termination.
-
-9. No Warranty
-
-THE WORK IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, OR THAT
-THE WORK WILL BE ERROR-FREE OR UNINTERRUPTED.
-
-10. Limitation of Liability
-
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL THE COPYRIGHT HOLDER
-BE LIABLE FOR ANY CLAIM, DAMAGES, LOSSES, OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE WORK OR THIS LICENSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGES.
-
-11. Commercial Licensing Contact
-
-For Restricted User licensing, Large Commercial User licensing, modification
-rights, OEM rights, hosted-service rights, support, or other commercial terms,
-contact:
-
-licensing@hashsite.org
+Project: [hashsite.org](https://hashsite.org) · [github.com/mchannon/hashsite](https://github.com/mchannon/hashsite)
