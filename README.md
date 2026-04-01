@@ -1,17 +1,15 @@
 ![Hashsite banner](img/hashsitebanner.png)
 
-# Hashsite
+**Open geocoding. Can be done with pencil and paper. Works offline. No API key. No rent. Locations that work for humans.**
 
-**Open geocoding. Works offline. No API key. No rent.**
+A C library and coordinate format for encoding real-world locations as short, human-shareable alphadecimal strings. Compact, hierarchical, 3D-native, and free to implement.
 
-Hashsite is a C library and coordinate format for encoding real-world locations as short, human-shareable alphadecimal strings. Compact, hierarchical, 3D-native, and free to implement.
-
-```
-#7BA2CSoDZ          Amarillo, TX — 9-char, ~4m precision
-#7B6.63IH.XB8       Albuquerque with Luhn readability dots
-#7BA2CSoDZ^I1I      Same location, 1.5m above street level
-#7BA2CKG^A#7BA2CSo#7BA2CSoDZ^J    Hashpath: gate → parking → door
-```
+| Code | Lat, Lon | Notes |
+|---|---|---|
+| `#7BA2CSoDZ` | 35.222°N, 101.831°W | Amarillo, TX — 9-char, ~4m precision |
+| `#7B6.63IH.XB8` | 35.124°N, 106.569°W | Albuquerque with Luhn readability dots |
+| `#7BA2CSoDZ^I1I` | 35.222°N, 101.831°W | Same location as row 1, 1.5m above street level |
+| `#7.B.A2CRNSQ^Agc4729#pSoCXdQL^I1I` | 35.222°N, 101.831°W | Hashpath: gate (+10m) → gate code → parking → door (+1.5m) |
 
 ---
 
@@ -67,7 +65,7 @@ That is not infrastructure. That is a hostage.
 
 **3D native.** Altitude is part of the format, not an afterthought. One character after `^` covers ±17m; four characters covers ±838km. Sub-meter precision available via precision mode.
 
-**Path-aware.** A real arrival problem is a path problem, not a point problem. Hashpath encodes an ordered sequence of waypoints — gate, parking, staircase, door — in a single compact string. This is the missing layer between raw coordinates and actual arrival.
+**Path-aware.** A real arrival problem is a path problem, not a point problem. Hashpath encodes an ordered arrival sequence in a single compact string — full code for the first waypoint, differential encoding for each subsequent one, optional non-spatial labels for gate codes and PINs. This is the missing layer between raw coordinates and actual arrival.
 
 **The confusable pair problem does not exist here.** Hashsite does not use words. The only ambiguity mitigation is `O` → `o`. Luhn-derived readability dots catch common transcription errors.
 
@@ -171,13 +169,22 @@ Big-endian — most significant digit first. 1 char: ±17m, 2 chars: ±647m, 3 c
 
 ### Hashpath
 
-Multiple waypoints concatenated with `#` separators:
+An ordered arrival sequence. All waypoints normalize to the same precision. The first waypoint is a full code; each subsequent waypoint encodes only the characters that differ from the previous one. Single lowercase letter labels precede each differential segment. `c` is reserved for non-spatial data (gate codes, door PINs) and is never a mappable location.
 
 ```
-#7BA2CKG^A#7BA2CSo#7BA2CSoDZ^I1I
+#7.B.A2CRNSQ^Agc4729#pSoCXdQL^I1I
 ```
 
-Each segment is `#CODE` with optional `^ALT`. Labels are single lowercase letters preceding each differential code. `c` is reserved for non-spatial data (gate codes, door PIN). All waypoints normalize to the same precision; each encodes only the characters that differ from the previous waypoint.
+Breaking that down:
+
+| Segment | Label | Meaning | Full code |
+|---|---|---|---|
+| `#7.B.A2CRNSQ^A` | `g` (gate) | First waypoint, full 9-char code, Luhn-dotted, +10m altitude | `#7BA2CRNSQ^A` |
+| `c4729#` | `c` (code) | Non-spatial gate PIN — not a location | — |
+| `pSoCX` | `p` (parking) | Shares first 5 chars with gate; only `SoCX` differs | `#7BA2CSoCX` |
+| `dQL^I1I` | `d` (door) | Shares first 7 chars with parking; only `QL` differs, +1.5m altitude | `#7BA2CSoQL^I1I` |
+
+Luhn dots on the first waypoint are computed over the full segment including altitude — `7BA2CRNSQ^A` — so the dots change if the altitude changes.
 
 ---
 
@@ -236,8 +243,9 @@ hashsite offset3d 7B663IHXB8 10 0 50 5      # translate east and up
 
 ```bash
 hashsite luhn 7B663IHXB8              # -> #7B6.63IH.XB8
-hashsite luhncheck 7B6.63IH.XB8       # exits 0 if dots are correct
-hashsite luhn 7B663IHXB8^A            # altitude included in checksum
+hashsite luhn 7B663IHXB8^A            # different dots — altitude is part of checksum
+hashsite luhncheck "7B6.63IH.XB8^A"   # exits 0 if dots match (with altitude)
+hashsite luhncheck 7B6.63IH.XB8       # exits 1 — dots were computed without ^A
 ```
 
 ### Pattern matching
