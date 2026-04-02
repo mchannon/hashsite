@@ -31,9 +31,17 @@ A C library and coordinate format for encoding real-world locations as short, hu
 
 ## Why Hashsite?
 
-Location is still broken — not for machines, but for people.
+Communicating location is hard.
 
-The tools we have for communicating location are: street addresses, lat/lon strings, and a small collection of proprietary geocoding products that have done their best to lock that problem up behind a paywall and a terms of service. None of them solve it well.
+Say you've been in a traffic accident and there are injuries. You're on the phone with emergency services and they want to know where to send the ambulance.
+
+Your phone knows exactly where you are. But you can't share your location over an emergency call once it's been connected.
+
+Now imagine it's dark. Or snowing hard. Or you went through some trees, or down a ravine, or into a lake. Or all five at once. They need to know where you are to the nearest meter, not the nearest mile.
+
+Launch Hashsite, and now you can read out the letters and numbers that will save your life.
+
+The tools we currently have for communicating location are: street addresses, lat/lon strings, and a small collection of proprietary geocoding products that have done their best to lock that problem up behind a paywall and a terms of service. None of them solve it well.
 
 ### The failure of street addresses
 
