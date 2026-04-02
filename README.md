@@ -10,7 +10,7 @@ A C library and coordinate format for encoding real-world locations as short, hu
 | `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Cadillac Ranch, Amarillo TX — 9-char, ~5m precision |
 | `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same, 2m above street level |
 | `$FC64W` | 34.927°N, 101.663°W | From `#7BA2CSoDZ`: prefix = first 3 chars (`7BA`), nearest 8-char ending `FC64W` → `#7BAFC64W` (Palo Duro Canyon, 36km SE) |
-| `#7BA2CRNSQc4729#pSoCXsQ9dL^2` | 35.2225°N, 101.8315°W | Hashpath: gate (35.2225°N, 101.8315°W) → code `4729#` → parking (35.2220°N, 101.8312°W) → stairs (35.2218°N, 101.8309°W) → door +2m (35.2218°N, 101.8309°W) |
+| `#7BGPSDMUTc4729#pFCDCsEN4Ld1T^2` | 33.628°N, 101.905°W | Hashpath: gate (33.628°N, 101.905°W) → code `4729#` → parking (33.629°N, 101.898°W) → stairs (33.629°N, 101.898°W) → door +2m (33.628°N, 101.899°W) |
 | `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
 
 ---
@@ -179,18 +179,18 @@ Big-endian — most significant digit first. 1 char: ±17m, 2 chars: ±647m, 3 c
 An ordered arrival sequence. All waypoints normalize to the same precision. The first waypoint is a full code; each subsequent waypoint encodes only the characters that differ from the previous one. Single lowercase letter labels precede each differential segment. `c` is reserved for non-spatial data (gate codes, door PINs) and is never a mappable location.
 
 ```
-#7BA2CRNSQc4729#pSoCXsQ9dL^2
+#7BGPSDMUTc4729#pFCDCsEN4Ld1T^2
 ```
 
-Breaking that down:
+A trailer park in Lubbock, TX — multiple buildings, no sane addressing. Breaking it down:
 
 | Segment | Label | Meaning | Full code |
 |---|---|---|---|
-| `#7BA2CRNSQ` | *(none)* | First waypoint, full 9-char code — always unlabelled | `#7BA2CRNSQ` |
-| `c4729#` | `c` (code) | Non-spatial gate PIN — not a location | — |
-| `pSoCX` | `p` (parking) | Shares first 5 chars with gate; only `SoCX` differs | `#7BA2CSoCX` |
-| `sQ9` | `s` (stairs) | Shares first 7 chars with parking; only `Q9` differs | `#7BA2CSoQ9` |
-| `dL^2` | `d` (door) | Shares first 8 chars with stairs; only `L` differs, +2m altitude | `#7BA2CSoQL^2` |
+| `#7BGPSDMUT` | *(none)* | Gate — first waypoint, full 9-char code, always unlabelled | `#7BGPSDMUT` |
+| `c4729#` | `c` (code) | Gate PIN — non-spatial, not a location | — |
+| `pFCDC` | `p` (parking) | Shares first 5 chars with gate; only `FCDC` differs | `#7BGPSFCDC` |
+| `sEN4L` | `s` (stairs) | Shares first 5 chars with parking; only `EN4L` differs | `#7BGPSEN4L` |
+| `d1T^2` | `d` (door) | Shares first 7 chars with stairs; only `1T` differs, +2m altitude | `#7BGPSEN1T^2` |
 
 The first waypoint is always a full unlabelled code. Each subsequent segment starts with a single lowercase label char followed by its differential suffix.
 
