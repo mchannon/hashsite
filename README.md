@@ -9,7 +9,7 @@ A C library and coordinate format for encoding real-world locations as short, hu
 | `#7BA2` | 35.22°N, 101.76°W | Potter County, TX — 4-char, ~40km precision |
 | `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Cadillac Ranch, Amarillo TX — 9-char, ~5m precision |
 | `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same, 2m above street level |
-| `$Y26Do` | 35.4430°N, 101.4188°W | From `#7BA2CSoDZ`: prefix = first 3 chars (`7BA`), nearest 8-char ending `Y26Do` → `#7B4Y26Do`. Geographic search — not a naive prefix swap |
+| `$FC64W` | 34.927°N, 101.663°W | From `#7BA2CSoDZ`: prefix = first 3 chars (`7BA`), nearest 8-char ending `FC64W` → `#7BAFC64W` (Palo Duro Canyon, 36km SE) |
 | `#7BA2CRNSQc4729#pSoCXsQ9dL^2` | 35.2225°N, 101.8315°W | Hashpath: gate (35.2225°N, 101.8315°W) → code `4729#` → parking (35.2220°N, 101.8312°W) → stairs (35.2218°N, 101.8309°W) → door +2m (35.2218°N, 101.8309°W) |
 | `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
 
@@ -266,10 +266,10 @@ hashsite luhncheck 7B6.63IH.XB8       # exits 1 — dots were computed without ^
 | `%SUFFIX` | first 5 chars of your position | 5 + len(SUFFIX) |
 | `SUFFIX` | none (fixed location) | len(SUFFIX) |
 
-Your position length doesn't affect the result length — only the prefix length (3 or 5) and suffix length matter. The nearest match is found geographically, not by naive prefix substitution: `$Y2` from `#7BA2CSoDZ` gives `#7B4Y2` (prefix `7B4`), not `#7BAY2` (prefix `7BA`).
+Your position length doesn't affect the result length — only the prefix length (3 or 5) and suffix length matter. The nearest match is found geographically — the result may use a different prefix than your own. `$FC64W` from `#7BA2CSoDZ` gives `#7BAFC64W` (Palo Duro Canyon, 36km SE).
 
 ```bash
-hashsite closest 7BA2CSoDZ '$Y26Do'  # prefix=7BA -> nearest 8-char ending Y26Do -> #7B4Y26Do
+hashsite closest 7BA2CSoDZ '$FC64W'  # prefix=7BA -> nearest 8-char ending FC64W -> #7BAFC64W
 hashsite closest 7BA2CSoDZ '%Y2'     # prefix=7BA2C -> nearest 7-char ending Y2 -> #7BA2CY2
 hashsite closest 7B663IHXB8 '$XB8'  # prefix=7B6 -> nearest 6-char ending XB8 -> #7A5XB8
 hashsite closest 62AZZ492 '$00009'  # prefix=62A -> nearest 8-char ending 00009 -> #62B00009
