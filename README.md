@@ -79,7 +79,7 @@ There is a long tradition of empires charging people for what they could make th
 
 **Path-aware.** A real arrival problem is a path problem, not a point problem. Hashpath encodes an ordered arrival sequence in a single compact string — full code for the first waypoint, differential encoding for each subsequent one, optional non-spatial labels for gate codes and PINs. This is the missing layer between raw coordinates and actual arrival.
 
-**The confusable pair problem does not exist here.** Hashsite does not use words. The only ambiguity mitigation is `O` → `o`. Luhn-derived readability dots catch common transcription errors.
+**The confusable pair problem does not exist here.** Hashsite does not use words. The only ambiguity mitigation is `O` → `o`. Checksum dots catch transcription errors before they matter.
 
 ---
 
@@ -143,15 +143,15 @@ Hashsite is prefix-hierarchical:
 
 Parent, child, and neighbor relationships are all computable without external data.
 
-### Readability dots
+### Checksum dots
 
-Hashsite supports optional Luhn-derived dots:
+Hashsite supports optional checksum dots:
 
 ```
 #7B6.63IH.XB8
 ```
 
-The dots are placed deterministically from the string content — not arbitrarily. A dotted Hashsite describes the same location as the undotted one. The Luhn checksum is computed over the **full string including altitude**, so the same horizontal code with different altitude produces different dot positions. Use dots when the code will be read aloud, transcribed by hand, or spot-checked visually.
+The dots are placed deterministically from the string content — not arbitrarily. A dotted Hashsite describes the same location as the undotted one. The Luhn checksum is computed over the **full string including altitude**, so the same horizontal code with different altitude produces different dot positions. Use dots when the code will be transcribed by hand, read aloud, or relayed in conditions where a wrong digit could matter.
 
 ### Altitude
 
@@ -419,7 +419,7 @@ All `nchars <= 0` selects precision automatically from the source format.
 - [x] C library and CLI
 - [x] 2D and 3D geometry
 - [x] Altitude encoding (coarse and precision modes)
-- [x] Luhn dot placement including vertical component
+- [x] Checksum dot placement and verification (Luhn-derived, includes vertical component)
 - [x] Hashpath encode/decode
 - [x] Geohash, Plus Code, Maidenhead, GARS, GEOREF, DMS, NMEA, UTM import
 - [ ] WebAssembly / npm package
