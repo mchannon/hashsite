@@ -1,0 +1,33 @@
+{
+  "name": "Hashsite",
+  "short_name": "Hashsite",
+  "description": "Open geocoding. Share your exact location as a short readable code. No API key. No rent.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090910",
+  "theme_color": "#0a0a0f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["navigation", "utilities"],
+  "shortcuts": [
+    {
+      "name": "My Location",
+      "short_name": "Location",
+      "description": "Open Hashsite to see your current location code",
+      "url": "/"
+    }
+  ]
+}
