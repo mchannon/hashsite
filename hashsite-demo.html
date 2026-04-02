@@ -104,9 +104,9 @@ input.strip-code-input {
 .red   .strip-code-wrap, .red   input.strip-code-input { color:#ff8070; }
 
 /* Superscript chars 4-5 (0-indexed 3-4 of bare code) */
-.hs-sup { position:relative; top:-2px; font-size:.82em; }
+.hs-sup { position:relative; top:-2px; }
 /* Dimmed suffix on green */
-.hs-dim { opacity:.28; color:#00d97e; }
+.hs-dim { opacity:.52; color:#00d97e; }
 
 .strip-latlon {
   font-size:9.5px; color:var(--white); opacity:.6;
@@ -117,11 +117,11 @@ input.strip-code-input {
 
 /* Tap-to-enable GPS prompt in blue strip */
 #gps-prompt {
-  font-size:11px; color:var(--blue); font-family:var(--ui);
+  font-size:11px; color:#70b8ff; font-family:var(--ui);
   font-weight:600; cursor:pointer; letter-spacing:.02em;
-  padding:3px 8px; border:1px solid var(--blue-dim,#1a3060);
+  padding:3px 8px; border:1px solid #2a4a80;
   border-radius:5px; display:none; white-space:nowrap;
-  background:rgba(58,143,255,.08);
+  background:rgba(58,143,255,.15);
   transition:background .15s;
 }
 #gps-prompt:hover, #gps-prompt:active { background:rgba(58,143,255,.18); }
@@ -138,8 +138,8 @@ input.strip-code-input {
 .caret-row.mid { margin-bottom:-2px; } /* raises $ button */
 
 .share-btn {
-  background:rgba(255,255,255,.055); border:1px solid var(--border);
-  border-radius:6px; color:var(--muted);
+  background:rgba(255,255,255,.11); border:1px solid #2a2a48;
+  border-radius:6px; color:#9090c0;
   font-size:10px; font-family:var(--mono); font-weight:600;
   letter-spacing:.04em; cursor:pointer;
   padding:0 7px; height:24px;
@@ -148,7 +148,10 @@ input.strip-code-input {
   white-space:nowrap; user-select:none;
 }
 .share-btn:hover, .share-btn:active {
-  background:rgba(255,255,255,.13); color:var(--text);
+  background:rgba(255,255,255,.22); color:#fff;
+}
+.share-btn.dim-btn {
+  opacity:.28; pointer-events:none;
 }
 .share-btn.mid {
   height:26px; /* slightly taller for visual caret apex */
@@ -210,6 +213,7 @@ input.strip-code-input {
     <div id="titlebar-logo">
       <span class="hash">#</span>hashsite
       <span class="tagline">open geocoding · no api key · no rent</span>
+      <span id="ver" style="font-size:8px;font-weight:400;color:#5a5a8a;letter-spacing:.04em;margin-left:8px;font-family:var(--mono)"></span>
     </div>
   </a>
 
@@ -227,17 +231,17 @@ input.strip-code-input {
     </div>
     <div class="share-caret" id="blue-caret" style="display:none">
       <div class="caret-row mid">
-        <button class="share-btn mid" onclick="doShare('blue','$')" title="Share $ prefix (3-char)">
+        <button class="share-btn mid" id="btn-blue-dollar" onclick="doShare('blue','$')" title="Share $ prefix (3-char)">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           $
         </button>
       </div>
       <div class="caret-row">
-        <button class="share-btn" onclick="doShare('blue','#')" title="Share full code">
+        <button class="share-btn" id="btn-blue-hash" onclick="doShare('blue','#')" title="Share full code">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           #
         </button>
-        <button class="share-btn" onclick="doShare('blue','%')" title="Share % prefix (5-char)">
+        <button class="share-btn" id="btn-blue-pct" onclick="doShare('blue','%')" title="Share % prefix (5-char)">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           %
         </button>
@@ -249,24 +253,25 @@ input.strip-code-input {
   <div class="strip green" id="strip-green">
     <div class="strip-icon"><div class="strip-dot"></div></div>
     <div class="strip-main">
+      <div class="strip-code-wrap" id="green-display" style="cursor:text" onclick="focusGreenInput()"></div>
       <input class="strip-code-input" id="green-code" type="text"
         spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-        placeholder="#…"/>
+        placeholder="#…" style="display:none;position:absolute;opacity:0;pointer-events:none"/>
       <div class="strip-latlon" id="green-latlon"></div>
     </div>
     <div class="share-caret">
       <div class="caret-row mid">
-        <button class="share-btn mid" onclick="doShare('green','$')" title="Share $ prefix">
+        <button class="share-btn mid" id="btn-green-dollar" onclick="doShare('green','$')" title="Share $ prefix">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           $
         </button>
       </div>
       <div class="caret-row">
-        <button class="share-btn" onclick="doShare('green','#')" title="Share full code">
+        <button class="share-btn" id="btn-green-hash" onclick="doShare('green','#')" title="Share full code">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           #
         </button>
-        <button class="share-btn" onclick="doShare('green','%')" title="Share % prefix">
+        <button class="share-btn" id="btn-green-pct" onclick="doShare('green','%')" title="Share % prefix">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           %
         </button>
@@ -285,17 +290,17 @@ input.strip-code-input {
     </div>
     <div class="share-caret">
       <div class="caret-row mid">
-        <button class="share-btn mid" onclick="doShare('red','$')" title="Share $ prefix">
+        <button class="share-btn mid" id="btn-red-dollar" onclick="doShare('red','$')" title="Share $ prefix">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           $
         </button>
       </div>
       <div class="caret-row">
-        <button class="share-btn" onclick="doShare('red','#')" title="Share full code">
+        <button class="share-btn" id="btn-red-hash" onclick="doShare('red','#')" title="Share full code">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           #
         </button>
-        <button class="share-btn" onclick="doShare('red','%')" title="Share % prefix">
+        <button class="share-btn" id="btn-red-pct" onclick="doShare('red','%')" title="Share % prefix">
           <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
           %
         </button>
@@ -361,32 +366,48 @@ function hs_luhn_place(hs){
    - superscript on bare chars at positions 3 & 4 (0-indexed)
    - optional dim suffix starting at 'dimFrom' bare char index
    ================================================================ */
-function renderCode(dotted, dimFrom) {
-  // dotted = '#7B6.6C3.J8F5' etc
-  // we need to track position in the bare (no #, no dots) string
-  // to know when to raise chars 3 & 4 and when to start dimming
-  const raw = dotted.replace(/^#/,'').replace(/\./g,''); // bare chars only
+function renderCode(fullDotted, dimFrom) {
+  // fullDotted = '#7BA2CSoDZ9' (10 char, luhn-dotted for full string)
+  // We want:
+  //   - bright chars: positions 0..dimFrom-1 of bare code, with luhn dots computed for ONLY those chars
+  //   - dim chars: positions dimFrom..9, no dots, dimmed
+  //   - chars at bare positions 3 & 4 are raised (same size)
+  const bare = fullDotted.replace(/^#/,'').replace(/\./g,''); // 10 bare chars
+  const brightCount = (dimFrom !== undefined) ? Math.min(dimFrom, bare.length) : bare.length;
+
+  // Compute luhn dots for bright portion only
+  const brightBare = bare.slice(0, brightCount);
+  const brightDotted = brightCount >= 3 ? hs_luhn_place('#' + brightBare) : '#' + brightBare;
+  // brightDotted = '#XX.XX.XX' etc, strip leading #
+  const brightPart = brightDotted.replace(/^#/,'');
+
   let html = '<span style="opacity:.5">#</span>';
   let bareIdx = 0;
-  const chars = dotted.replace(/^#/,'').split('');
 
-  for (const ch of chars) {
+  // Render bright portion (with dots)
+  for (const ch of brightPart.split('')) {
     if (ch === '.') {
-      html += '<span style="opacity:.3">.</span>';
+      html += '<span style="opacity:.35">.</span>';
       continue;
     }
-    const bi = bareIdx;
-    bareIdx++;
-
+    const bi = bareIdx++;
     const isRaised = (bi === 3 || bi === 4);
-    const isDim    = (dimFrom !== undefined && bi >= dimFrom);
+    let span = isRaised ? `<span class="hs-sup">` : '';
+    span += escHtml(ch);
+    if (isRaised) span += '</span>';
+    html += span;
+  }
 
-    let span = '';
-    if (isDim)    span += `<span class="hs-dim">`;
+  // Render dim portion (no dots)
+  const dimPart = bare.slice(brightCount);
+  for (const ch of dimPart.split('')) {
+    const bi = bareIdx++;
+    const isRaised = (bi === 3 || bi === 4);
+    let span = `<span class="hs-dim">`;
     if (isRaised) span += `<span class="hs-sup">`;
     span += escHtml(ch);
-    if (isRaised) span += `</span>`;
-    if (isDim)    span += `</span>`;
+    if (isRaised) span += '</span>';
+    span += '</span>';
     html += span;
   }
   return html;
@@ -427,7 +448,7 @@ function zoomToPrecision(map, lat) {
    ================================================================ */
 let blueLL=null, redLL=null;
 let redMkr=null, blueMkr=null, blueAcc=null;
-let greenBox=null;
+let greenBox=null, blueBox=null, redBox=null;
 let map=null, firstFix=true, toastTmr=null;
 let gpsDenied=false;
 
@@ -453,8 +474,10 @@ function updateBlue(lat, lon, acc) {
   const dotted = coded(lat, lon, 10);
   const prec = map ? zoomToPrecision(map, lat) : 10;
   const el = document.getElementById('blue-code');
-  el.innerHTML = renderCode(dotted, prec);
+  const blueBright = Math.min(prec + 3, 10);
+  el.innerHTML = renderCode(dotted, blueBright);
   el.classList.remove('dim');
+  updateBtnDim('blue', blueBright);
   document.getElementById('blue-latlon').textContent =
     fmtLL(lat,lon) + (acc ? `  ±${Math.round(acc)}m` : '');
   document.getElementById('blue-dot').classList.remove('pulse');
@@ -469,31 +492,50 @@ function updateBlue(lat, lon, acc) {
     if (blueAcc) { blueAcc.setLatLng([lat,lon]); blueAcc.setRadius(acc); }
     else blueAcc = L.circle([lat,lon],{radius:acc,color:'#3a8fff',fillColor:'#3a8fff',fillOpacity:.06,weight:1,opacity:.3}).addTo(map);
   }
+
+  // blue box at same precision as green
+  const ctr = map ? map.getCenter() : {lat,lng:lon};
+  const bprec = map ? zoomToPrecision(map, ctr.lat) : prec;
+  const bbox = hsps2bbox(ll2hsps(lat, lon, bprec));
+  if (bbox) {
+    const bounds = [[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]];
+    if (blueBox) setBoxBounds(blueBox, bbox);
+    else { blueBox = L.rectangle([[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]],{interactive:false,pane:'shadowPane'}).addTo(map); }
+  }
+  updateBoxColors();
 }
 
 function updateGreen(lat, lon) {
   const prec = map ? zoomToPrecision(map, lat) : 10;
   const dotted = coded(lat, lon, 10);
 
-  // Update input value if not focused
+  // Update display div with dim suffix
+  const disp = document.getElementById('green-display');
+  const greenBright = Math.min(prec + 3, 10);
+  if (disp) disp.innerHTML = renderCode(dotted, greenBright);
+  updateBtnDim('green', greenBright);
+  // Keep hidden input in sync for Enter-to-navigate
   const inp = document.getElementById('green-code');
-  if (document.activeElement !== inp) inp.value = dotted;
+  inp.value = dotted;
   document.getElementById('green-latlon').textContent = fmtLL(lat, lon);
 
   // Update bounding box overlay
   const bbox = hsps2bbox(ll2hsps(lat, lon, prec));
   if (bbox) {
     const bounds = [[bbox.lat_s, bbox.lon_w],[bbox.lat_n, bbox.lon_e]];
-    if (greenBox) {
-      greenBox.setBounds(bounds);
-    } else {
-      greenBox = L.rectangle(bounds, {
-        color:'#00d97e', weight:1.5, opacity:.6,
-        fillColor:'#00d97e', fillOpacity:.07,
-        interactive:false,
-      }).addTo(map);
-    }
+    if (greenBox) setBoxBounds(greenBox, bbox);
+    else { greenBox = L.rectangle([[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]],{interactive:false,pane:'shadowPane'}).addTo(map); }
   }
+  updateBoxColors();
+}
+
+function focusGreenInput() {
+  const inp = document.getElementById('green-code');
+  const disp = document.getElementById('green-display');
+  if (disp) disp.style.display = 'none';
+  inp.style.cssText = '';
+  inp.focus();
+  inp.select();
 }
 
 function updateRed(lat, lon) {
@@ -503,8 +545,98 @@ function updateRed(lat, lon) {
   inp.value = dotted;
   inp.classList.remove('dim');
   document.getElementById('red-latlon').textContent = fmtLL(lat, lon);
+  updateBtnDim('red', 10);
+
+  const ctr = map ? map.getCenter() : {lat,lng:lon};
+  const prec = map ? zoomToPrecision(map, ctr.lat) : 10;
+  const bbox = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (bbox) {
+    const bounds = [[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]];
+    if (redBox) setBoxBounds(redBox, bbox);
+    else { redBox = L.rectangle([[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]],{interactive:false,pane:'shadowPane'}).addTo(map); }
+  }
+  updateBoxColors();
 }
 
+
+
+/* ================================================================
+   BUTTON DIM: $ needs >=6 bright chars, % needs >=8
+   ================================================================ */
+function updateBtnDim(color, brightCount) {
+  const dollar = document.getElementById('btn-'+color+'-dollar');
+  const pct    = document.getElementById('btn-'+color+'-pct');
+  if (dollar) dollar.classList.toggle('dim-btn', brightCount < 6);
+  if (pct)    pct.classList.toggle('dim-btn',    brightCount < 8);
+}
+/* ================================================================
+   ANTIMERIDIAN-SAFE RECTANGLE HELPER
+   ================================================================ */
+function setBoxBounds(box, bbox) {
+  // If box crosses antimeridian, Leaflet can't handle it with setBounds.
+  // Clamp lon_e to lon_w+360 if needed, then use wrapping.
+  // Leaflet 1.9 supports L.rectangle with lon > 180 on wrapped maps.
+  // We just need to ensure the bbox lon coords are valid.
+  const w = bbox.lon_w, e = bbox.lon_e;
+  // Normalise: if cell width is sane (<60°) but lon_w pushed past ±180
+  const bounds = [[bbox.lat_s, w],[bbox.lat_n, e]];
+  box.setBounds(bounds);
+}
+
+/* ================================================================
+   BOX COLOR MIXING
+   green=only green, blue=only blue, red=only red,
+   green+blue=cyan, green+red=yellow, blue+red=magenta, all=white
+   ================================================================ */
+function updateBoxColors() {
+  const hasG = !!greenBox, hasB = !!blueBox, hasR = !!redBox;
+
+  function sameBox(a, b) {
+    if (!a || !b) return false;
+    const ba = a.getBounds(), bb = b.getBounds();
+    return Math.abs(ba.getSouth()-bb.getSouth())<0.0001 &&
+           Math.abs(ba.getNorth()-bb.getNorth())<0.0001 &&
+           Math.abs(ba.getWest()-bb.getWest())<0.0001 &&
+           Math.abs(ba.getEast()-bb.getEast())<0.0001;
+  }
+
+  // Determine which logical boxes are coincident
+  const gb = sameBox(greenBox,blueBox);
+  const gr = sameBox(greenBox,redBox);
+  const br = sameBox(blueBox,redBox);
+
+  function applyStyle(box, stroke, fill, fillOp) {
+    if (!box) return;
+    box.setStyle({color:stroke, weight:2, opacity:.85, fillColor:fill, fillOpacity:fillOp});
+  }
+
+  const all3 = gb && gr;
+  if (all3) {
+    applyStyle(greenBox,'#ffffff','#ffffff',.13);
+    if (blueBox) blueBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
+    if (redBox)  redBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
+  } else {
+    // green
+    if (hasG) {
+      if (gb && hasB) { applyStyle(greenBox,'#00ffff','#00ffff',.1); }
+      else if (gr && hasR) { applyStyle(greenBox,'#ffff00','#ffff00',.1); }
+      else { applyStyle(greenBox,'#00d97e','#00d97e',.09); }
+    }
+    // blue
+    if (hasB && !gb) {
+      if (br && hasR) { applyStyle(blueBox,'#ff44ff','#ff44ff',.1); }
+      else { applyStyle(blueBox,'#3a8fff','#3a8fff',.09); }
+    } else if (hasB && gb) {
+      blueBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
+    }
+    // red
+    if (hasR && !gr && !br) {
+      applyStyle(redBox,'#ff4a3a','#ff4a3a',.09);
+    } else if (hasR && (gr || br)) {
+      redBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
+    }
+  }
+}
 function placePin(lat, lon) {
   const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6);margin:-7px 0 0 -7px"></div>`,iconSize:[0,0],iconAnchor:[0,0]});
   if (redMkr) redMkr.setLatLng([lat,lon]);
@@ -541,16 +673,16 @@ function doShare(color, mode) {
   let text;
   if (mode === '#') {
     text = dotted;
+    // # always copies directly
+    copyText(text);
+    return;
   } else if (mode === '$') {
-    const suf = suffixFor(dotted, 3);
-    text = '$' + suf;
-  } else { // %
-    const suf = suffixFor(dotted, 5);
-    text = '%' + suf;
+    text = '$' + suffixFor(dotted, 3);
+  } else {
+    text = '%' + suffixFor(dotted, 5);
   }
 
   const shareText = `${text}\nhttps://hashsite.org`;
-
   if (navigator.share) {
     navigator.share({ title: 'Hashsite location', text: shareText }).catch(() => copyText(text));
   } else {
@@ -574,8 +706,8 @@ function copyText(t) {
    ================================================================ */
 function initMap() {
   map = L.map('map', {center:[35.085,-106.65], zoom:13, zoomControl:true});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom:19,
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom:19, subdomains:'',
   }).addTo(map);
 
   const onMove = () => {
@@ -592,11 +724,19 @@ function initMap() {
   });
 
   // Green input: Enter pans to hashsite
-  document.getElementById('green-code').addEventListener('keydown', function(e) {
+  const greenInp = document.getElementById('green-code');
+  const greenDisp = document.getElementById('green-display');
+  greenInp.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
     const b = hsps2bbox(this.value.trim());
     if (b) { map.setView([b.lat_c, b.lon_c], Math.max(map.getZoom(), 15)); this.blur(); }
     else { this.classList.add('shake'); setTimeout(() => this.classList.remove('shake'), 320); toast('Not a valid hashsite'); }
+  });
+  greenInp.addEventListener('blur', function() {
+    this.style.cssText = 'display:none;position:absolute;opacity:0;pointer-events:none';
+    if (greenDisp) greenDisp.style.display = '';
+    const c = map.getCenter();
+    updateGreen(c.lat, c.lng);
   });
 
   // Red input: Enter moves pin
@@ -679,6 +819,11 @@ document.getElementById('install-btn').addEventListener('click', () => {
    ================================================================ */
 initMap();
 startGPS();
+(()=>{
+  const n=new Date(),h=n.getHours(),m=String(n.getMinutes()).padStart(2,'0'),
+        ap=h>=12?'pm':'am',h12=h%12||12;
+  document.getElementById('ver').textContent=`v${n.getMonth()+1}.${n.getDate()}.${h12}${m}${ap}`;
+})();
 </script>
 </body>
 </html>
