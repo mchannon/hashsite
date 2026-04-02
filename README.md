@@ -6,11 +6,11 @@ A C library and coordinate format for encoding real-world locations as short, hu
 
 | Code | Lat, Lon | Notes |
 |---|---|---|
-| `#7BA2CS` | 35.22°N, 101.83°W | Amarillo, TX — 6-char, ~1000m precision |
-| `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Amarillo, TX — 9-char, ~5m precision |
+| `#7BA2` | 35.22°N, 101.76°W | Potter County, TX — 4-char, ~40km precision |
+| `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Cadillac Ranch, Amarillo TX — 9-char, ~5m precision |
 | `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same, 2m above street level |
-| `$Y2` | 35.4364°N, 101.4043°W | From `#7BA2CSoDZ`: prefix = first 3 chars = `7BA`, find nearest 5-char ending `Y2` → `#7B4Y2`. Not `#7BAY2` — nearest is geographic, not a naive prefix swap |
-| `#7BA2CRNSQgc4729#pSoCXsQ9dL^2` | 35.2225°N, 101.8315°W | Hashpath: gate (35.2225°N, 101.8315°W) → gate code 4729# → parking (35.2220°N, 101.8312°W) → stairs (35.2218°N, 101.8309°W) → door +2m (35.2218°N, 101.8309°W) |
+| `$Y26Do` | 35.4430°N, 101.4188°W | From `#7BA2CSoDZ`: prefix = first 3 chars (`7BA`), nearest 8-char ending `Y26Do` → `#7B4Y26Do`. Geographic search — not a naive prefix swap |
+| `#7BA2CRNSQc4729#pSoCXsQ9dL^2` | 35.2225°N, 101.8315°W | Hashpath: gate (35.2225°N, 101.8315°W) → code `4729#` → parking (35.2220°N, 101.8312°W) → stairs (35.2218°N, 101.8309°W) → door +2m (35.2218°N, 101.8309°W) |
 | `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
 
 ---
@@ -121,7 +121,10 @@ The number of characters encodes the desired precision tolerance, not the precis
 
 ### Grid structure
 
-The first character divides the globe into 36 zones: 6 longitude bands × 6 latitude bands. The latitude bands use equal-area boundaries at 0°, ±19.47° (= arcsin(1/3)), and ±41.81°, keeping cells more equal in area than a naive rectangular grid. Polar zones use a variable-width column scheme that prevents extreme longitude crowding at high latitudes. All subsequent characters use regular 6×6 subdivision.
+The first character divides the globe into 36 zones: 6 longitude bands × 6 latitude bands. The latitude bands use equal-area boundaries at 0°, ±19.47° (= arcsin(1/3)), and ±41.81°, keeping cells more equal in area than a naive rectangular grid.
+
+The second character subdivides each first-character zone into 36 cells using a **9×4 grid** — 9 longitude columns × 4 latitude rows — for all non-polar zones. Polar zones (above ±41.81°) use a variable column count per latitude row (1/1/2/3/3/4/5/5/6/6, from pole to band edge), which reduces the extreme east-west crowding that afflicts rectangular grids at high latitudes. All characters after the second use regular **6×6** subdivision.
+
 
 ### Hierarchy
 
@@ -176,20 +179,20 @@ Big-endian — most significant digit first. 1 char: ±17m, 2 chars: ±647m, 3 c
 An ordered arrival sequence. All waypoints normalize to the same precision. The first waypoint is a full code; each subsequent waypoint encodes only the characters that differ from the previous one. Single lowercase letter labels precede each differential segment. `c` is reserved for non-spatial data (gate codes, door PINs) and is never a mappable location.
 
 ```
-#7BA2CRNSQgc4729#pSoCXsQ9dL^2
+#7BA2CRNSQc4729#pSoCXsQ9dL^2
 ```
 
 Breaking that down:
 
 | Segment | Label | Meaning | Full code |
 |---|---|---|---|
-| `#7BA2CRNSQ` | `g` (gate) | First waypoint, full 9-char code | `#7BA2CRNSQ` |
+| `#7BA2CRNSQ` | *(none)* | First waypoint, full 9-char code — always unlabelled | `#7BA2CRNSQ` |
 | `c4729#` | `c` (code) | Non-spatial gate PIN — not a location | — |
 | `pSoCX` | `p` (parking) | Shares first 5 chars with gate; only `SoCX` differs | `#7BA2CSoCX` |
 | `sQ9` | `s` (stairs) | Shares first 7 chars with parking; only `Q9` differs | `#7BA2CSoQ9` |
 | `dL^2` | `d` (door) | Shares first 8 chars with stairs; only `L` differs, +2m altitude | `#7BA2CSoQL^2` |
 
-Each waypoint is reconstructed by taking the previous full code and replacing from the divergence point onward with the differential segment.
+The first waypoint is always a full unlabelled code. Each subsequent segment starts with a single lowercase label char followed by its differential suffix.
 
 ---
 
@@ -266,11 +269,22 @@ hashsite luhncheck 7B6.63IH.XB8       # exits 1 — dots were computed without ^
 Your position length doesn't affect the result length — only the prefix length (3 or 5) and suffix length matter. The nearest match is found geographically, not by naive prefix substitution: `$Y2` from `#7BA2CSoDZ` gives `#7B4Y2` (prefix `7B4`), not `#7BAY2` (prefix `7BA`).
 
 ```bash
-hashsite closest 7BA2CSoDZ '$Y2'     # prefix=7BA2C[0:3]=7BA -> nearest 5-char -> #7B4Y2
-hashsite closest 7BA2CSoDZ '%Y2'     # prefix=7BA2CSoDZ[0:5]=7BA2C -> nearest 7-char -> #7BA2CY2
+hashsite closest 7BA2CSoDZ '$Y26Do'  # prefix=7BA -> nearest 8-char ending Y26Do -> #7B4Y26Do
+hashsite closest 7BA2CSoDZ '%Y2'     # prefix=7BA2C -> nearest 7-char ending Y2 -> #7BA2CY2
 hashsite closest 7B663IHXB8 '$XB8'  # prefix=7B6 -> nearest 6-char ending XB8 -> #7A5XB8
 hashsite closest 62AZZ492 '$00009'  # prefix=62A -> nearest 8-char ending 00009 -> #62B00009
 ```
+
+#### Cross-zone example: Chicago
+
+A club in Brighton Park (41.801°N, 87.625°W) texts its location as `$04H49` — a 5-character suffix that resolves to a full 8-char building-entrance-precision code (3-char prefix from your position + 5-char suffix). You're in a Bridgeport apartment (`#1XVWQNK82`, 41.842°N, 87.644°W), just north of the 41.81° polar band boundary. The club is just south of it. The two locations are in different Hashsite latitude bands — `#1X...` polar, `#74...` mid-latitude — and share no prefix characters at all.
+
+```bash
+hashsite closest 1XVWQNK82 '$04H49'
+# -> #74504H49   (41.801°N, 87.625°W — building entrance precision, correct)
+```
+
+A naive substitution of your first 3 chars gives `#1XV04H49` — which decodes to 42.61°N, 88.10°W, nearly 100km away in Wisconsin. The geographic search correctly crosses the band boundary regardless.
 
 ---
 
