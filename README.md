@@ -41,11 +41,11 @@ Now imagine it's dark. Or snowing hard. Or you went through some trees, or down 
 
 Launch Hashsite, and now you can read out the letters and numbers that will save your life.
 
-The tools we currently have for communicating location are: street addresses, lat/lon strings, and a small collection of proprietary geocoding products that have done their best to lock that problem up behind a paywall and a terms of service. None of them solve it well.
+The tools we currently have for communicating location are: street addresses, lat/lon strings, and a small collection of proprietary geocoding products.
 
 ### The failure of street addresses
 
-A building address is a billing artifact designed for mail sorting. It does not tell you which entrance to use, where to park, which gate is the service gate, which of three buildings on a campus is the right one, or where the ambulance entrance is. It is not a usable delivery point, a usable pickup point, or a usable patient entrance. It is frequently not even accurate.
+A building address is a billing artifact designed for mail sorting. It does not tell you which entrance to use, where to park, which gate is the service gate, which of three buildings on a campus is the right one, or where the ambulance entrance is. It is not a usable delivery point, a usable pickup point, or a usable patient entrance. Forget precision and accuracy — addresses often break their own rules.
 
 ### The failure of lat/lon
 
@@ -190,7 +190,7 @@ An ordered arrival sequence. All waypoints normalize to the same precision. The 
 #7BGPSDMUTc4729#pFCDCsEN4Ld1T^2
 ```
 
-A trailer park in Lubbock, TX — multiple buildings, no sane addressing. Breaking it down:
+A trailer park in Lubbock, TX. Buildings unmarked using a seemingly random numbering system. Glad I don't live here because a pizza guy would never find me, let alone an Uber or an ambulance. Breaking it down:
 
 | Segment | Label | Meaning | Full code |
 |---|---|---|---|
@@ -201,6 +201,8 @@ A trailer park in Lubbock, TX — multiple buildings, no sane addressing. Breaki
 | `d1T^2` | `d` (door) | Shares first 7 chars with stairs; only `1T` differs, +2m altitude | `#7BGPSEN1T^2` |
 
 The first waypoint is always a full unlabelled code. Each subsequent segment starts with a single lowercase label char followed by its differential suffix.
+
+If you've ever delivered a pizza, you'd know what a big pain this solves.
 
 ---
 
