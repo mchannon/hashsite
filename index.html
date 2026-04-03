@@ -449,13 +449,16 @@ function updateBtns(prefix, brightCount, hasCode) {
 /* ================================================================
    BOX MANAGEMENT
    ================================================================ */
-function makeBox() {
-  return L.rectangle([[0,0],[0,0]], {interactive:false, pane:'overlayPane'}).addTo(map);
+function makeBox(bbox) {
+  const b = shiftBboxToMap(bbox);
+  return L.rectangle([[b.lat_s,b.lon_w],[b.lat_n,b.lon_e]],
+    {interactive:false, color:'#ffffff', weight:2, opacity:.8,
+     fillColor:'#ffffff', fillOpacity:.1}).addTo(map);
 }
 
-function makeLbl(color) {
-  const icon = L.divIcon({className:'', html:'', iconSize:[0,0], iconAnchor:[0,0]});
-  return L.marker([0,0], {icon, interactive:false, zIndexOffset:200}).addTo(map);
+function makeLbl() {
+  const icon = L.divIcon({className:'', html:'<div></div>', iconSize:[0,0], iconAnchor:[0,0]});
+  return L.marker([0,0], {icon, interactive:false, zIndexOffset:500}).addTo(map);
 }
 
 function shiftBboxToMap(bbox) {
@@ -544,8 +547,8 @@ function refreshBoxColors() {
 function updateGreenBox(lat, lon, prec) {
   const bb = hsps2bbox(ll2hsps(lat, lon, prec));
   if (!bb) return;
-  if (!greenBox) greenBox = makeBox();
-  if (!greenLbl) greenLbl = makeLbl('#00d97e');
+  if (!greenBox) greenBox = makeBox(bb);
+  if (!greenLbl) greenLbl = makeLbl();
   setBox(greenBox, bb);
   greenLblCode = ll2hsps(lat, lon, prec);
   setLbl(greenLbl, bb, greenLblCode, '#00d97e');
@@ -555,8 +558,8 @@ function updateGreenBox(lat, lon, prec) {
 function updateBlueBox(lat, lon, prec) {
   const bb = hsps2bbox(ll2hsps(lat, lon, prec));
   if (!bb) return;
-  if (!blueBox) blueBox = makeBox();
-  if (!blueLbl) blueLbl = makeLbl('#3a8fff');
+  if (!blueBox) blueBox = makeBox(bb);
+  if (!blueLbl) blueLbl = makeLbl();
   setBox(blueBox, bb);
   blueLblCode = ll2hsps(lat, lon, prec);
   setLbl(blueLbl, bb, blueLblCode, '#3a8fff');
@@ -566,8 +569,8 @@ function updateBlueBox(lat, lon, prec) {
 function updateRedBox(lat, lon, prec) {
   const bb = hsps2bbox(ll2hsps(lat, lon, prec));
   if (!bb) return;
-  if (!redBox) redBox = makeBox();
-  if (!redLbl) redLbl = makeLbl('#ff4a3a');
+  if (!redBox) redBox = makeBox(bb);
+  if (!redLbl) redLbl = makeLbl();
   setBox(redBox, bb);
   redLblCode = ll2hsps(lat, lon, prec);
   setLbl(redLbl, bb, redLblCode, '#ff4a3a');
@@ -591,12 +594,11 @@ function updateBlue(lat, lon, acc) {
   document.getElementById('blue-caret').style.visibility='visible';
   updateBtns('bb-', bc, true);
 
-  // Blue pin marker — same style as red but blue, with accuracy halo
-  const pinHtml = `<div style="position:relative;width:0;height:0">
-    <div style="width:16px;height:16px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 14px var(--blue),0 2px 8px rgba(0,0,0,.7);position:absolute;top:-8px;left:-8px"></div>
-  </div>`;
-  const icon = L.divIcon({className:'',html:pinHtml,iconSize:[0,0],iconAnchor:[0,0]});
-  if (blueMkr) blueMkr.setLatLng([lat,lon]); else blueMkr=L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map);
+  // Blue pin marker
+  const pinHtml = `<div style="width:16px;height:16px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 14px var(--blue),0 2px 8px rgba(0,0,0,.7)"></div>`;
+  const icon = L.divIcon({className:'',html:pinHtml,iconSize:[16,16],iconAnchor:[8,8]});
+  if (blueMkr) { blueMkr.setLatLng([lat,lon]); blueMkr.setIcon(icon); }
+  else blueMkr = L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map);
 
   // Accuracy halo — radius = acc meters, updates with each fix
   if (acc) {
@@ -640,8 +642,9 @@ function updateRed(lat, lon) {
 }
 
 function placePin(lat, lon) {
-  const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6);margin:-7px 0 0 -7px"></div>`,iconSize:[0,0],iconAnchor:[0,0]});
-  if (redMkr) redMkr.setLatLng([lat,lon]); else redMkr=L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
+  const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6)"></div>`,iconSize:[14,14],iconAnchor:[7,7]});
+  if (redMkr) { redMkr.setLatLng([lat,lon]); redMkr.setIcon(icon); }
+  else redMkr = L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
   updateRed(lat,lon);
 }
 
@@ -753,7 +756,7 @@ function requestGPS() {
 
 function startWatch() {
   if (watchId!==null) return;
-  watchId = navigator.geolocation.watchPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000,maximumAge:5000});
+  watchId = navigator.geolocation.watchPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
 
 function onFix(pos) {
