@@ -390,6 +390,28 @@ function zoomToPrecision(lat, lon) {
   return 10;
 }
 
+
+/* ================================================================
+   ACCURACY → PRECISION
+   Find largest char count whose cell half-width fits within acc meters.
+   Uses actual bbox sizes at the given lat/lon via the codec.
+   ================================================================ */
+function accToPrec(lat, lon, acc) {
+  if (!acc || acc <= 0) return 10;
+  // Find the finest precision level where the cell half-diagonal is still
+  // >= the GPS accuracy radius. Beyond that we'd be displaying false precision.
+  const R = 6371000;
+  let result = 1;
+  for (let n = 1; n <= 10; n++) {
+    const bb = hsps2bbox(ll2hsps(lat, lon, n));
+    if (!bb) continue;
+    const dLat = (bb.lat_n - bb.lat_s) * Math.PI / 180 * R;
+    const dLon = (bb.lon_e - bb.lon_w) * Math.PI / 180 * R * Math.cos(lat * Math.PI / 180);
+    const half = Math.sqrt(dLat*dLat + dLon*dLon) / 2;
+    if (half >= acc) result = n; else break;
+  }
+  return result;
+}
 /* ================================================================
    STATE
    ================================================================ */
@@ -557,8 +579,9 @@ function updateRedBox(lat, lon, prec) {
    ================================================================ */
 function updateBlue(lat, lon, acc) {
   blueLL = {lat,lon};
-  const prec = map ? zoomToPrecision(lat, lon) : 10;
-  const bc = Math.min(prec+3, 10);
+  // Precision comes from GPS accuracy, not map zoom
+  const prec = acc ? accToPrec(lat, lon, acc) : 10;
+  const bc = prec; // no +3 fudge — accuracy is already the truth
   blueBright = bc;
   blueBare = ll2hsps(lat,lon,10).replace(/^#/,'');
   setDisplay('blue-code', blueBare, bc);
@@ -568,10 +591,27 @@ function updateBlue(lat, lon, acc) {
   document.getElementById('blue-caret').style.visibility='visible';
   updateBtns('bb-', bc, true);
 
-  // blue GPS marker
-  const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 12px var(--blue),0 2px 6px rgba(0,0,0,.6);margin:-7px 0 0 -7px"></div>`,iconSize:[0,0],iconAnchor:[0,0]});
+  // Blue pin marker — same style as red but blue, with accuracy halo
+  const pinHtml = `<div style="position:relative;width:0;height:0">
+    <div style="width:16px;height:16px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 14px var(--blue),0 2px 8px rgba(0,0,0,.7);position:absolute;top:-8px;left:-8px"></div>
+  </div>`;
+  const icon = L.divIcon({className:'',html:pinHtml,iconSize:[0,0],iconAnchor:[0,0]});
   if (blueMkr) blueMkr.setLatLng([lat,lon]); else blueMkr=L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map);
-  if (acc){ if(blueAccCirc){blueAccCirc.setLatLng([lat,lon]);blueAccCirc.setRadius(acc)}else blueAccCirc=L.circle([lat,lon],{radius:acc,color:'#3a8fff',fillColor:'#3a8fff',fillOpacity:.06,weight:1,opacity:.3}).addTo(map); }
+
+  // Accuracy halo — radius = acc meters, updates with each fix
+  if (acc) {
+    if (blueAccCirc) {
+      blueAccCirc.setLatLng([lat,lon]);
+      blueAccCirc.setRadius(acc);
+    } else {
+      blueAccCirc = L.circle([lat,lon],{
+        radius:acc,
+        color:'#3a8fff',fillColor:'#3a8fff',
+        fillOpacity:.08,weight:1.5,opacity:.5,
+        interactive:false,
+      }).addTo(map);
+    }
+  }
   updateBlueBox(lat, lon, prec);
 }
 
@@ -703,7 +743,12 @@ let watchId=null;
 function requestGPS() {
   if (!navigator.geolocation) { showGpsMsg('GPS not available'); return; }
   showGpsMsg('Locating…');
-  navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
+  // Small delay so iOS Safari finishes processing the tap before spawning
+  // the system permission alert — without this it can appear behind Safari's
+  // chrome and the user never sees it.
+  setTimeout(() => {
+    navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
+  }, 150);
 }
 
 function startWatch() {
