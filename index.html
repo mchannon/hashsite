@@ -594,7 +594,7 @@ function flyToBlue() {
 }
 function updateBlue(lat, lon, acc) {
   console.log('[blue] updateBlue called lat='+lat+' lon='+lon+' acc='+acc+' map='+!!map);
-  if (!map) { console.log('[blue] map not ready, retrying'); setTimeout(()=>updateBlue(lat,lon,acc), 200); return; }
+  if (!map || !map._panes) { console.log('[blue] map panes not ready, retrying'); setTimeout(()=>updateBlue(lat,lon,acc), 100); return; }
   blueLL = {lat,lon};
   const prec = acc ? accToPrec(lat, lon, acc) : 10;
   console.log('[blue] prec='+prec);
@@ -767,9 +767,8 @@ let watchId=null;
 function requestGPS() {
   if (!navigator.geolocation) { showGpsMsg('GPS not available'); return; }
   showGpsMsg('Locating…');
-  // Small delay so iOS Safari finishes processing the tap before spawning
-  // the system permission alert — without this it can appear behind Safari's
-  // chrome and the user never sees it.
+  // 150ms delay ensures iOS Safari surfaces the permission alert in the foreground
+  // (without it the alert can spawn behind Safari's chrome and never be seen)
   setTimeout(() => {
     navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
   }, 150);
@@ -818,8 +817,9 @@ document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.p
    BOOT
    ================================================================ */
 initMap();
-// GPS starts after map is ready — marker/box creation requires map to exist
-requestGPS();
+// Wait for two animation frames so Leaflet fully renders its pane DOM
+// before any GPS fix tries to call .addTo(map)
+requestAnimationFrame(() => requestAnimationFrame(() => requestGPS()));
 </script>
 </body>
 </html>
