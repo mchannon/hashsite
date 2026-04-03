@@ -183,7 +183,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
     <div id="tl-logo"><span class="hash">#</span>hashsite</div>
     <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.3.735pm</span>
+    <span id="tl-ver">v4.3.742pm</span>
   </a>
 
   <!-- BLUE -->
@@ -420,9 +420,10 @@ let blueUpdateCount=0, blueLastUpdate=null;
 let blueRenderData=null;
 let blueLL=null, greenLL=null, redLL=null;
 let redMkr=null;
-let greenBox=null, redBox=null;
-let greenLbl=null, redLbl=null;
-let greenLblCode=null, redLblCode=null;
+let greenBox=null, blueBox=null, redBox=null;
+let blueDot=null, blueHalo=null;
+let greenLbl=null, blueLbl=null, redLbl=null;
+let greenLblCode=null, blueLblCode=null, redLblCode=null;
 let greenBare=null, blueBare=null, redBare=null; // bare 10-char for sharing
 let greenBright=10, blueBright=10, redBright=10; // current bright char counts
 
@@ -495,7 +496,7 @@ function setLbl(lbl, bbox, code, color) {
 }
 
 function refreshBoxColors() {
-  if (!greenBox && !redBox) return;
+  if (!greenBox && !blueBox && !redBox) return;
   function eq(a,b){
     if(!a||!b)return false;
     const ba=a.getBounds(),bb=b.getBounds();
@@ -512,16 +513,71 @@ function refreshBoxColors() {
     const b=box.getBounds();
     setLbl(lbl,{lat_s:b.getSouth(),lat_n:b.getNorth(),lon_w:b.getWest(),lon_e:b.getEast()},code,color);
   }
+  const gb = greenBox&&blueBox&&eq(greenBox,blueBox);
   const gr = greenBox&&redBox&&eq(greenBox,redBox);
-  const gc = gr ? '#ffff00' : '#00d97e';
-  const rc = gr ? '#ffff00' : '#ff4a3a';
+  const br = blueBox&&redBox&&eq(blueBox,redBox);
+  let gc='#00d97e', bc='#3a8fff', rc='#ff4a3a';
+  if(gb&&gr){gc=bc=rc='#ffffff';}
+  else {
+    if(gb) gc='#00ffff';
+    else if(gr) gc='#ffff00';
+    if(br&&!gb) bc='#ff44ff';
+  }
   if(greenBox) style(greenBox,gc,gc);
-  if(redBox)  { if(gr) hide(redBox); else style(redBox,rc,rc); }
+  if(blueBox)  { if(gb) hide(blueBox); else style(blueBox,bc,bc); }
+  if(redBox)   { if(gr||br) hide(redBox); else style(redBox,rc,rc); }
   relbl(greenLbl,greenBox,greenLblCode,gc);
-  relbl(redLbl,redBox,redLblCode,gr?'transparent':rc);
-  renderBlueOverlay();
+  relbl(blueLbl,blueBox,blueLblCode,gb?'transparent':bc);
+  relbl(redLbl,redBox,redLblCode,(gr||br)?'transparent':rc);
 }
 
+
+function updateBlueBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!blueBox) blueBox = makeBox(bb);
+  if (!blueLbl) blueLbl = makeLbl();
+  setBox(blueBox, bb);
+  blueLblCode = ll2hsps(lat, lon, prec);
+  setLbl(blueLbl, bb, blueLblCode, '#3a8fff');
+  refreshBoxColors();
+}
+
+function updateBlueDot(lat, lon, acc) {
+  // L.circleMarker is pure SVG — more reliable than divIcon markers
+  if (blueDot) {
+    blueDot.setLatLng([lat, lon]);
+  } else {
+    blueDot = L.circleMarker([lat, lon], {
+      radius: 8,
+      color: '#ffffff',
+      weight: 2.5,
+      fillColor: '#3a8fff',
+      fillOpacity: 1,
+      pane: 'markerPane',
+    }).addTo(map);
+  }
+  if (acc) {
+    const R = 6371000;
+    const metersPerDeg = Math.PI * R / 180;
+    // Use L.circle for halo
+    if (blueHalo) {
+      blueHalo.setLatLng([lat, lon]);
+      blueHalo.setRadius(acc);
+    } else {
+      blueHalo = L.circle([lat, lon], {
+        radius: acc,
+        color: '#3a8fff',
+        weight: 1.5,
+        opacity: 0.5,
+        fillColor: '#3a8fff',
+        fillOpacity: 0.07,
+        pane: 'overlayPane',
+        interactive: false,
+      }).addTo(map);
+    }
+  }
+}
 function updateGreenBox(lat, lon, prec) {
   const bb = hsps2bbox(ll2hsps(lat, lon, prec));
   if (!bb) return;
@@ -530,6 +586,11 @@ function updateGreenBox(lat, lon, prec) {
   setBox(greenBox, bb);
   greenLblCode = ll2hsps(lat, lon, prec);
   setLbl(greenLbl, bb, greenLblCode, '#00d97e');
+  // Also draw blue if we have a GPS fix
+  if (blueRenderData) {
+    updateBlueBox(blueRenderData.lat, blueRenderData.lon, blueRenderData.prec);
+    updateBlueDot(blueRenderData.lat, blueRenderData.lon, blueRenderData.acc);
+  }
   refreshBoxColors();
 }
 
@@ -546,79 +607,6 @@ function updateRedBox(lat, lon, prec) {
 }
 
 
-/* ================================================================
-   BLUE DOM OVERLAY — dot, accuracy halo, bounding box
-   Drawn as absolutely-positioned SVG/div over the map container.
-   Redrawn on every map move/zoom so it stays in sync.
-   ================================================================ */
-function renderBlueOverlay() {
-  if (!map || !blueRenderData) return;
-  const {lat, lon, acc, prec} = blueRenderData;
-
-  // Get or create the overlay SVG
-  let svg = document.getElementById('blue-overlay');
-  if (!svg) {
-    svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.id = 'blue-overlay';
-    svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:650;overflow:visible';
-    document.getElementById('map').appendChild(svg);
-  }
-
-  const pt = map.latLngToContainerPoint([lat, lon]);
-  const px = pt.x, py = pt.y;
-
-  // Accuracy halo radius in pixels
-  let haloR = 0;
-  if (acc) {
-    const metersPerPx = getMetersPerPixel(lat);
-    haloR = Math.max(8, Math.min(acc / metersPerPx, 300));
-  }
-
-  // Bounding box corners in pixels
-  let boxSvg = '';
-  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
-  if (bb) {
-    const sbb = shiftBboxToMap(bb);
-    const tl = map.latLngToContainerPoint([sbb.lat_n, sbb.lon_w]);
-    const br2 = map.latLngToContainerPoint([sbb.lat_s, sbb.lon_e]);
-    const bx = tl.x, by = tl.y, bw = br2.x - tl.x, bh2 = br2.y - tl.y;
-    // Determine color based on overlap with green/red boxes
-    let boxColor = '#3a8fff';
-    if (greenBox && redBox) {
-      const gbb = greenBox.getBounds(), rbb = redBox.getBounds();
-      const gSame = Math.abs(gbb.getSouth()-sbb.lat_s)<1e-4 && Math.abs(gbb.getNorth()-sbb.lat_n)<1e-4;
-      const rSame = Math.abs(rbb.getSouth()-sbb.lat_s)<1e-4 && Math.abs(rbb.getNorth()-sbb.lat_n)<1e-4;
-      if (gSame && rSame) boxColor = '#ffffff';
-      else if (gSame) boxColor = '#00ffff';
-      else if (rSame) boxColor = '#ff44ff';
-    } else if (greenBox) {
-      const gbb = greenBox.getBounds();
-      const gSame = Math.abs(gbb.getSouth()-sbb.lat_s)<1e-4 && Math.abs(gbb.getNorth()-sbb.lat_n)<1e-4;
-      if (gSame) boxColor = '#00ffff';
-    } else if (redBox) {
-      const rbb = redBox.getBounds();
-      const rSame = Math.abs(rbb.getSouth()-sbb.lat_s)<1e-4 && Math.abs(rbb.getNorth()-sbb.lat_n)<1e-4;
-      if (rSame) boxColor = '#ff44ff';
-    }
-    const code = ll2hsps(lat, lon, prec);
-    boxSvg = `
-      <rect x="${bx}" y="${by}" width="${bw}" height="${bh2}"
-        fill="${boxColor}" fill-opacity="0.09"
-        stroke="${boxColor}" stroke-width="2" stroke-opacity="0.85"/>
-      <text x="${bx+4}" y="${by+22}" font-family="JetBrains Mono,monospace"
-        font-size="26" font-weight="700" fill="${boxColor}" opacity="0.85"
-        style="text-shadow:0 0 5px rgba(0,0,0,1)">${esc(code)}</text>`;
-  }
-
-  svg.innerHTML = `
-    ${haloR > 8 ? `<circle cx="${px}" cy="${py}" r="${haloR}"
-      fill="#3a8fff" fill-opacity="0.08"
-      stroke="#3a8fff" stroke-width="1.5" stroke-opacity="0.4"/>` : ''}
-    ${boxSvg}
-    <circle cx="${px}" cy="${py}" r="8"
-      fill="#3a8fff" stroke="white" stroke-width="2.5"
-      filter="drop-shadow(0 0 6px #3a8fff)"/>`;
-}
 
 function getMetersPerPixel(lat) {
   const zoom = map.getZoom();
@@ -653,9 +641,12 @@ function updateBlue(lat, lon, acc) {
   document.getElementById('blue-caret').style.visibility='visible';
   updateBtns('bb-', bc, true);
 
-  // Store for DOM overlay rendering
   blueRenderData = {lat, lon, acc, prec};
-  renderBlueOverlay();
+  // Draw immediately if map is ready, otherwise green's next redraw will catch it
+  if (map) {
+    updateBlueBox(lat, lon, prec);
+    updateBlueDot(lat, lon, acc);
+  }
 }
 
 function updateGreen(lat, lon) {
@@ -771,7 +762,7 @@ function initMap() {
     attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19,
   }).addTo(map);
 
-  const onMove = () => { const c=map.getCenter(); updateGreen(c.lat,c.lng); renderBlueOverlay(); };
+  const onMove = () => { const c=map.getCenter(); updateGreen(c.lat,c.lng); };
   map.on('move', onMove);
   map.on('zoom', onMove);
   onMove();
