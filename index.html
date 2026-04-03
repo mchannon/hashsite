@@ -725,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
    MAP
    ================================================================ */
 function initMap() {
-  map = L.map('map',{center:[35.085,-106.65],zoom:13,zoomControl:true});
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19,
   }).addTo(map);
@@ -762,7 +762,15 @@ function startWatch() {
 function onFix(pos) {
   const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;
   updateBlue(lat,lon,acc);
-  if (firstFix) { map.setView([lat,lon],16); firstFix=false; startWatch(); }
+  if (firstFix) {
+    firstFix = false;
+    startWatch();
+    // Zoom to a level appropriate for the accuracy of the first fix
+    const prec = acc ? accToPrec(lat, lon, acc) : 5;
+    const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18]; // prec 1..10 -> zoom
+    const z = zoomForPrec[Math.min(prec, 10) - 1] || 14;
+    map.setView([lat, lon], z);
+  }
 }
 
 function onGpsErr(err) {
