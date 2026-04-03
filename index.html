@@ -451,6 +451,7 @@ function updateBtns(prefix, brightCount, hasCode) {
    BOX MANAGEMENT
    ================================================================ */
 function makeBox(bbox) {
+  console.log("[blue] makeBox called bbox="+JSON.stringify(bbox));
   const b = shiftBboxToMap(bbox);
   return L.rectangle([[b.lat_s,b.lon_w],[b.lat_n,b.lon_e]],
     {interactive:false, color:'#ffffff', weight:2, opacity:.8,
@@ -559,9 +560,10 @@ function updateGreenBox(lat, lon, prec) {
 
 function updateBlueBox(lat, lon, prec) {
   const bb = hsps2bbox(ll2hsps(lat, lon, prec));
-  if (!bb) return;
-  if (!blueBox) blueBox = makeBox(bb);
-  if (!blueLbl) blueLbl = makeLbl();
+  console.log('[blue] updateBlueBox prec='+prec+' bb='+JSON.stringify(bb));
+  if (!bb) { console.log('[blue] bbox null, aborting'); return; }
+  if (!blueBox) { blueBox = makeBox(bb); console.log('[blue] box created'); }
+  if (!blueLbl) { blueLbl = makeLbl(); console.log('[blue] lbl created'); }
   setBox(blueBox, bb);
   blueLblCode = ll2hsps(lat, lon, prec);
   setLbl(blueLbl, bb, blueLblCode, '#3a8fff');
@@ -591,11 +593,11 @@ function flyToBlue() {
   map.setView([blueLL.lat, blueLL.lon], z);
 }
 function updateBlue(lat, lon, acc) {
-  // Guard: if map isn't ready yet (can happen if GPS fires before map init),
-  // store and retry after a short delay
-  if (!map) { setTimeout(()=>updateBlue(lat,lon,acc), 200); return; }
+  console.log('[blue] updateBlue called lat='+lat+' lon='+lon+' acc='+acc+' map='+!!map);
+  if (!map) { console.log('[blue] map not ready, retrying'); setTimeout(()=>updateBlue(lat,lon,acc), 200); return; }
   blueLL = {lat,lon};
   const prec = acc ? accToPrec(lat, lon, acc) : 10;
+  console.log('[blue] prec='+prec);
   const bc = prec; // no +3 fudge — accuracy is already the truth
   blueBright = bc;
   blueBare = ll2hsps(lat,lon,10).replace(/^#/,'');
@@ -611,8 +613,8 @@ function updateBlue(lat, lon, acc) {
   // Blue pin marker
   const pinHtml = `<div style="width:16px;height:16px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 14px var(--blue),0 2px 8px rgba(0,0,0,.7)"></div>`;
   const icon = L.divIcon({className:'',html:pinHtml,iconSize:[16,16],iconAnchor:[8,8]});
-  if (blueMkr) { blueMkr.setLatLng([lat,lon]); blueMkr.setIcon(icon); }
-  else blueMkr = L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map);
+  if (blueMkr) { blueMkr.setLatLng([lat,lon]); blueMkr.setIcon(icon); console.log('[blue] marker moved'); }
+  else { blueMkr = L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map); console.log('[blue] marker created'); }
 
   // Accuracy halo — radius = acc meters, updates with each fix
   if (acc) {
@@ -629,6 +631,11 @@ function updateBlue(lat, lon, acc) {
     }
   }
   updateBlueBox(lat, lon, prec);
+
+  // DEBUG: draw a second red dot at GPS position using identical code to the working red pin
+  const debugIcon = L.divIcon({className:'',html:`<div style="width:18px;height:18px;border-radius:50%;background:#ff4a3a;border:3px solid #fff;box-shadow:0 0 14px #ff4a3a,0 2px 8px rgba(0,0,0,.7)"></div>`,iconSize:[18,18],iconAnchor:[9,9]});
+  if (window._debugBlueMkr) window._debugBlueMkr.setLatLng([lat,lon]);
+  else window._debugBlueMkr = L.marker([lat,lon],{icon:debugIcon,zIndexOffset:2000,interactive:false}).addTo(map);
 }
 
 function updateGreen(lat, lon) {
@@ -775,6 +782,7 @@ function startWatch() {
 
 function onFix(pos) {
   const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;
+  console.log("[blue] onFix lat="+lat+" lon="+lon+" acc="+acc);
   updateBlue(lat,lon,acc);
   if (firstFix) {
     firstFix = false;
