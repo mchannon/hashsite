@@ -192,7 +192,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
     <div id="tl-logo"><span class="hash">#</span>hashsite</div>
     <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.3.816pm</span>
+    <span id="tl-ver">v4.3.819pm</span>
   </a>
 
   <!-- BLUE -->
@@ -654,8 +654,8 @@ function updateBlue(lat, lon, acc) {
   blueUpdateCount++;
   blueLastUpdate = Date.now();
   document.getElementById('blue-ll').textContent = fmtLL(lat,lon)+(acc?`  ±${Math.round(acc)}m`:'')+(blueUpdateCount>1?`  #${blueUpdateCount}`:'');
-  document.getElementById('blue-dot').classList.remove('pulse');
-  document.getElementById('gps-prompt').classList.add('hidden');
+  const bd=document.getElementById('blue-dot'); if(bd) bd.classList.remove('pulse');
+  const gp=document.getElementById('gps-prompt'); if(gp) gp.classList.add('hidden');
   document.getElementById('blue-caret').style.visibility='visible';
   updateBtns('bb-', bc, true);
 
@@ -792,18 +792,7 @@ function initMap() {
 
   map.on('click', e => { placePin(e.latlng.lat,e.latlng.lng); toast('#'+ll2hsps(e.latlng.lat,e.latlng.lng,10).replace(/^#/,'')); });
 
-  // HARDCODED TEST: blue dot at ABQ, no GPS needed
-  // If this shows, Leaflet drawing works and GPS is the issue
-  // If this doesn't show, something is wrong with map rendering
-  setTimeout(function() {
-    L.circleMarker([35.085, -106.65], {
-      radius: 20, color: '#ff0000', weight: 4,
-      fillColor: '#0000ff', fillOpacity: 1
-    }).addTo(map);
-    L.rectangle([[35.07,-106.67],[35.10,-106.63]], {
-      color:'#ff0000', weight:3, fillColor:'#ff0000', fillOpacity:0.3
-    }).addTo(map);
-  }, 1000);
+
 }
 
 /* ================================================================
@@ -837,12 +826,13 @@ function onFix(pos) {
 }
 
 function onGpsErr(err) {
-  document.getElementById('blue-dot').classList.remove('pulse');
+  const bd=document.getElementById('blue-dot'); if(bd) bd.classList.remove('pulse');
   showGpsMsg(err.code===1?'🚫 Location denied (err 1) — tap to retry':'⚠ GPS error (err '+err.code+') — tap to retry');
 }
 
 function showGpsMsg(msg) {
   const p=document.getElementById('gps-prompt');
+  if (!p) return;
   p.classList.remove('hidden');
   p.innerHTML = msg.startsWith('Locating') ? msg :
     `<svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>${msg}`;
