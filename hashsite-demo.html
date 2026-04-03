@@ -18,291 +18,250 @@
   --green:#00d97e; --green-bg:#03110a;
   --red:#ff4a3a;  --red-bg:#130404;
   --bg:#090910; --surface:#111118; --border:#1a1a2e;
-  --text:#ddddf0; --muted:#50508a; --white:#e8e8f0;
+  --text:#ddddf0; --white:#e0e0f4;
   --mono:'JetBrains Mono','Fira Mono',monospace;
   --ui:'DM Sans',system-ui,sans-serif;
-  --title-h: 38px;
-  --sh: 52px; /* strip height — desktop comfortable */
+  --title-h:38px;
+  --sh:58px;
 }
-/* mobile: tighter */
-@media (max-width:600px) { :root { --sh:44px; --title-h:34px; } }
+@media(max-width:600px){:root{--sh:46px;--title-h:34px}}
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--ui)}
 #app{display:flex;flex-direction:column;height:100%}
 
 /* ── TITLE BAR ── */
-#titlebar {
-  height:var(--title-h); min-height:var(--title-h);
-  background:#0c0c18; border-bottom:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; cursor:pointer; user-select:none;
-  text-decoration:none;
-  transition:background .15s;
+#titlebar{
+  height:var(--title-h);min-height:var(--title-h);
+  background:#0c0c18;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;cursor:pointer;user-select:none;text-decoration:none;
 }
-#titlebar:hover { background:#111128; }
-#titlebar-logo {
-  font-family:var(--mono); font-size:15px; font-weight:600;
-  letter-spacing:.12em; color:var(--white);
-  display:flex; align-items:center; gap:6px;
+#titlebar:hover{background:#111128}
+#tl-logo{
+  font-family:var(--mono);font-size:15px;font-weight:600;
+  letter-spacing:.12em;color:var(--white);
+  display:flex;align-items:baseline;gap:0;
 }
-#titlebar-logo .hash { color:var(--green); }
-#titlebar-logo .tagline {
-  font-size:10px; font-weight:400; color:var(--muted);
-  letter-spacing:.04em; margin-left:4px;
+#tl-logo .hash{color:var(--green)}
+#tl-tag{
+  font-size:10px;font-weight:500;color:#b8b8e0;
+  letter-spacing:.04em;margin-left:10px;font-family:var(--ui);
+}
+#tl-ver{
+  font-size:8px;font-weight:500;color:#b8b8e0;
+  letter-spacing:.04em;margin-left:8px;font-family:var(--mono);
 }
 
 /* ── STRIPS ── */
-.strip {
-  display:flex; align-items:center;
-  height:var(--sh); min-height:var(--sh);
+.strip{
+  display:flex;align-items:center;
+  height:var(--sh);min-height:var(--sh);
   padding:0 10px 0 0;
   border-bottom:1px solid var(--border);
-  flex-shrink:0; position:relative;
+  flex-shrink:0;position:relative;
 }
-.strip::before {
-  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-}
-.strip.blue  { background:var(--blue-bg);  } .strip.blue::before  { background:var(--blue);  box-shadow:0 0 8px var(--blue); }
-.strip.green { background:var(--green-bg); } .strip.green::before { background:var(--green); box-shadow:0 0 8px var(--green); }
-.strip.red   { background:var(--red-bg);   } .strip.red::before   { background:var(--red);   box-shadow:0 0 8px var(--red); }
+.strip::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.strip.blue{background:var(--blue-bg)} .strip.blue::before{background:var(--blue);box-shadow:0 0 8px var(--blue)}
+.strip.green{background:var(--green-bg)} .strip.green::before{background:var(--green);box-shadow:0 0 8px var(--green)}
+.strip.red{background:var(--red-bg)} .strip.red::before{background:var(--red);box-shadow:0 0 8px var(--red)}
 
-.strip-icon {
-  width:38px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-}
-.strip-dot { width:9px; height:9px; border-radius:50%; }
-.blue  .strip-dot { background:var(--blue);  box-shadow:0 0 6px var(--blue); }
-.green .strip-dot { background:var(--green); box-shadow:0 0 6px var(--green); }
-.red   .strip-dot { background:var(--red);   box-shadow:0 0 6px var(--red); }
-.strip-dot.pulse { animation:gpspulse 1.2s ease-in-out infinite; }
-@keyframes gpspulse { 0%,100%{opacity:1} 50%{opacity:.1} }
+.strip-icon{width:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.dot{width:9px;height:9px;border-radius:50%}
+.blue .dot{background:var(--blue);box-shadow:0 0 6px var(--blue)}
+.green .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.red .dot{background:var(--red);box-shadow:0 0 6px var(--red)}
+.dot.pulse{animation:gpspulse 1.2s ease-in-out infinite}
+@keyframes gpspulse{0%,100%{opacity:1}50%{opacity:.1}}
 
-.strip-main {
-  flex:1; min-width:0;
-  display:flex; flex-direction:column; justify-content:center; gap:3px;
-  overflow:hidden;
+/* strip-main must NOT clip vertically so raised chars show */
+.strip-main{
+  flex:1;min-width:0;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
 }
 
-/* Code display — uses a <span> for rich superscript rendering */
-.strip-code-wrap {
-  font-family:var(--mono); font-size:15px; font-weight:600;
-  letter-spacing:.04em; line-height:1;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+/* Code display div — used for blue, green (rich HTML with spans) */
+.code-display{
+  font-family:var(--mono);font-size:15px;font-weight:600;
+  letter-spacing:.04em;line-height:1.2;
+  overflow:visible;white-space:nowrap;
   width:100%;
 }
-.strip-code-wrap.dim { opacity:.38; font-weight:400; }
-/* Input version (green/red editable) */
-input.strip-code-input {
-  font-family:var(--mono); font-size:15px; font-weight:600;
-  letter-spacing:.04em; line-height:1;
-  background:transparent; border:none; outline:none;
-  width:100%; cursor:text; color:inherit;
-}
-.blue  .strip-code-wrap, .blue  input.strip-code-input { color:#70b8ff; }
-.green .strip-code-wrap, .green input.strip-code-input { color:#45ffb0; }
-.red   .strip-code-wrap, .red   input.strip-code-input { color:#ff8070; }
+.strip.blue  .code-display { color:#7fc4ff; }
+.strip.green .code-display { color:#3fffc0; }
+.strip.red   .code-display { color:#ff7a6a; }
+/* raised chars: same size, 2px up */
+.code-display .sup{position:relative;top:-2px}
+/* dim chars */
+/* dim dots within bright region */
+/* placeholder text */
+.code-display.placeholder{opacity:.35;font-weight:400}
 
-/* Superscript chars 4-5 (0-indexed 3-4 of bare code) */
-.hs-sup { position:relative; top:-2px; }
-/* Dimmed suffix on green */
-.hs-dim { opacity:.52; color:#00d97e; }
-
-.strip-latlon {
-  font-size:9.5px; color:var(--white); opacity:.6;
-  font-family:var(--mono); white-space:nowrap;
-  overflow:hidden; text-overflow:ellipsis;
-  letter-spacing:.02em; line-height:1;
+/* Lat/lon row */
+.latlon{
+  font-size:9.5px;color:#b0b0d0;
+  font-family:var(--mono);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;line-height:1;
 }
 
-/* Tap-to-enable GPS prompt in blue strip */
-#gps-prompt {
-  font-size:11px; color:#70b8ff; font-family:var(--ui);
-  font-weight:600; cursor:pointer; letter-spacing:.02em;
-  padding:3px 8px; border:1px solid #2a4a80;
-  border-radius:5px; display:none; white-space:nowrap;
+/* GPS tap prompt inside blue strip */
+#gps-prompt{
+  font-size:11px;color:#70b8ff;font-family:var(--ui);
+  font-weight:600;cursor:pointer;letter-spacing:.02em;
+  padding:3px 10px;border:1px solid #2a4a80;
+  border-radius:5px;white-space:nowrap;
   background:rgba(58,143,255,.15);
-  transition:background .15s;
+  transition:background .15s;display:inline-flex;align-items:center;gap:5px;
 }
-#gps-prompt:hover, #gps-prompt:active { background:rgba(58,143,255,.18); }
-#gps-prompt.visible { display:inline-flex; align-items:center; gap:5px; }
+#gps-prompt:hover,#gps-prompt:active{background:rgba(58,143,255,.28)}
+#gps-prompt.hidden{display:none}
 
-/* ── SHARE CARET BUTTONS ── */
-.share-caret {
-  display:flex; flex-direction:column; align-items:center;
-  gap:0; flex-shrink:0; padding-left:8px;
+/* ── SHARE CARET ── */
+.share-caret{
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;flex-shrink:0;padding-left:8px;
 }
-.caret-row {
-  display:flex; gap:4px; align-items:center;
-}
-.caret-row.mid { margin-bottom:-2px; } /* raises $ button */
+.caret-row{display:flex;gap:4px;align-items:center}
+.caret-mid{margin-bottom:-2px}
 
-.share-btn {
-  background:rgba(255,255,255,.11); border:1px solid #2a2a48;
-  border-radius:6px; color:#9090c0;
-  font-size:10px; font-family:var(--mono); font-weight:600;
-  letter-spacing:.04em; cursor:pointer;
-  padding:0 7px; height:24px;
-  display:flex; align-items:center; gap:3px;
-  transition:background .1s, color .1s, transform .1s;
-  white-space:nowrap; user-select:none;
+.sbtn{
+  background:rgba(255,255,255,.12);border:1px solid #2a2a50;
+  border-radius:6px;color:#a0a0d0;
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  letter-spacing:.04em;cursor:pointer;
+  padding:0 7px;height:24px;
+  display:flex;align-items:center;gap:3px;
+  transition:background .1s,color .1s;
+  white-space:nowrap;user-select:none;
 }
-.share-btn:hover, .share-btn:active {
-  background:rgba(255,255,255,.22); color:#fff;
-}
-.share-btn.dim-btn {
-  opacity:.28; pointer-events:none;
-}
-.share-btn.mid {
-  height:26px; /* slightly taller for visual caret apex */
-  transform:translateY(-3px);
-}
-/* Share icon SVG inline */
-.share-icon { width:11px; height:11px; flex-shrink:0; }
+.sbtn.apex{height:26px;transform:translateY(-3px)}
+.sbtn:hover,.sbtn:active{background:rgba(255,255,255,.24);color:#fff}
+.sbtn.off{opacity:.22;pointer-events:none}
+.si{width:11px;height:11px;flex-shrink:0}
 
 /* ── MAP ── */
-#map { flex:1; min-height:0; position:relative; }
+#map{flex:1;min-height:0;position:relative}
 
-#crosshair {
-  position:absolute; top:50%; left:50%;
+#crosshair{
+  position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%);
-  pointer-events:none; z-index:800; width:40px; height:40px;
+  pointer-events:none;z-index:800;width:40px;height:40px;
 }
-#crosshair::before, #crosshair::after {
-  content:''; position:absolute; background:var(--green); opacity:.8;
-}
-#crosshair::before { width:1.5px; height:100%; left:50%; top:0; transform:translateX(-50%); }
-#crosshair::after  { width:100%; height:1.5px; top:50%; left:0; transform:translateY(-50%); }
-.ch-ring {
-  position:absolute; width:10px; height:10px; border-radius:50%;
-  border:1.5px solid var(--green); opacity:.75;
-  top:50%; left:50%; transform:translate(-50%,-50%);
-}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:var(--green);opacity:.8}
+#crosshair::before{width:1.5px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+#crosshair::after{width:100%;height:1.5px;top:50%;left:0;transform:translateY(-50%)}
+.ch-ring{position:absolute;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--green);opacity:.75;top:50%;left:50%;transform:translate(-50%,-50%)}
 
-.leaflet-tile-pane { filter:brightness(.76) saturate(.6) hue-rotate(200deg); }
-.leaflet-control-attribution { font-size:9px!important; background:rgba(0,0,0,.65)!important; color:#444!important; }
-.leaflet-control-attribution a { color:#555!important; }
-.leaflet-control-zoom a { background:var(--surface)!important; color:var(--text)!important; border-color:var(--border)!important; }
+.leaflet-tile-pane{filter:brightness(.76) saturate(.6) hue-rotate(200deg)}
+.leaflet-control-attribution{font-size:9px!important;background:rgba(0,0,0,.65)!important;color:#444!important}
+.leaflet-control-attribution a{color:#555!important}
+.leaflet-control-zoom a{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
 
-#toast {
-  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
-  background:rgba(8,8,16,.94); border:1px solid var(--border); border-radius:8px;
-  padding:7px 14px; font-size:11.5px; color:var(--text); font-family:var(--mono);
-  z-index:900; pointer-events:none; opacity:0; transition:opacity .2s;
-  white-space:nowrap; max-width:calc(100vw - 32px); overflow:hidden; text-overflow:ellipsis;
+#toast{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  background:rgba(8,8,16,.94);border:1px solid var(--border);border-radius:8px;
+  padding:7px 14px;font-size:11.5px;color:var(--text);font-family:var(--mono);
+  z-index:900;pointer-events:none;opacity:0;transition:opacity .2s;
+  white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;
 }
-#toast.show { opacity:1; }
+#toast.show{opacity:1}
 
-@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
-.shake { animation:shake .28s; }
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.shake{animation:shake .28s}
 
-#install-btn {
-  position:absolute; top:8px; right:8px; z-index:950;
-  background:var(--surface); border:1px solid var(--border); border-radius:7px;
-  padding:6px 12px; font-size:11px; color:var(--muted); font-family:var(--ui);
-  font-weight:600; cursor:pointer; display:none; transition:background .15s,color .15s;
+#install-btn{
+  position:absolute;top:8px;right:8px;z-index:950;
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;
+  padding:6px 12px;font-size:11px;color:#8080b0;font-family:var(--ui);
+  font-weight:600;cursor:pointer;display:none;transition:background .15s,color .15s;
 }
-#install-btn:hover { background:#1a1a2e; color:var(--text); }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- TITLE BAR -->
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
-    <div id="titlebar-logo">
-      <span class="hash">#</span>hashsite
-      <span class="tagline">open geocoding · no api key · no rent</span>
-      <span id="ver" style="font-size:8px;font-weight:400;color:#5a5a8a;letter-spacing:.04em;margin-left:8px;font-family:var(--mono)"></span>
-    </div>
+    <div id="tl-logo"><span class="hash">#</span>hashsite</div>
+    <span id="tl-tag">open geocoding · no api key · no rent</span>
+    <span id="tl-ver">v4.3.214am</span>
   </a>
 
-  <!-- BLUE: GPS -->
-  <div class="strip blue" id="strip-blue">
-    <div class="strip-icon"><div class="strip-dot pulse" id="blue-dot"></div></div>
+  <!-- BLUE -->
+  <div class="strip blue">
+    <div class="strip-icon"><div class="dot pulse" id="blue-dot"></div></div>
     <div class="strip-main">
-      <div class="strip-code-wrap dim" id="blue-code">
-        <span id="gps-prompt" class="visible" onclick="requestGPS()">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      <div class="code-display" id="blue-code">
+        <span id="gps-prompt" onclick="requestGPS()">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
           Tap to enable location
         </span>
       </div>
-      <div class="strip-latlon" id="blue-latlon"></div>
+      <div class="latlon" id="blue-ll"></div>
     </div>
-    <div class="share-caret" id="blue-caret" style="display:none">
-      <div class="caret-row mid">
-        <button class="share-btn mid" id="btn-blue-dollar" onclick="doShare('blue','$')" title="Share $ prefix (3-char)">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          $
+    <div class="share-caret" id="blue-caret" style="visibility:hidden">
+      <div class="caret-row caret-mid">
+        <button class="sbtn apex" id="bb-dollar" onclick="doShare('blue','$')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
         </button>
       </div>
       <div class="caret-row">
-        <button class="share-btn" id="btn-blue-hash" onclick="doShare('blue','#')" title="Share full code">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          #
+        <button class="sbtn" id="bb-hash" onclick="doShare('blue','#')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
         </button>
-        <button class="share-btn" id="btn-blue-pct" onclick="doShare('blue','%')" title="Share % prefix (5-char)">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          %
+        <button class="sbtn" id="bb-pct" onclick="doShare('blue','%')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
         </button>
       </div>
     </div>
   </div>
 
-  <!-- GREEN: crosshair -->
-  <div class="strip green" id="strip-green">
-    <div class="strip-icon"><div class="strip-dot"></div></div>
+  <!-- GREEN -->
+  <div class="strip green">
+    <div class="strip-icon"><div class="dot"></div></div>
     <div class="strip-main">
-      <div class="strip-code-wrap" id="green-display" style="cursor:text" onclick="focusGreenInput()"></div>
-      <input class="strip-code-input" id="green-code" type="text"
-        spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-        placeholder="#…" style="display:none;position:absolute;opacity:0;pointer-events:none"/>
-      <div class="strip-latlon" id="green-latlon"></div>
+      <div class="code-display" id="green-code" style="cursor:text" onclick="focusGreenEdit()"></div>
+      <input id="green-edit" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
+      <div class="latlon" id="green-ll"></div>
     </div>
     <div class="share-caret">
-      <div class="caret-row mid">
-        <button class="share-btn mid" id="btn-green-dollar" onclick="doShare('green','$')" title="Share $ prefix">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          $
+      <div class="caret-row caret-mid">
+        <button class="sbtn apex" id="gb-dollar" onclick="doShare('green','$')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
         </button>
       </div>
       <div class="caret-row">
-        <button class="share-btn" id="btn-green-hash" onclick="doShare('green','#')" title="Share full code">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          #
+        <button class="sbtn" id="gb-hash" onclick="doShare('green','#')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
         </button>
-        <button class="share-btn" id="btn-green-pct" onclick="doShare('green','%')" title="Share % prefix">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          %
+        <button class="sbtn" id="gb-pct" onclick="doShare('green','%')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
         </button>
       </div>
     </div>
   </div>
 
-  <!-- RED: pin -->
-  <div class="strip red" id="strip-red">
-    <div class="strip-icon"><div class="strip-dot"></div></div>
+  <!-- RED -->
+  <div class="strip red">
+    <div class="strip-icon"><div class="dot"></div></div>
     <div class="strip-main">
-      <input class="strip-code-input dim" id="red-code" type="text"
-        spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-        placeholder="Tap map to drop pin"/>
-      <div class="strip-latlon" id="red-latlon"></div>
+      <div class="code-display placeholder" id="red-code">Tap map to drop pin</div>
+      <input id="red-edit" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
+      <div class="latlon" id="red-ll"></div>
     </div>
     <div class="share-caret">
-      <div class="caret-row mid">
-        <button class="share-btn mid" id="btn-red-dollar" onclick="doShare('red','$')" title="Share $ prefix">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          $
+      <div class="caret-row caret-mid">
+        <button class="sbtn apex off" id="rb-dollar" onclick="doShare('red','$')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
         </button>
       </div>
       <div class="caret-row">
-        <button class="share-btn" id="btn-red-hash" onclick="doShare('red','#')" title="Share full code">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          #
+        <button class="sbtn off" id="rb-hash" onclick="doShare('red','#')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
         </button>
-        <button class="share-btn" id="btn-red-pct" onclick="doShare('red','%')" title="Share % prefix">
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-          %
+        <button class="sbtn off" id="rb-pct" onclick="doShare('red','%')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
         </button>
       </div>
     </div>
@@ -317,13 +276,21 @@ input.strip-code-input {
 
 <script>
 /* ================================================================
-   CODEC (identical to v2, verified against C binary)
+   CODEC — verified against C binary
    ================================================================ */
-const HS_MAXLEN=18,HS_LAT_POLAR=41.81,HS_LAT_MID=19.47,HS_POLAR_HEI=(90-41.81)/10,HS_EQ_WID=60/9;
+const HS_MAXLEN=18,HS_LAT_POLAR=41.81,HS_LAT_MID=19.47,
+      HS_POLAR_HEI=(90-41.81)/10,HS_EQ_WID=60/9;
+
 function hs_encode(n){if(n<0||n>35)return'?';if(n<10)return String.fromCharCode(48+n);if(n===24)return'o';return String.fromCharCode(55+n)}
-function hs_decode(c){const cc=c.toUpperCase();if(cc>='0'&&cc<='9')return cc.charCodeAt(0)-48;if(cc>='A'&&cc<='Z')return cc.charCodeAt(0)-55;return-1}
-const NR=[{ncols:6,base:30},{ncols:6,base:24},{ncols:5,base:19},{ncols:5,base:14},{ncols:4,base:10},{ncols:3,base:7},{ncols:3,base:4},{ncols:2,base:2},{ncols:1,base:1},{ncols:1,base:0}];
-const SR=[{ncols:6,base:0},{ncols:6,base:6},{ncols:5,base:12},{ncols:5,base:17},{ncols:4,base:22},{ncols:3,base:26},{ncols:3,base:29},{ncols:2,base:32},{ncols:1,base:34},{ncols:1,base:35}];
+function hs_decode(c){const u=c.toUpperCase();if(u>='0'&&u<='9')return u.charCodeAt(0)-48;if(u>='A'&&u<='Z')return u.charCodeAt(0)-55;return-1}
+
+const NR=[{ncols:6,base:30},{ncols:6,base:24},{ncols:5,base:19},{ncols:5,base:14},
+          {ncols:4,base:10},{ncols:3,base:7},{ncols:3,base:4},{ncols:2,base:2},
+          {ncols:1,base:1},{ncols:1,base:0}];
+const SR=[{ncols:6,base:0},{ncols:6,base:6},{ncols:5,base:12},{ncols:5,base:17},
+          {ncols:4,base:22},{ncols:3,base:26},{ncols:3,base:29},{ncols:2,base:32},
+          {ncols:1,base:34},{ncols:1,base:35}];
+
 function nps(lo,ln){let y2=Math.min(Math.floor(lo/HS_POLAR_HEI),9);const r=NR[y2],w=60/r.ncols,xa=Math.min(Math.floor(ln/w),r.ncols-1);return{let:hs_encode(r.base+xa),hei:HS_POLAR_HEI,wid:w,lat:HS_POLAR_HEI-(lo-y2*HS_POLAR_HEI),lon:ln-xa*w}}
 function sps(lo,ln){let y2=Math.min(Math.floor(lo/HS_POLAR_HEI),9);const r=SR[y2],w=60/r.ncols,xa=Math.min(Math.floor(ln/w),r.ncols-1);return{let:hs_encode(r.base+xa),hei:HS_POLAR_HEI,wid:w,lat:lo-y2*HS_POLAR_HEI,lon:ln-xa*w}}
 function eqs(lo,ln,bh){const rh=bh/4,ya=Math.min(Math.floor(lo/rh),3),xa=Math.min(Math.floor(ln/HS_EQ_WID),8);return{let:hs_encode(xa+9*ya),hei:rh,wid:HS_EQ_WID,lat:lo-ya*rh,lon:ln-xa*HS_EQ_WID}}
@@ -331,6 +298,7 @@ function ll2a(lat,lon){const x=((lon+180)%360+360)%360,x1=Math.min(Math.floor(x/
 function ll2b(c){const y1=Math.floor(hs_decode(c.let)/6);if(y1===0)return nps(c.hei-c.lat,c.lon);if(y1===5)return sps(c.lat,c.lon);return eqs(c.lat,c.lon,c.hei)}
 function ll2n(c){const sw=c.wid/6,sh=c.hei/6,xa=Math.min(Math.floor(c.lon/sw),5),ya=Math.min(Math.floor(c.lat/sh),5);return{let:hs_encode(ya*6+xa),wid:sw,hei:sh,lat:c.lat-ya*sh,lon:c.lon-xa*sw}}
 function ll2hsps(lat,lon,nc){nc=Math.max(1,Math.min(nc,HS_MAXLEN));const c1=ll2a(lat,lon);let b=c1.let;if(nc===1)return'#'+b;const c2=ll2b(c1);b+=c2.let;let cn=c2;for(let n=2;n<nc;n++){cn=ll2n(cn);b+=cn.let}return'#'+b}
+
 function hsps2bbox(hs){
   const s=hs.replace(/^#/,'').replace(/\./g,'').replace(/\^.*$/,'').toUpperCase();
   if(s.length<1||s.length>HS_MAXLEN)return null;
@@ -347,98 +315,77 @@ function hsps2bbox(hs){
   return{lat_s:CL,lat_n:CL+CH,lon_w:CLn,lon_e:CLn+CW,lat_c:CL+CH/2,lon_c:CLn+CW/2}}
 
 /* ================================================================
-   LUHN (verified against C binary)
+   LUHN — verified against C binary
    ================================================================ */
 function hs_comb2(n){return n*(n-1)/2}
-function hs_combo_from_index(idx,ns){let k=0;for(let i=1;i<=ns;i++)for(let j=i+1;j<=ns;j++){if(k===idx)return[i,j];k++}return[1,2]}
-function hs_luhn_index(clean,n){let s=0;for(let i=0;i<n;i++){let v=hs_decode(clean[i]);if(v<0)v=0;if(i%2===1){v*=2;if(v>35)v-=35}s+=v}const c=hs_comb2(n-1);return c<1?0:(s*25)%c}
-function hs_luhn_place(hs){
-  const horiz=hs.replace(/^#/,'').replace(/\^.*$/,'').replace(/\./g,'');
-  const n=horiz.length;if(n<3)return'#'+horiz;
-  const full=hs.replace(/^#/,'').replace(/\^/,'').replace(/\./g,'');
-  const ci=hs.indexOf('^'),vert=ci>=0?hs.slice(ci):'';
-  const[p1,p2]=hs_combo_from_index(hs_luhn_index(full,full.length),n-1);
-  let out='#';for(let i=0;i<n;i++){out+=horiz[i];if(i+1===p1||i+1===p2)out+='.'}
-  return out+vert}
+function hs_combo_idx(idx,ns){let k=0;for(let i=1;i<=ns;i++)for(let j=i+1;j<=ns;j++){if(k===idx)return[i,j];k++}return[1,2]}
+function hs_luhn_idx(clean,n){let s=0;for(let i=0;i<n;i++){let v=hs_decode(clean[i]);if(v<0)v=0;if(i%2===1){v*=2;if(v>35)v-=35}s+=v}const c=hs_comb2(n-1);return c<1?0:(s*25)%c}
+function hs_luhn(hs){
+  const h=hs.replace(/^#/,'').replace(/\^.*$/,'').replace(/\./g,'');
+  const n=h.length;if(n<3)return'#'+h;
+  const f=hs.replace(/^#/,'').replace(/\^/,'').replace(/\./g,'');
+  const ci=hs.indexOf('^'),vt=ci>=0?hs.slice(ci):'';
+  const[p1,p2]=hs_combo_idx(hs_luhn_idx(f,f.length),n-1);
+  let o='#';for(let i=0;i<n;i++){o+=h[i];if(i+1===p1||i+1===p2)o+='.'}
+  return o+vt}
 
 /* ================================================================
-   RENDER: build rich HTML for a code string with:
-   - superscript on bare chars at positions 3 & 4 (0-indexed)
-   - optional dim suffix starting at 'dimFrom' bare char index
+   RENDER CODE: rich HTML with raised chars 3&4, dim suffix, luhn on bright only
+   brightCount = number of bare chars to show bright (rest dimmed)
    ================================================================ */
-function renderCode(fullDotted, dimFrom) {
-  // fullDotted = '#7BA2CSoDZ9' (10 char, luhn-dotted for full string)
-  // We want:
-  //   - bright chars: positions 0..dimFrom-1 of bare code, with luhn dots computed for ONLY those chars
-  //   - dim chars: positions dimFrom..9, no dots, dimmed
-  //   - chars at bare positions 3 & 4 are raised (same size)
-  const bare = fullDotted.replace(/^#/,'').replace(/\./g,''); // 10 bare chars
-  const brightCount = (dimFrom !== undefined) ? Math.min(dimFrom, bare.length) : bare.length;
+function renderCode(bare10, brightCount) {
+  // Only render bright chars — dim portion is simply not drawn.
+  const bc = Math.min(brightCount, bare10.length);
+  const brightBare = bare10.slice(0, bc);
 
-  // Compute luhn dots for bright portion only
-  const brightBare = bare.slice(0, brightCount);
-  const brightDotted = brightCount >= 3 ? hs_luhn_place('#' + brightBare) : '#' + brightBare;
-  // brightDotted = '#XX.XX.XX' etc, strip leading #
-  const brightPart = brightDotted.replace(/^#/,'');
+  // Compute luhn dots for bright portion only.
+  // Suppress a dot if it would land at position >= bc-1 (right before last bright char).
+  let brightStr = brightBare;
+  if (bc >= 3) {
+    const rawBare = brightBare; // already clean
+    const n = rawBare.length;
+    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(rawBare, n), n-1);
+    let bd = '';
+    for (let i = 0; i < n; i++) {
+      bd += rawBare[i];
+      const pos = i+1;
+      if ((pos===rp1||pos===rp2) && pos < bc) bd += '.';
+    }
+    brightStr = bd;
+  }
 
-  let html = '<span style="opacity:.5">#</span>';
+  let html = '<span style="opacity:.45">#</span>';
   let bareIdx = 0;
 
-  // Render bright portion (with dots)
-  for (const ch of brightPart.split('')) {
+  for (const ch of brightStr) {
     if (ch === '.') {
-      html += '<span style="opacity:.35">.</span>';
+      // dot: same color as surrounding chars, wider letter-spacing via margin
+      html += '<span style="margin:0 0.12em;opacity:1">.</span>';
       continue;
     }
     const bi = bareIdx++;
-    const isRaised = (bi === 3 || bi === 4);
-    let span = isRaised ? `<span class="hs-sup">` : '';
-    span += escHtml(ch);
-    if (isRaised) span += '</span>';
-    html += span;
-  }
-
-  // Render dim portion (no dots)
-  const dimPart = bare.slice(brightCount);
-  for (const ch of dimPart.split('')) {
-    const bi = bareIdx++;
-    const isRaised = (bi === 3 || bi === 4);
-    let span = `<span class="hs-dim">`;
-    if (isRaised) span += `<span class="hs-sup">`;
-    span += escHtml(ch);
-    if (isRaised) span += '</span>';
-    span += '</span>';
-    html += span;
+    const raised = (bi===3||bi===4);
+    if (raised) html += `<span class="sup">${esc(ch)}</span>`;
+    else html += esc(ch);
   }
   return html;
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 /* ================================================================
-   ZOOM → PRECISION: find char count whose cell covers 1/4–1/2 screen
+   ZOOM → PRECISION using actual codec bbox sizes
    ================================================================ */
-function zoomToPrecision(map, lat) {
+function zoomToPrecision(lat, lon) {
   const bounds = map.getBounds();
   const latSpan = bounds.getNorth() - bounds.getSouth();
   const lonSpan = bounds.getEast()  - bounds.getWest();
-  // target: cell should be 1/4 to 1/2 of screen span → aim for 3/8
-  const targetLat = latSpan * 0.375;
-  const targetLon = lonSpan * 0.375;
-
-  // Each char after 1st divides by 6 (roughly). Approximate cell sizes:
-  // char n: hei ≈ 180/(6^n) for equatorial, lon similar
-  // Find n where cell fits target
-  let cellHei = 180, cellWid = 360;
-  for (let n = 1; n <= 10; n++) {
-    if (n === 1) { cellHei = 19.47; cellWid = 60; }
-    else if (n === 2) { cellHei = 19.47/4; cellWid = 60/9; }
-    else { cellHei /= 6; cellWid /= 6; }
-    // adjust wid for latitude compression
-    const adjWid = cellWid * Math.cos(lat * Math.PI / 180);
-    if (cellHei <= targetLat || adjWid <= targetLon) return n;
+  const tLat = latSpan * 0.375;
+  const tLon = lonSpan * 0.375;
+  for (let n=1; n<=10; n++) {
+    const bb = hsps2bbox(ll2hsps(lat, lon, n));
+    if (!bb) continue;
+    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) return n;
   }
   return 10;
 }
@@ -446,384 +393,354 @@ function zoomToPrecision(map, lat) {
 /* ================================================================
    STATE
    ================================================================ */
-let blueLL=null, redLL=null;
-let redMkr=null, blueMkr=null, blueAcc=null;
-let greenBox=null, blueBox=null, redBox=null;
 let map=null, firstFix=true, toastTmr=null;
-let gpsDenied=false;
+let blueLL=null, greenLL=null, redLL=null;
+let blueMkr=null, blueAccCirc=null;
+let redMkr=null;
+let greenBox=null, blueBox=null, redBox=null;
+let greenLbl=null, blueLbl=null, redLbl=null;
+let greenLblCode=null, blueLblCode=null, redLblCode=null;
+let greenBare=null, blueBare=null, redBare=null; // bare 10-char for sharing
+let greenBright=10, blueBright=10, redBright=10; // current bright char counts
 
 /* ================================================================
-   FORMAT HELPERS
+   HELPERS
    ================================================================ */
 function fmtLL(lat,lon){return`${Math.abs(lat).toFixed(6)}°${lat>=0?'N':'S'}  ${Math.abs(lon).toFixed(6)}°${lon>=0?'E':'W'}`}
-function coded(lat,lon,nc){return hs_luhn_place(ll2hsps(lat,lon,nc))}
 
-// Extract bare suffix for $ and % sharing
-function suffixFor(dotted, prefixLen) {
-  // dotted = '#7B6.6C3.J8F5', prefixLen = 3 means keep first 3 bare chars as context
-  // return the remaining bare chars as the suffix
-  const bare = dotted.replace(/^#/,'').replace(/\./g,'');
-  return bare.slice(prefixLen);
+function setDisplay(elId, bare10, brightCount) {
+  const el = document.getElementById(elId);
+  el.classList.remove('placeholder');
+  el.innerHTML = renderCode(bare10, brightCount);
+}
+
+function updateBtns(prefix, brightCount, hasCode) {
+  const hash   = document.getElementById(prefix+'hash');
+  const dollar = document.getElementById(prefix+'dollar');
+  const pct    = document.getElementById(prefix+'pct');
+  if (!hash) return;
+  hash.classList.toggle('off',   !hasCode);
+  dollar.classList.toggle('off', !hasCode || brightCount < 6);
+  pct.classList.toggle('off',    !hasCode || brightCount < 8);
+}
+
+/* ================================================================
+   BOX MANAGEMENT
+   ================================================================ */
+function makeBox() {
+  return L.rectangle([[0,0],[0,0]], {interactive:false, pane:'overlayPane'}).addTo(map);
+}
+
+function makeLbl(color) {
+  const icon = L.divIcon({className:'', html:'', iconSize:[0,0], iconAnchor:[0,0]});
+  return L.marker([0,0], {icon, interactive:false, zIndexOffset:200}).addTo(map);
+}
+
+function shiftBboxToMap(bbox) {
+  // The codec always returns lon in [-180,180). When the map is panned past
+  // ±180, Leaflet's center lon can be e.g. 185 or -200. Shift bbox by the
+  // nearest multiple of 360 so it aligns with the visible map area.
+  const mapLon = map.getCenter().lng;
+  const cellMid = (bbox.lon_w + bbox.lon_e) / 2;
+  const shift = Math.round((mapLon - cellMid) / 360) * 360;
+  return {
+    lat_s: bbox.lat_s, lat_n: bbox.lat_n,
+    lon_w: bbox.lon_w + shift, lon_e: bbox.lon_e + shift,
+  };
+}
+
+function setBox(box, bbox) {
+  const b = shiftBboxToMap(bbox);
+  box.setBounds([[b.lat_s, b.lon_w],[b.lat_n, b.lon_e]]);
+}
+
+function setLbl(lbl, bbox, code, color) {
+  if (!map) return;
+  const sb = shiftBboxToMap(bbox);
+  lbl.setOpacity(1);
+  lbl.setLatLng([sb.lat_n, sb.lon_w]);
+  lbl.setIcon(L.divIcon({
+    className: '',
+    html: `<div style="font-family:var(--mono);font-size:26px;font-weight:700;color:${color};opacity:.85;white-space:nowrap;pointer-events:none;padding:2px 0 0 3px;text-shadow:0 0 5px rgba(0,0,0,1),0 1px 3px rgba(0,0,0,.9)">${esc(code)}</div>`,
+    iconSize:[0,0], iconAnchor:[0,0],
+  }));
+}
+
+function refreshBoxColors() {
+  if (!greenBox && !blueBox && !redBox) return;
+
+  function eq(a,b){
+    if(!a||!b)return false;
+    const ba=a.getBounds(),bb=b.getBounds();
+    return Math.abs(ba.getSouth()-bb.getSouth())<1e-4 &&
+           Math.abs(ba.getNorth()-bb.getNorth())<1e-4 &&
+           Math.abs(ba.getWest() -bb.getWest()) <1e-4 &&
+           Math.abs(ba.getEast() -bb.getEast()) <1e-4;
+  }
+
+  const gb=greenBox&&blueBox&&eq(greenBox,blueBox);
+  const gr=greenBox&&redBox &&eq(greenBox,redBox);
+  const br=blueBox &&redBox &&eq(blueBox,redBox);
+  const all=gb&&gr;
+
+  function style(box, stroke, fill) {
+    if(!box)return;
+    box.setStyle({color:stroke,weight:2,opacity:.8,fillColor:fill,fillOpacity:.1});
+  }
+  function hide(box) { if(box) box.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0}); }
+
+  // Determine final colors
+  let gc='#00d97e', bc2='#3a8fff', rc='#ff4a3a';
+  if (all) { gc=bc2=rc='#ffffff'; }
+  else {
+    if (gb&&blueBox)  gc='#00ffff';
+    else if (gr&&redBox) gc='#ffff00';
+    if (!gb && br&&redBox) bc2='#ff44ff';
+  }
+
+  if (all) {
+    style(greenBox,gc,gc); hide(blueBox); hide(redBox);
+  } else {
+    if (greenBox) style(greenBox,gc,gc);
+    if (blueBox)  { if(gb) hide(blueBox); else style(blueBox,bc2,bc2); }
+    if (redBox)   { if(gr||br) hide(redBox); else style(redBox,rc,rc); }
+  }
+
+  // Update label colors to match
+  function relbl(lbl, box, code, color) {
+    if (!lbl || !box || !code) return;
+    if (color === 'transparent') { lbl.setOpacity(0); return; }
+    const bb2 = box.getBounds();
+    const bbox2 = {lat_s:bb2.getSouth(),lat_n:bb2.getNorth(),lon_w:bb2.getWest(),lon_e:bb2.getEast()};
+    setLbl(lbl, bbox2, code, color);
+  }
+  relbl(greenLbl, greenBox, greenLblCode, gc);
+  relbl(blueLbl,  blueBox,  blueLblCode,  gb ? 'transparent' : bc2);
+  relbl(redLbl,   redBox,   redLblCode,   (gr||br) ? 'transparent' : rc);
+}
+
+function updateGreenBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!greenBox) greenBox = makeBox();
+  if (!greenLbl) greenLbl = makeLbl('#00d97e');
+  setBox(greenBox, bb);
+  greenLblCode = ll2hsps(lat, lon, prec);
+  setLbl(greenLbl, bb, greenLblCode, '#00d97e');
+  refreshBoxColors();
+}
+
+function updateBlueBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!blueBox) blueBox = makeBox();
+  if (!blueLbl) blueLbl = makeLbl('#3a8fff');
+  setBox(blueBox, bb);
+  blueLblCode = ll2hsps(lat, lon, prec);
+  setLbl(blueLbl, bb, blueLblCode, '#3a8fff');
+  refreshBoxColors();
+}
+
+function updateRedBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!redBox) redBox = makeBox();
+  if (!redLbl) redLbl = makeLbl('#ff4a3a');
+  setBox(redBox, bb);
+  redLblCode = ll2hsps(lat, lon, prec);
+  setLbl(redLbl, bb, redLblCode, '#ff4a3a');
+  refreshBoxColors();
 }
 
 /* ================================================================
    STRIP UPDATES
    ================================================================ */
 function updateBlue(lat, lon, acc) {
-  blueLL = {lat, lon};
-  const dotted = coded(lat, lon, 10);
-  const prec = map ? zoomToPrecision(map, lat) : 10;
-  const el = document.getElementById('blue-code');
-  const blueBright = Math.min(prec + 3, 10);
-  el.innerHTML = renderCode(dotted, blueBright);
-  el.classList.remove('dim');
-  updateBtnDim('blue', blueBright);
-  document.getElementById('blue-latlon').textContent =
-    fmtLL(lat,lon) + (acc ? `  ±${Math.round(acc)}m` : '');
+  blueLL = {lat,lon};
+  const prec = map ? zoomToPrecision(lat, lon) : 10;
+  const bc = Math.min(prec+3, 10);
+  blueBright = bc;
+  blueBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  setDisplay('blue-code', blueBare, bc);
+  document.getElementById('blue-ll').textContent = fmtLL(lat,lon)+(acc?`  ±${Math.round(acc)}m`:'');
   document.getElementById('blue-dot').classList.remove('pulse');
-  document.getElementById('gps-prompt').classList.remove('visible');
-  document.getElementById('blue-caret').style.display = '';
+  document.getElementById('gps-prompt').classList.add('hidden');
+  document.getElementById('blue-caret').style.visibility='visible';
+  updateBtns('bb-', bc, true);
 
-  // update/create blue marker
+  // blue GPS marker
   const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--blue);border:2.5px solid #fff;box-shadow:0 0 12px var(--blue),0 2px 6px rgba(0,0,0,.6);margin:-7px 0 0 -7px"></div>`,iconSize:[0,0],iconAnchor:[0,0]});
-  if (blueMkr) blueMkr.setLatLng([lat,lon]);
-  else blueMkr = L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map);
-  if (acc) {
-    if (blueAcc) { blueAcc.setLatLng([lat,lon]); blueAcc.setRadius(acc); }
-    else blueAcc = L.circle([lat,lon],{radius:acc,color:'#3a8fff',fillColor:'#3a8fff',fillOpacity:.06,weight:1,opacity:.3}).addTo(map);
-  }
-
-  // blue box at same precision as green
-  const ctr = map ? map.getCenter() : {lat,lng:lon};
-  const bprec = map ? zoomToPrecision(map, ctr.lat) : prec;
-  const bbox = hsps2bbox(ll2hsps(lat, lon, bprec));
-  if (bbox) {
-    const bounds = [[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]];
-    if (blueBox) setBoxBounds(blueBox, bbox);
-    else { blueBox = L.rectangle([[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]],{interactive:false,pane:'shadowPane'}).addTo(map); }
-  }
-  updateBoxColors();
+  if (blueMkr) blueMkr.setLatLng([lat,lon]); else blueMkr=L.marker([lat,lon],{icon,zIndexOffset:1000,interactive:false}).addTo(map);
+  if (acc){ if(blueAccCirc){blueAccCirc.setLatLng([lat,lon]);blueAccCirc.setRadius(acc)}else blueAccCirc=L.circle([lat,lon],{radius:acc,color:'#3a8fff',fillColor:'#3a8fff',fillOpacity:.06,weight:1,opacity:.3}).addTo(map); }
+  updateBlueBox(lat, lon, prec);
 }
 
 function updateGreen(lat, lon) {
-  const prec = map ? zoomToPrecision(map, lat) : 10;
-  const dotted = coded(lat, lon, 10);
-
-  // Update display div with dim suffix
-  const disp = document.getElementById('green-display');
-  const greenBright = Math.min(prec + 3, 10);
-  if (disp) disp.innerHTML = renderCode(dotted, greenBright);
-  updateBtnDim('green', greenBright);
-  // Keep hidden input in sync for Enter-to-navigate
-  const inp = document.getElementById('green-code');
-  inp.value = dotted;
-  document.getElementById('green-latlon').textContent = fmtLL(lat, lon);
-
-  // Update bounding box overlay
-  const bbox = hsps2bbox(ll2hsps(lat, lon, prec));
-  if (bbox) {
-    const bounds = [[bbox.lat_s, bbox.lon_w],[bbox.lat_n, bbox.lon_e]];
-    if (greenBox) setBoxBounds(greenBox, bbox);
-    else { greenBox = L.rectangle([[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]],{interactive:false,pane:'shadowPane'}).addTo(map); }
-  }
-  updateBoxColors();
-}
-
-function focusGreenInput() {
-  const inp = document.getElementById('green-code');
-  const disp = document.getElementById('green-display');
-  if (disp) disp.style.display = 'none';
-  inp.style.cssText = '';
-  inp.focus();
-  inp.select();
+  greenLL = {lat,lon};
+  const prec = map ? zoomToPrecision(lat, lon) : 10;
+  const bc = Math.min(prec+3, 10);
+  greenBright = bc;
+  greenBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  setDisplay('green-code', greenBare, bc);
+  document.getElementById('green-ll').textContent = fmtLL(lat,lon);
+  updateBtns('gb-', bc, true);
+  updateGreenBox(lat, lon, prec);
 }
 
 function updateRed(lat, lon) {
-  redLL = {lat, lon};
-  const dotted = coded(lat, lon, 10);
-  const inp = document.getElementById('red-code');
-  inp.value = dotted;
-  inp.classList.remove('dim');
-  document.getElementById('red-latlon').textContent = fmtLL(lat, lon);
-  updateBtnDim('red', 10);
-
-  const ctr = map ? map.getCenter() : {lat,lng:lon};
-  const prec = map ? zoomToPrecision(map, ctr.lat) : 10;
-  const bbox = hsps2bbox(ll2hsps(lat, lon, prec));
-  if (bbox) {
-    const bounds = [[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]];
-    if (redBox) setBoxBounds(redBox, bbox);
-    else { redBox = L.rectangle([[bbox.lat_s,bbox.lon_w],[bbox.lat_n,bbox.lon_e]],{interactive:false,pane:'shadowPane'}).addTo(map); }
-  }
-  updateBoxColors();
+  redLL = {lat,lon};
+  const prec = map ? zoomToPrecision(lat, lon) : 10;
+  const bc = Math.min(prec+3, 10);
+  redBright = bc;
+  redBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  setDisplay('red-code', redBare, bc);
+  document.getElementById('red-ll').textContent = fmtLL(lat,lon);
+  updateBtns('rb-', bc, true);
+  updateRedBox(lat, lon, prec);
 }
 
-
-
-/* ================================================================
-   BUTTON DIM: $ needs >=6 bright chars, % needs >=8
-   ================================================================ */
-function updateBtnDim(color, brightCount) {
-  const dollar = document.getElementById('btn-'+color+'-dollar');
-  const pct    = document.getElementById('btn-'+color+'-pct');
-  if (dollar) dollar.classList.toggle('dim-btn', brightCount < 6);
-  if (pct)    pct.classList.toggle('dim-btn',    brightCount < 8);
-}
-/* ================================================================
-   ANTIMERIDIAN-SAFE RECTANGLE HELPER
-   ================================================================ */
-function setBoxBounds(box, bbox) {
-  // If box crosses antimeridian, Leaflet can't handle it with setBounds.
-  // Clamp lon_e to lon_w+360 if needed, then use wrapping.
-  // Leaflet 1.9 supports L.rectangle with lon > 180 on wrapped maps.
-  // We just need to ensure the bbox lon coords are valid.
-  const w = bbox.lon_w, e = bbox.lon_e;
-  // Normalise: if cell width is sane (<60°) but lon_w pushed past ±180
-  const bounds = [[bbox.lat_s, w],[bbox.lat_n, e]];
-  box.setBounds(bounds);
-}
-
-/* ================================================================
-   BOX COLOR MIXING
-   green=only green, blue=only blue, red=only red,
-   green+blue=cyan, green+red=yellow, blue+red=magenta, all=white
-   ================================================================ */
-function updateBoxColors() {
-  const hasG = !!greenBox, hasB = !!blueBox, hasR = !!redBox;
-
-  function sameBox(a, b) {
-    if (!a || !b) return false;
-    const ba = a.getBounds(), bb = b.getBounds();
-    return Math.abs(ba.getSouth()-bb.getSouth())<0.0001 &&
-           Math.abs(ba.getNorth()-bb.getNorth())<0.0001 &&
-           Math.abs(ba.getWest()-bb.getWest())<0.0001 &&
-           Math.abs(ba.getEast()-bb.getEast())<0.0001;
-  }
-
-  // Determine which logical boxes are coincident
-  const gb = sameBox(greenBox,blueBox);
-  const gr = sameBox(greenBox,redBox);
-  const br = sameBox(blueBox,redBox);
-
-  function applyStyle(box, stroke, fill, fillOp) {
-    if (!box) return;
-    box.setStyle({color:stroke, weight:2, opacity:.85, fillColor:fill, fillOpacity:fillOp});
-  }
-
-  const all3 = gb && gr;
-  if (all3) {
-    applyStyle(greenBox,'#ffffff','#ffffff',.13);
-    if (blueBox) blueBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
-    if (redBox)  redBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
-  } else {
-    // green
-    if (hasG) {
-      if (gb && hasB) { applyStyle(greenBox,'#00ffff','#00ffff',.1); }
-      else if (gr && hasR) { applyStyle(greenBox,'#ffff00','#ffff00',.1); }
-      else { applyStyle(greenBox,'#00d97e','#00d97e',.09); }
-    }
-    // blue
-    if (hasB && !gb) {
-      if (br && hasR) { applyStyle(blueBox,'#ff44ff','#ff44ff',.1); }
-      else { applyStyle(blueBox,'#3a8fff','#3a8fff',.09); }
-    } else if (hasB && gb) {
-      blueBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
-    }
-    // red
-    if (hasR && !gr && !br) {
-      applyStyle(redBox,'#ff4a3a','#ff4a3a',.09);
-    } else if (hasR && (gr || br)) {
-      redBox.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});
-    }
-  }
-}
 function placePin(lat, lon) {
   const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6);margin:-7px 0 0 -7px"></div>`,iconSize:[0,0],iconAnchor:[0,0]});
-  if (redMkr) redMkr.setLatLng([lat,lon]);
-  else redMkr = L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
-  updateRed(lat, lon);
+  if (redMkr) redMkr.setLatLng([lat,lon]); else redMkr=L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
+  updateRed(lat,lon);
 }
 
 /* ================================================================
    TOAST
    ================================================================ */
-function toast(msg, dur=2200) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTmr);
-  toastTmr = setTimeout(() => el.classList.remove('show'), dur);
-}
+function toast(msg,dur=2200){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>el.classList.remove('show'),dur)}
 
 /* ================================================================
-   SHARE / COPY LOGIC
+   SHARE / COPY
    ================================================================ */
-function getRawCode(color) {
-  if (color === 'blue') {
-    if (!blueLL) return null;
-    return coded(blueLL.lat, blueLL.lon, 10);
-  }
-  const val = document.getElementById(color + '-code').value.trim();
-  return val || null;
+function getBare(color) {
+  if (color==='blue')  return blueBare;
+  if (color==='green') return greenBare;
+  return redBare;
 }
 
 function doShare(color, mode) {
-  const dotted = getRawCode(color);
-  if (!dotted) { toast('Nothing to share yet'); return; }
-
+  const bare = getBare(color);
+  if (!bare) { toast('Nothing to share yet'); return; }
+  const bc = color==='blue' ? blueBright : color==='green' ? greenBright : redBright;
+  const brightBare = bare.slice(0, bc);
+  // Build dotted bright string (same logic as renderCode)
+  let dotted = '#' + brightBare;
+  if (bc >= 3) {
+    const n = bc;
+    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(brightBare, n), n-1);
+    let bd = '#';
+    for (let i=0; i<n; i++) {
+      bd += brightBare[i];
+      const pos = i+1;
+      if ((pos===rp1||pos===rp2) && pos < bc) bd += '.';
+    }
+    dotted = bd;
+  }
   let text;
-  if (mode === '#') {
-    text = dotted;
-    // # always copies directly
-    copyText(text);
-    return;
-  } else if (mode === '$') {
-    text = '$' + suffixFor(dotted, 3);
-  } else {
-    text = '%' + suffixFor(dotted, 5);
-  }
-
-  const shareText = `${text}\nhttps://hashsite.org`;
-  if (navigator.share) {
-    navigator.share({ title: 'Hashsite location', text: shareText }).catch(() => copyText(text));
-  } else {
-    copyText(text);
-  }
+  if (mode==='#') { copyText(dotted); return; }
+  if (mode==='$') text = '$' + brightBare.slice(3);
+  else            text = '%' + brightBare.slice(5);
+  const shareText = text+'\nhttps://hashsite.org';
+  if (navigator.share) navigator.share({title:'Hashsite location',text:shareText}).catch(()=>copyText(text));
+  else copyText(text);
 }
 
-function copyText(t) {
-  navigator.clipboard.writeText(t)
-    .then(() => toast('Copied  ' + t))
-    .catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = t; document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      toast('Copied  ' + t);
-    });
+function copyText(t){
+  navigator.clipboard.writeText(t).then(()=>toast('Copied  '+t)).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copied  '+t);
+  });
 }
 
 /* ================================================================
-   MAP INIT
+   GREEN EDIT (tap to type a hashsite)
+   ================================================================ */
+function focusGreenEdit() {
+  const inp = document.getElementById('green-edit');
+  inp.value = greenBare ? '#'+greenBare : '';
+  inp.style.cssText = 'position:absolute;left:-9999px;opacity:0;width:1px;height:1px';
+  inp.focus();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('green-edit');
+  inp.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter') return;
+    const bb = hsps2bbox(this.value.trim());
+    if (bb) { map.setView([bb.lat_c,bb.lon_c],Math.max(map.getZoom(),15)); this.blur(); }
+    else { document.getElementById('green-code').classList.add('shake'); setTimeout(()=>document.getElementById('green-code').classList.remove('shake'),320); toast('Not a valid hashsite'); }
+  });
+  const rinp = document.getElementById('red-edit');
+  rinp.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter') return;
+    const bb = hsps2bbox(this.value.trim());
+    if (bb) { placePin(bb.lat_c,bb.lon_c); map.setView([bb.lat_c,bb.lon_c],Math.max(map.getZoom(),15)); this.blur(); }
+    else { document.getElementById('red-code').classList.add('shake'); setTimeout(()=>document.getElementById('red-code').classList.remove('shake'),320); toast('Not a valid hashsite'); }
+  });
+});
+
+/* ================================================================
+   MAP
    ================================================================ */
 function initMap() {
-  map = L.map('map', {center:[35.085,-106.65], zoom:13, zoomControl:true});
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom:19, subdomains:'',
+  map = L.map('map',{center:[35.085,-106.65],zoom:13,zoomControl:true});
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19,
   }).addTo(map);
 
-  const onMove = () => {
-    const c = map.getCenter();
-    updateGreen(c.lat, c.lng);
-  };
+  const onMove = () => { const c=map.getCenter(); updateGreen(c.lat,c.lng); };
   map.on('move', onMove);
   map.on('zoom', onMove);
   onMove();
 
-  map.on('click', (e) => {
-    placePin(e.latlng.lat, e.latlng.lng);
-    toast(coded(e.latlng.lat, e.latlng.lng, 10));
-  });
-
-  // Green input: Enter pans to hashsite
-  const greenInp = document.getElementById('green-code');
-  const greenDisp = document.getElementById('green-display');
-  greenInp.addEventListener('keydown', function(e) {
-    if (e.key !== 'Enter') return;
-    const b = hsps2bbox(this.value.trim());
-    if (b) { map.setView([b.lat_c, b.lon_c], Math.max(map.getZoom(), 15)); this.blur(); }
-    else { this.classList.add('shake'); setTimeout(() => this.classList.remove('shake'), 320); toast('Not a valid hashsite'); }
-  });
-  greenInp.addEventListener('blur', function() {
-    this.style.cssText = 'display:none;position:absolute;opacity:0;pointer-events:none';
-    if (greenDisp) greenDisp.style.display = '';
-    const c = map.getCenter();
-    updateGreen(c.lat, c.lng);
-  });
-
-  // Red input: Enter moves pin
-  document.getElementById('red-code').addEventListener('keydown', function(e) {
-    if (e.key !== 'Enter') return;
-    const b = hsps2bbox(this.value.trim());
-    if (b) { placePin(b.lat_c, b.lon_c); map.setView([b.lat_c, b.lon_c], Math.max(map.getZoom(), 15)); this.blur(); }
-    else { this.classList.add('shake'); setTimeout(() => this.classList.remove('shake'), 320); toast('Not a valid hashsite'); }
-  });
+  map.on('click', e => { placePin(e.latlng.lat,e.latlng.lng); toast('#'+ll2hsps(e.latlng.lat,e.latlng.lng,10).replace(/^#/,'')); });
 }
 
 /* ================================================================
    GPS
    ================================================================ */
+let watchId=null;
+
 function requestGPS() {
-  if (!navigator.geolocation) {
-    document.getElementById('blue-code').innerHTML = '<span style="opacity:.5">GPS not available</span>';
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    pos => { onGPSFix(pos); startWatch(); },
-    err => { onGPSError(err); },
-    {enableHighAccuracy:true, timeout:20000, maximumAge:0}
-  );
-  document.getElementById('gps-prompt').textContent = 'Locating…';
+  if (!navigator.geolocation) { showGpsMsg('GPS not available'); return; }
+  showGpsMsg('Locating…');
+  navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
 }
 
-let watchId = null;
 function startWatch() {
-  if (watchId !== null) return;
-  watchId = navigator.geolocation.watchPosition(
-    onGPSFix, onGPSError,
-    {enableHighAccuracy:true, timeout:20000, maximumAge:5000}
-  );
+  if (watchId!==null) return;
+  watchId = navigator.geolocation.watchPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000,maximumAge:5000});
 }
 
-function onGPSFix(pos) {
-  const {latitude:lat, longitude:lon, accuracy:acc} = pos.coords;
-  updateBlue(lat, lon, acc);
-  if (firstFix) { map.setView([lat,lon], 16); firstFix = false; }
+function onFix(pos) {
+  const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;
+  updateBlue(lat,lon,acc);
+  if (firstFix) { map.setView([lat,lon],16); firstFix=false; startWatch(); }
 }
 
-function onGPSError(err) {
+function onGpsErr(err) {
   document.getElementById('blue-dot').classList.remove('pulse');
-  const prompt = document.getElementById('gps-prompt');
-  prompt.innerHTML = err.code === 1
-    ? '🚫 Location denied — tap to retry'
-    : '⚠︎ GPS unavailable — tap to retry';
-  prompt.classList.add('visible');
-  prompt.onclick = requestGPS;
-  document.getElementById('blue-latlon').textContent = '';
+  showGpsMsg(err.code===1?'🚫 Location denied — tap to retry':'⚠ GPS unavailable — tap to retry');
 }
 
-function startGPS() {
-  if (!navigator.geolocation) {
-    const prompt = document.getElementById('gps-prompt');
-    prompt.textContent = 'GPS not supported';
-    prompt.classList.add('visible');
-    prompt.onclick = null;
-    return;
-  }
-  // Try immediately — if denied, onGPSError shows the tap prompt
-  requestGPS();
+function showGpsMsg(msg) {
+  const p=document.getElementById('gps-prompt');
+  p.classList.remove('hidden');
+  p.innerHTML = msg.startsWith('Locating') ? msg :
+    `<svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>${msg}`;
 }
 
 /* ================================================================
-   PWA INSTALL
+   PWA
    ================================================================ */
-let dp = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault(); dp = e;
-  document.getElementById('install-btn').style.display = 'block';
-});
-document.getElementById('install-btn').addEventListener('click', () => {
-  if (dp) { dp.prompt(); dp.userChoice.then(() => { dp=null; document.getElementById('install-btn').style.display='none'; }); }
-});
+let dp=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('install-btn').style.display='block'});
+document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.prompt();dp.userChoice.then(()=>{dp=null;document.getElementById('install-btn').style.display='none'})}});
 
 /* ================================================================
    BOOT
    ================================================================ */
 initMap();
-startGPS();
-(()=>{
-  const n=new Date(),h=n.getHours(),m=String(n.getMinutes()).padStart(2,'0'),
-        ap=h>=12?'pm':'am',h12=h%12||12;
-  document.getElementById('ver').textContent=`v${n.getMonth()+1}.${n.getDate()}.${h12}${m}${ap}`;
-})();
+requestGPS();
 </script>
 </body>
 </html>
