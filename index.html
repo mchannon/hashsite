@@ -594,7 +594,7 @@ function flyToBlue() {
 }
 function updateBlue(lat, lon, acc) {
   console.log('[blue] updateBlue called lat='+lat+' lon='+lon+' acc='+acc+' map='+!!map);
-  if (!map || !map._panes) { console.log('[blue] map panes not ready, retrying'); setTimeout(()=>updateBlue(lat,lon,acc), 100); return; }
+  if (!map) { setTimeout(()=>updateBlue(lat,lon,acc), 100); return; }
   blueLL = {lat,lon};
   const prec = acc ? accToPrec(lat, lon, acc) : 10;
   console.log('[blue] prec='+prec);
@@ -767,11 +767,7 @@ let watchId=null;
 function requestGPS() {
   if (!navigator.geolocation) { showGpsMsg('GPS not available'); return; }
   showGpsMsg('Locating…');
-  // 150ms delay ensures iOS Safari surfaces the permission alert in the foreground
-  // (without it the alert can spawn behind Safari's chrome and never be seen)
-  setTimeout(() => {
-    navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
-  }, 150);
+  navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
 }
 
 function startWatch() {
@@ -796,7 +792,7 @@ function onFix(pos) {
 
 function onGpsErr(err) {
   document.getElementById('blue-dot').classList.remove('pulse');
-  showGpsMsg(err.code===1?'🚫 Location denied — tap to retry':'⚠ GPS unavailable — tap to retry');
+  showGpsMsg(err.code===1?'🚫 Location denied (err 1) — tap to retry':'⚠ GPS error (err '+err.code+') — tap to retry');
 }
 
 function showGpsMsg(msg) {
@@ -819,7 +815,9 @@ document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.p
 initMap();
 // Wait for two animation frames so Leaflet fully renders its pane DOM
 // before any GPS fix tries to call .addTo(map)
-requestAnimationFrame(() => requestAnimationFrame(() => requestGPS()));
+// Fire GPS at page load — on iOS this may show the permission prompt automatically
+// if the site hasn't been denied before
+requestGPS();
 </script>
 </body>
 </html>
