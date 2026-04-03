@@ -101,7 +101,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .latlon{
   font-size:9.5px;color:#b0b0d0;
   font-family:var(--mono);white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;line-height:1;
+  overflow:visible;text-overflow:ellipsis;letter-spacing:.02em;line-height:1.4;
 }
 
 /* GPS tap prompt inside blue strip */
@@ -192,11 +192,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
     <div id="tl-logo"><span class="hash">#</span>hashsite</div>
     <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.3.829pm</span>
+    <span id="tl-ver">v4.3.834pm</span>
   </a>
 
   <!-- BLUE -->
-  <div class="strip blue">
+  <div class="strip blue" style="cursor:pointer" onclick="requestGPS()" title="Tap to refresh location">
     <div class="strip-icon"><div class="dot pulse" id="blue-dot"></div></div>
     <div class="strip-main">
       <div class="code-display" id="blue-code">
