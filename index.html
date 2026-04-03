@@ -192,7 +192,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
     <div id="tl-logo"><span class="hash">#</span>hashsite</div>
     <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.3.819pm</span>
+    <span id="tl-ver">v4.3.829pm</span>
   </a>
 
   <!-- BLUE -->
@@ -654,6 +654,13 @@ function updateBlue(lat, lon, acc) {
   blueUpdateCount++;
   blueLastUpdate = Date.now();
   document.getElementById('blue-ll').textContent = fmtLL(lat,lon)+(acc?`  ±${Math.round(acc)}m`:'')+(blueUpdateCount>1?`  #${blueUpdateCount}`:'');
+  // Update the counter every second to show staleness
+  clearInterval(window._blueAgeTmr);
+  window._blueAgeTmr = setInterval(function() {
+    const age = Math.round((Date.now() - blueLastUpdate) / 1000);
+    const base = fmtLL(blueLL.lat, blueLL.lon) + (blueRenderData && blueRenderData.acc ? `  ±${Math.round(blueRenderData.acc)}m` : '');
+    document.getElementById('blue-ll').textContent = base + `  #${blueUpdateCount} ${age}s ago`;
+  }, 1000);
   const bd=document.getElementById('blue-dot'); if(bd) bd.classList.remove('pulse');
   const gp=document.getElementById('gps-prompt'); if(gp) gp.classList.add('hidden');
   document.getElementById('blue-caret').style.visibility='visible';
