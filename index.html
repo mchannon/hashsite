@@ -1,55 +1,847 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blue Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hashsite">
+<meta name="description" content="Open geocoding. Share your exact location as a short readable code. No API key. No rent.">
+<title>Hashsite</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-  body { margin: 0; }
-  #map { width: 100vw; height: 60vh; }
-  #log { padding: 10px; font-family: monospace; font-size: 13px; background: #111; color: #0f0; height: 40vh; overflow-y: auto; }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap');
+:root {
+  --blue:#3a8fff; --blue-bg:#060d1c;
+  --green:#00d97e; --green-bg:#03110a;
+  --red:#ff4a3a;  --red-bg:#130404;
+  --bg:#090910; --surface:#111118; --border:#1a1a2e;
+  --text:#ddddf0; --white:#e0e0f4;
+  --mono:'JetBrains Mono','Fira Mono',monospace;
+  --ui:'DM Sans',system-ui,sans-serif;
+  --title-h:38px;
+  --sh:58px;
+}
+@media(max-width:600px){:root{--sh:46px;--title-h:34px}}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--ui)}
+#app{display:flex;flex-direction:column;height:100%}
+
+/* ── TITLE BAR ── */
+#titlebar{
+  height:var(--title-h);min-height:var(--title-h);
+  background:#0c0c18;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;cursor:pointer;user-select:none;text-decoration:none;
+}
+#titlebar:hover{background:#111128}
+#tl-logo{
+  font-family:var(--mono);font-size:15px;font-weight:600;
+  letter-spacing:.12em;color:var(--white);
+  display:flex;align-items:baseline;gap:0;
+}
+#tl-logo .hash{color:var(--green)}
+#tl-tag{
+  font-size:10px;font-weight:500;color:#b8b8e0;
+  letter-spacing:.04em;margin-left:10px;font-family:var(--ui);
+}
+#tl-ver{
+  font-size:8px;font-weight:500;color:#b8b8e0;
+  letter-spacing:.04em;margin-left:8px;font-family:var(--mono);
+}
+
+/* ── STRIPS ── */
+.strip{
+  display:flex;align-items:center;
+  height:var(--sh);min-height:var(--sh);
+  padding:0 10px 0 0;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;position:relative;
+}
+.strip::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.strip.blue{background:var(--blue-bg)} .strip.blue::before{background:var(--blue);box-shadow:0 0 8px var(--blue)}
+.strip.green{background:var(--green-bg)} .strip.green::before{background:var(--green);box-shadow:0 0 8px var(--green)}
+.strip.red{background:var(--red-bg)} .strip.red::before{background:var(--red);box-shadow:0 0 8px var(--red)}
+
+.strip-icon{width:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.dot{width:9px;height:9px;border-radius:50%}
+.blue .dot{background:var(--blue);box-shadow:0 0 6px var(--blue)}
+.green .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.red .dot{background:var(--red);box-shadow:0 0 6px var(--red)}
+.dot.pulse{animation:gpspulse 1.2s ease-in-out infinite}
+@keyframes gpspulse{0%,100%{opacity:1}50%{opacity:.1}}
+
+/* strip-main must NOT clip vertically so raised chars show */
+.strip-main{
+  flex:1;min-width:0;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+
+/* Code display div — used for blue, green (rich HTML with spans) */
+.code-display{
+  font-family:var(--mono);font-size:15px;font-weight:600;
+  letter-spacing:.04em;line-height:1.2;
+  overflow:visible;white-space:nowrap;
+  width:100%;
+}
+.strip.blue  .code-display { color:#7fc4ff; }
+.strip.green .code-display { color:#3fffc0; }
+.strip.red   .code-display { color:#ff7a6a; }
+/* raised chars: same size, 2px up */
+.code-display .sup{position:relative;top:-2px}
+/* dim chars */
+/* dim dots within bright region */
+/* placeholder text */
+.code-display.placeholder{opacity:.35;font-weight:400}
+
+/* Lat/lon row */
+.latlon{
+  font-size:9.5px;color:#b0b0d0;
+  font-family:var(--mono);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;line-height:1;
+}
+
+/* GPS tap prompt inside blue strip */
+#gps-prompt{
+  font-size:11px;color:#70b8ff;font-family:var(--ui);
+  font-weight:600;cursor:pointer;letter-spacing:.02em;
+  padding:3px 10px;border:1px solid #2a4a80;
+  border-radius:5px;white-space:nowrap;
+  background:rgba(58,143,255,.15);
+  transition:background .15s;display:inline-flex;align-items:center;gap:5px;
+}
+#gps-prompt:hover,#gps-prompt:active{background:rgba(58,143,255,.28)}
+#gps-prompt.hidden{display:none}
+
+/* ── SHARE CARET ── */
+.share-caret{
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;flex-shrink:0;padding-left:8px;
+}
+.caret-row{display:flex;gap:4px;align-items:center}
+.caret-mid{margin-bottom:-2px}
+
+.sbtn{
+  background:rgba(255,255,255,.12);border:1px solid #2a2a50;
+  border-radius:6px;color:#a0a0d0;
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  letter-spacing:.04em;cursor:pointer;
+  padding:0 7px;height:24px;
+  display:flex;align-items:center;gap:3px;
+  transition:background .1s,color .1s;
+  white-space:nowrap;user-select:none;
+}
+.sbtn.apex{height:26px;transform:translateY(-3px)}
+.sbtn:hover,.sbtn:active{background:rgba(255,255,255,.24);color:#fff}
+.sbtn.off{opacity:.22;pointer-events:none}
+.si{width:11px;height:11px;flex-shrink:0}
+
+/* ── MAP ── */
+#map{flex:1;min-height:0;position:relative}
+
+#crosshair{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;z-index:800;width:40px;height:40px;
+}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:var(--green);opacity:.8}
+#crosshair::before{width:1.5px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+#crosshair::after{width:100%;height:1.5px;top:50%;left:0;transform:translateY(-50%)}
+.ch-ring{position:absolute;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--green);opacity:.75;top:50%;left:50%;transform:translate(-50%,-50%)}
+
+/* NO filter on tile pane — WebKit/Safari filter creates stacking context
+   that buries marker and overlay panes underneath tiles.
+   Use a dark overlay div instead (added in initMap). */
+.leaflet-tile-pane { filter: none; }
+#map-darkener {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,20,0.32);
+  pointer-events: none;
+  z-index: 300; /* above tiles (200) but below overlays (400) and markers (600) */
+}
+.leaflet-control-attribution{font-size:9px!important;background:rgba(0,0,0,.65)!important;color:#444!important}
+.leaflet-control-attribution a{color:#555!important}
+.leaflet-control-zoom a{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
+
+#toast{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  background:rgba(8,8,16,.94);border:1px solid var(--border);border-radius:8px;
+  padding:7px 14px;font-size:11.5px;color:var(--text);font-family:var(--mono);
+  z-index:900;pointer-events:none;opacity:0;transition:opacity .2s;
+  white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;
+}
+#toast.show{opacity:1}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.shake{animation:shake .28s}
+
+#install-btn{
+  position:absolute;top:8px;right:8px;z-index:950;
+  background:var(--surface);border:1px solid var(--border);border-radius:7px;
+  padding:6px 12px;font-size:11px;color:#8080b0;font-family:var(--ui);
+  font-weight:600;cursor:pointer;display:none;transition:background .15s,color .15s;
+}
 </style>
 </head>
 <body>
-<div id="map"></div>
-<div id="log">Waiting for GPS...<br></div>
+<div id="app">
+
+  <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
+    <div id="tl-logo"><span class="hash">#</span>hashsite</div>
+    <span id="tl-tag">open geocoding · no api key · no rent</span>
+    <span id="tl-ver">v4.3.805pm</span>
+  </a>
+
+  <!-- BLUE -->
+  <div class="strip blue">
+    <div class="strip-icon"><div class="dot pulse" id="blue-dot"></div></div>
+    <div class="strip-main">
+      <div class="code-display" id="blue-code">
+        <span id="gps-prompt" onclick="requestGPS()">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          Tap to enable location
+        </span>
+      </div>
+      <div class="latlon" id="blue-ll" style="cursor:pointer" onclick="flyToBlue()" title="Tap to fly here"></div>
+    </div>
+    <div class="share-caret" id="blue-caret" style="visibility:hidden">
+      <div class="caret-row caret-mid">
+        <button class="sbtn apex" id="bb-dollar" onclick="doShare('blue','$')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
+        </button>
+      </div>
+      <div class="caret-row">
+        <button class="sbtn" id="bb-hash" onclick="doShare('blue','#')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
+        </button>
+        <button class="sbtn" id="bb-pct" onclick="doShare('blue','%')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GREEN -->
+  <div class="strip green">
+    <div class="strip-icon"><div class="dot"></div></div>
+    <div class="strip-main">
+      <div class="code-display" id="green-code" style="cursor:text" onclick="focusGreenEdit()"></div>
+      <input id="green-edit" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
+      <div class="latlon" id="green-ll"></div>
+    </div>
+    <div class="share-caret">
+      <div class="caret-row caret-mid">
+        <button class="sbtn apex" id="gb-dollar" onclick="doShare('green','$')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
+        </button>
+      </div>
+      <div class="caret-row">
+        <button class="sbtn" id="gb-hash" onclick="doShare('green','#')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
+        </button>
+        <button class="sbtn" id="gb-pct" onclick="doShare('green','%')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RED -->
+  <div class="strip red">
+    <div class="strip-icon"><div class="dot"></div></div>
+    <div class="strip-main">
+      <div class="code-display placeholder" id="red-code">Tap map to drop pin</div>
+      <input id="red-edit" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
+      <div class="latlon" id="red-ll"></div>
+    </div>
+    <div class="share-caret">
+      <div class="caret-row caret-mid">
+        <button class="sbtn apex off" id="rb-dollar" onclick="doShare('red','$')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
+        </button>
+      </div>
+      <div class="caret-row">
+        <button class="sbtn off" id="rb-hash" onclick="doShare('red','#')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
+        </button>
+        <button class="sbtn off" id="rb-pct" onclick="doShare('red','%')">
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="map">
+    <div id="crosshair"><div class="ch-ring"></div></div>
+    <div id="toast"></div>
+    <button id="install-btn">⊕ Add to Home Screen</button>
+  </div>
+</div>
+
 <script>
-function log(msg) {
-  document.getElementById('log').innerHTML += msg + '<br>';
+/* ================================================================
+   CODEC — verified against C binary
+   ================================================================ */
+const HS_MAXLEN=18,HS_LAT_POLAR=41.81,HS_LAT_MID=19.47,
+      HS_POLAR_HEI=(90-41.81)/10,HS_EQ_WID=60/9;
+
+function hs_encode(n){if(n<0||n>35)return'?';if(n<10)return String.fromCharCode(48+n);if(n===24)return'o';return String.fromCharCode(55+n)}
+function hs_decode(c){const u=c.toUpperCase();if(u>='0'&&u<='9')return u.charCodeAt(0)-48;if(u>='A'&&u<='Z')return u.charCodeAt(0)-55;return-1}
+
+const NR=[{ncols:6,base:30},{ncols:6,base:24},{ncols:5,base:19},{ncols:5,base:14},
+          {ncols:4,base:10},{ncols:3,base:7},{ncols:3,base:4},{ncols:2,base:2},
+          {ncols:1,base:1},{ncols:1,base:0}];
+const SR=[{ncols:6,base:0},{ncols:6,base:6},{ncols:5,base:12},{ncols:5,base:17},
+          {ncols:4,base:22},{ncols:3,base:26},{ncols:3,base:29},{ncols:2,base:32},
+          {ncols:1,base:34},{ncols:1,base:35}];
+
+function nps(lo,ln){let y2=Math.min(Math.floor(lo/HS_POLAR_HEI),9);const r=NR[y2],w=60/r.ncols,xa=Math.min(Math.floor(ln/w),r.ncols-1);return{let:hs_encode(r.base+xa),hei:HS_POLAR_HEI,wid:w,lat:HS_POLAR_HEI-(lo-y2*HS_POLAR_HEI),lon:ln-xa*w}}
+function sps(lo,ln){let y2=Math.min(Math.floor(lo/HS_POLAR_HEI),9);const r=SR[y2],w=60/r.ncols,xa=Math.min(Math.floor(ln/w),r.ncols-1);return{let:hs_encode(r.base+xa),hei:HS_POLAR_HEI,wid:w,lat:lo-y2*HS_POLAR_HEI,lon:ln-xa*w}}
+function eqs(lo,ln,bh){const rh=bh/4,ya=Math.min(Math.floor(lo/rh),3),xa=Math.min(Math.floor(ln/HS_EQ_WID),8);return{let:hs_encode(xa+9*ya),hei:rh,wid:HS_EQ_WID,lat:lo-ya*rh,lon:ln-xa*HS_EQ_WID}}
+function ll2a(lat,lon){const x=((lon+180)%360+360)%360,x1=Math.min(Math.floor(x/60),5);let y1,hei,clat;if(lat>HS_LAT_POLAR){y1=0;hei=90-HS_LAT_POLAR;clat=90-lat}else if(lat>HS_LAT_MID){y1=1;hei=HS_LAT_POLAR-HS_LAT_MID;clat=HS_LAT_POLAR-lat}else if(lat>0){y1=2;hei=HS_LAT_MID;clat=HS_LAT_MID-lat}else if(lat>-HS_LAT_MID){y1=3;hei=HS_LAT_MID;clat=-lat}else if(lat>-HS_LAT_POLAR){y1=4;hei=HS_LAT_POLAR-HS_LAT_MID;clat=-HS_LAT_MID-lat}else{y1=5;hei=90-HS_LAT_POLAR;clat=-HS_LAT_POLAR-lat}return{let:hs_encode(y1*6+x1),lat:clat,lon:x-60*x1,wid:60,hei,y1}}
+function ll2b(c){const y1=Math.floor(hs_decode(c.let)/6);if(y1===0)return nps(c.hei-c.lat,c.lon);if(y1===5)return sps(c.lat,c.lon);return eqs(c.lat,c.lon,c.hei)}
+function ll2n(c){const sw=c.wid/6,sh=c.hei/6,xa=Math.min(Math.floor(c.lon/sw),5),ya=Math.min(Math.floor(c.lat/sh),5);return{let:hs_encode(ya*6+xa),wid:sw,hei:sh,lat:c.lat-ya*sh,lon:c.lon-xa*sw}}
+function ll2hsps(lat,lon,nc){nc=Math.max(1,Math.min(nc,HS_MAXLEN));const c1=ll2a(lat,lon);let b=c1.let;if(nc===1)return'#'+b;const c2=ll2b(c1);b+=c2.let;let cn=c2;for(let n=2;n<nc;n++){cn=ll2n(cn);b+=cn.let}return'#'+b}
+
+function hsps2bbox(hs){
+  const s=hs.replace(/^#/,'').replace(/\./g,'').replace(/\^.*$/,'').toUpperCase();
+  if(s.length<1||s.length>HS_MAXLEN)return null;
+  const v0=hs_decode(s[0]);if(v0<0)return null;
+  const y1=Math.floor(v0/6),x1=v0%6;
+  let cl,ch;
+  switch(y1){case 0:cl=HS_LAT_POLAR;ch=90-HS_LAT_POLAR;break;case 1:cl=HS_LAT_MID;ch=HS_LAT_POLAR-HS_LAT_MID;break;case 2:cl=0;ch=HS_LAT_MID;break;case 3:cl=-HS_LAT_MID;ch=HS_LAT_MID;break;case 4:cl=-HS_LAT_POLAR;ch=HS_LAT_POLAR-HS_LAT_MID;break;case 5:cl=-90;ch=90-HS_LAT_POLAR;break;default:return null}
+  let CL=cl,CH=ch,CLn=x1*60-180,CW=60;
+  if(s.length>=2){const v1=hs_decode(s[1]);if(v1<0)return null;
+    if(y1===0){let f=false;for(let y2=0;y2<=9;y2++){const r=NR[y2];if(v1>=r.base&&v1<r.base+r.ncols){const xa=v1-r.base,w=60/r.ncols;CL=HS_LAT_POLAR+y2*HS_POLAR_HEI;CLn=x1*60-180+xa*w;CH=HS_POLAR_HEI;CW=w;f=true;break}}if(!f)return null}
+    else if(y1===5){let f=false;for(let y2=0;y2<=9;y2++){const r=SR[y2];if(v1>=r.base&&v1<r.base+r.ncols){const xa=v1-r.base,w=60/r.ncols;CL=-(HS_LAT_POLAR+(y2+1)*HS_POLAR_HEI);CLn=x1*60-180+xa*w;CH=HS_POLAR_HEI;CW=w;f=true;break}}if(!f)return null}
+    else{const ya=Math.floor(v1/9),xa=v1%9,rh=CH/4,top=CL+CH;CL=top-(ya+1)*rh;CLn+=xa*HS_EQ_WID;CH=rh;CW=HS_EQ_WID}}
+  for(let n=2;n<s.length;n++){const vn=hs_decode(s[n]);if(vn<0)return null;const yn=Math.floor(vn/6),xn=vn%6,sh=CH/6,sw=CW/6,top=CL+CH;CL=top-(yn+1)*sh;CLn+=xn*sw;CH=sh;CW=sw}
+  return{lat_s:CL,lat_n:CL+CH,lon_w:CLn,lon_e:CLn+CW,lat_c:CL+CH/2,lon_c:CLn+CW/2}}
+
+/* ================================================================
+   LUHN — verified against C binary
+   ================================================================ */
+function hs_comb2(n){return n*(n-1)/2}
+function hs_combo_idx(idx,ns){let k=0;for(let i=1;i<=ns;i++)for(let j=i+1;j<=ns;j++){if(k===idx)return[i,j];k++}return[1,2]}
+function hs_luhn_idx(clean,n){let s=0;for(let i=0;i<n;i++){let v=hs_decode(clean[i]);if(v<0)v=0;if(i%2===1){v*=2;if(v>35)v-=35}s+=v}const c=hs_comb2(n-1);return c<1?0:(s*25)%c}
+function hs_luhn(hs){
+  const h=hs.replace(/^#/,'').replace(/\^.*$/,'').replace(/\./g,'');
+  const n=h.length;if(n<3)return'#'+h;
+  const f=hs.replace(/^#/,'').replace(/\^/,'').replace(/\./g,'');
+  const ci=hs.indexOf('^'),vt=ci>=0?hs.slice(ci):'';
+  const[p1,p2]=hs_combo_idx(hs_luhn_idx(f,f.length),n-1);
+  let o='#';for(let i=0;i<n;i++){o+=h[i];if(i+1===p1||i+1===p2)o+='.'}
+  return o+vt}
+
+/* ================================================================
+   RENDER CODE: rich HTML with raised chars 3&4, dim suffix, luhn on bright only
+   brightCount = number of bare chars to show bright (rest dimmed)
+   ================================================================ */
+function renderCode(bare10, brightCount) {
+  // Only render bright chars — dim portion is simply not drawn.
+  const bc = Math.min(brightCount, bare10.length);
+  const brightBare = bare10.slice(0, bc);
+
+  // Compute luhn dots for bright portion only.
+  // Suppress a dot if it would land at position >= bc-1 (right before last bright char).
+  let brightStr = brightBare;
+  if (bc >= 3) {
+    const rawBare = brightBare; // already clean
+    const n = rawBare.length;
+    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(rawBare, n), n-1);
+    let bd = '';
+    for (let i = 0; i < n; i++) {
+      bd += rawBare[i];
+      const pos = i+1;
+      if ((pos===rp1||pos===rp2) && pos < bc) bd += '.';
+    }
+    brightStr = bd;
+  }
+
+  let html = '<span style="opacity:.45">#</span>';
+  let bareIdx = 0;
+
+  for (const ch of brightStr) {
+    if (ch === '.') {
+      // dot: same color as surrounding chars, wider letter-spacing via margin
+      html += '<span style="margin:0 -0.18em;opacity:1">.</span>';
+      continue;
+    }
+    const bi = bareIdx++;
+    const raised = (bi===3||bi===4);
+    if (raised) html += `<span class="sup">${esc(ch)}</span>`;
+    else html += esc(ch);
+  }
+  return html;
 }
 
-const map = L.map('map').setView([0, 0], 2);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-log('Map created');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-navigator.geolocation.getCurrentPosition(function(pos) {
-  const lat = pos.coords.latitude;
-  const lon = pos.coords.longitude;
-  const acc = pos.coords.accuracy;
-  log('GPS fix: ' + lat.toFixed(4) + ', ' + lon.toFixed(4) + ' acc=' + Math.round(acc) + 'm');
+/* ================================================================
+   ZOOM → PRECISION using actual codec bbox sizes
+   ================================================================ */
+function zoomToPrecision(lat, lon) {
+  const bounds = map.getBounds();
+  const latSpan = bounds.getNorth() - bounds.getSouth();
+  const lonSpan = bounds.getEast()  - bounds.getWest();
+  const tLat = latSpan * 0.375;
+  const tLon = lonSpan * 0.375;
+  for (let n=1; n<=10; n++) {
+    const bb = hsps2bbox(ll2hsps(lat, lon, n));
+    if (!bb) continue;
+    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) return n;
+  }
+  return 10;
+}
 
-  map.setView([lat, lon], 14);
-  log('Map panned');
 
-  const dot = L.circleMarker([lat, lon], {
-    radius: 12,
-    color: '#ffffff',
-    weight: 3,
-    fillColor: '#3a8fff',
-    fillOpacity: 1,
+/* ================================================================
+   ACCURACY → PRECISION
+   Find largest char count whose cell half-width fits within acc meters.
+   Uses actual bbox sizes at the given lat/lon via the codec.
+   ================================================================ */
+function accToPrec(lat, lon, acc) {
+  if (!acc || acc <= 0) return 10;
+  // Find the finest precision level where the cell half-diagonal is still
+  // >= the GPS accuracy radius. Beyond that we'd be displaying false precision.
+  const R = 6371000;
+  let result = 1;
+  for (let n = 1; n <= 10; n++) {
+    const bb = hsps2bbox(ll2hsps(lat, lon, n));
+    if (!bb) continue;
+    const dLat = (bb.lat_n - bb.lat_s) * Math.PI / 180 * R;
+    const dLon = (bb.lon_e - bb.lon_w) * Math.PI / 180 * R * Math.cos(lat * Math.PI / 180);
+    const half = Math.sqrt(dLat*dLat + dLon*dLon) / 2;
+    if (half >= acc) result = n; else break;
+  }
+  return result;
+}
+/* ================================================================
+   STATE
+   ================================================================ */
+let map=null, firstFix=true, toastTmr=null;
+let blueUpdateCount=0, blueLastUpdate=null;
+let blueRenderData=null;
+let blueLL=null, greenLL=null, redLL=null;
+let redMkr=null;
+let greenBox=null, blueBox=null, redBox=null;
+let blueDot=null, blueHalo=null;
+let greenLbl=null, blueLbl=null, redLbl=null;
+let greenLblCode=null, blueLblCode=null, redLblCode=null;
+let greenBare=null, blueBare=null, redBare=null; // bare 10-char for sharing
+let greenBright=10, blueBright=10, redBright=10; // current bright char counts
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function fmtLL(lat,lon){return`${Math.abs(lat).toFixed(6)}°${lat>=0?'N':'S'}  ${Math.abs(lon).toFixed(6)}°${lon>=0?'E':'W'}`}
+
+function setDisplay(elId, bare10, brightCount) {
+  const el = document.getElementById(elId);
+  el.classList.remove('placeholder');
+  el.innerHTML = renderCode(bare10, brightCount);
+}
+
+function updateBtns(prefix, brightCount, hasCode) {
+  const hash   = document.getElementById(prefix+'hash');
+  const dollar = document.getElementById(prefix+'dollar');
+  const pct    = document.getElementById(prefix+'pct');
+  if (!hash) return;
+  hash.classList.toggle('off',   !hasCode);
+  dollar.classList.toggle('off', !hasCode || brightCount < 6);
+  pct.classList.toggle('off',    !hasCode || brightCount < 8);
+}
+
+/* ================================================================
+   BOX MANAGEMENT
+   ================================================================ */
+function makeBox(bbox) {
+  console.log("[blue] makeBox called bbox="+JSON.stringify(bbox));
+  const b = shiftBboxToMap(bbox);
+  return L.rectangle([[b.lat_s,b.lon_w],[b.lat_n,b.lon_e]],
+    {interactive:false, color:'#ffffff', weight:2, opacity:.8,
+     fillColor:'#ffffff', fillOpacity:.1}).addTo(map);
+}
+
+function makeLbl() {
+  const icon = L.divIcon({className:'', html:'<div></div>', iconSize:[0,0], iconAnchor:[0,0]});
+  return L.marker([0,0], {icon, interactive:false, zIndexOffset:500}).addTo(map);
+}
+
+function shiftBboxToMap(bbox) {
+  // The codec always returns lon in [-180,180). When the map is panned past
+  // ±180, Leaflet's center lon can be e.g. 185 or -200. Shift bbox by the
+  // nearest multiple of 360 so it aligns with the visible map area.
+  if (!map) return bbox;
+  const mapLon = map.getCenter().lng;
+  const cellMid = (bbox.lon_w + bbox.lon_e) / 2;
+  const shift = Math.round((mapLon - cellMid) / 360) * 360;
+  return {
+    lat_s: bbox.lat_s, lat_n: bbox.lat_n,
+    lon_w: bbox.lon_w + shift, lon_e: bbox.lon_e + shift,
+  };
+}
+
+function setBox(box, bbox) {
+  const b = shiftBboxToMap(bbox);
+  box.setBounds([[b.lat_s, b.lon_w],[b.lat_n, b.lon_e]]);
+}
+
+function setLbl(lbl, bbox, code, color) {
+  if (!map) return;
+  const sb = shiftBboxToMap(bbox);
+  lbl.setOpacity(1);
+  lbl.setLatLng([sb.lat_n, sb.lon_w]);
+  lbl.setIcon(L.divIcon({
+    className: '',
+    html: `<div style="font-family:var(--mono);font-size:26px;font-weight:700;color:${color};opacity:.85;white-space:nowrap;pointer-events:none;padding:2px 0 0 3px;text-shadow:0 0 5px rgba(0,0,0,1),0 1px 3px rgba(0,0,0,.9)">${esc(code)}</div>`,
+    iconSize:[0,0], iconAnchor:[0,0],
+  }));
+}
+
+function refreshBoxColors() {
+  if (!greenBox && !blueBox && !redBox) return;
+  function eq(a,b){
+    if(!a||!b)return false;
+    const ba=a.getBounds(),bb=b.getBounds();
+    return Math.abs(ba.getSouth()-bb.getSouth())<1e-4 &&
+           Math.abs(ba.getNorth()-bb.getNorth())<1e-4 &&
+           Math.abs(ba.getWest()-bb.getWest())<1e-4 &&
+           Math.abs(ba.getEast()-bb.getEast())<1e-4;
+  }
+  function style(box,stroke,fill){if(!box)return;box.setStyle({color:stroke,weight:2,opacity:.8,fillColor:fill,fillOpacity:.1});}
+  function hide(box){if(box)box.setStyle({color:'transparent',fillColor:'transparent',fillOpacity:0});}
+  function relbl(lbl,box,code,color){
+    if(!lbl||!box||!code)return;
+    if(color==='transparent'){lbl.setOpacity(0);return;}
+    const b=box.getBounds();
+    setLbl(lbl,{lat_s:b.getSouth(),lat_n:b.getNorth(),lon_w:b.getWest(),lon_e:b.getEast()},code,color);
+  }
+  const gb = greenBox&&blueBox&&eq(greenBox,blueBox);
+  const gr = greenBox&&redBox&&eq(greenBox,redBox);
+  const br = blueBox&&redBox&&eq(blueBox,redBox);
+  let gc='#00d97e', bc='#3a8fff', rc='#ff4a3a';
+  if(gb&&gr){gc=bc=rc='#ffffff';}
+  else {
+    if(gb) gc='#00ffff';
+    else if(gr) gc='#ffff00';
+    if(br&&!gb) bc='#ff44ff';
+  }
+  if(greenBox) style(greenBox,gc,gc);
+  if(blueBox)  { if(gb) hide(blueBox); else style(blueBox,bc,bc); }
+  if(redBox)   { if(gr||br) hide(redBox); else style(redBox,rc,rc); }
+  relbl(greenLbl,greenBox,greenLblCode,gc);
+  relbl(blueLbl,blueBox,blueLblCode,gb?'transparent':bc);
+  relbl(redLbl,redBox,redLblCode,(gr||br)?'transparent':rc);
+}
+
+
+function updateBlueBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!blueBox) blueBox = makeBox(bb);
+  if (!blueLbl) blueLbl = makeLbl();
+  setBox(blueBox, bb);
+  blueLblCode = ll2hsps(lat, lon, prec);
+  setLbl(blueLbl, bb, blueLblCode, '#3a8fff');
+  refreshBoxColors();
+}
+
+function updateBlueDot(lat, lon, acc) {
+  // L.circleMarker is pure SVG — more reliable than divIcon markers
+  if (blueDot) {
+    blueDot.setLatLng([lat, lon]);
+  } else {
+    blueDot = L.circleMarker([lat, lon], {
+      radius: 8,
+      color: '#ffffff',
+      weight: 2.5,
+      fillColor: '#3a8fff',
+      fillOpacity: 1,
+      pane: 'markerPane',
+    }).addTo(map);
+  }
+  if (acc) {
+    const R = 6371000;
+    const metersPerDeg = Math.PI * R / 180;
+    // Use L.circle for halo
+    if (blueHalo) {
+      blueHalo.setLatLng([lat, lon]);
+      blueHalo.setRadius(acc);
+    } else {
+      blueHalo = L.circle([lat, lon], {
+        radius: acc,
+        color: '#3a8fff',
+        weight: 1.5,
+        opacity: 0.5,
+        fillColor: '#3a8fff',
+        fillOpacity: 0.07,
+        pane: 'overlayPane',
+        interactive: false,
+      }).addTo(map);
+    }
+  }
+}
+function updateGreenBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!greenBox) greenBox = makeBox(bb);
+  if (!greenLbl) greenLbl = makeLbl();
+  setBox(greenBox, bb);
+  greenLblCode = ll2hsps(lat, lon, prec);
+  setLbl(greenLbl, bb, greenLblCode, '#00d97e');
+  // Also draw blue if we have a GPS fix
+  if (blueRenderData) {
+    updateBlueBox(blueRenderData.lat, blueRenderData.lon, blueRenderData.prec);
+    updateBlueDot(blueRenderData.lat, blueRenderData.lon, blueRenderData.acc);
+  }
+  refreshBoxColors();
+}
+
+
+function updateRedBox(lat, lon, prec) {
+  const bb = hsps2bbox(ll2hsps(lat, lon, prec));
+  if (!bb) return;
+  if (!redBox) redBox = makeBox(bb);
+  if (!redLbl) redLbl = makeLbl();
+  setBox(redBox, bb);
+  redLblCode = ll2hsps(lat, lon, prec);
+  setLbl(redLbl, bb, redLblCode, '#ff4a3a');
+  refreshBoxColors();
+}
+
+
+
+function getMetersPerPixel(lat) {
+  const zoom = map.getZoom();
+  return (156543.03392 * Math.cos(lat * Math.PI / 180)) / Math.pow(2, zoom);
+}
+/* ================================================================
+   STRIP UPDATES
+   ================================================================ */
+
+function flyToBlue() {
+  if (!blueLL || !map) return;
+  const prec = blueBright || 5;
+  const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+  const z = Math.max(map.getZoom(), zoomForPrec[Math.min(prec,10)-1] || 14);
+  map.setView([blueLL.lat, blueLL.lon], z);
+}
+function updateBlue(lat, lon, acc) {
+  console.log('[blue] updateBlue called lat='+lat+' lon='+lon+' acc='+acc+' map='+!!map);
+  if (!map) { setTimeout(()=>updateBlue(lat,lon,acc), 100); return; }
+  blueLL = {lat,lon};
+  const prec = acc ? accToPrec(lat, lon, acc) : 10;
+  console.log('[blue] prec='+prec);
+  const bc = prec; // no +3 fudge — accuracy is already the truth
+  blueBright = bc;
+  blueBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  setDisplay('blue-code', blueBare, bc);
+  blueUpdateCount++;
+  blueLastUpdate = Date.now();
+  document.getElementById('blue-ll').textContent = fmtLL(lat,lon)+(acc?`  ±${Math.round(acc)}m`:'')+(blueUpdateCount>1?`  #${blueUpdateCount}`:'');
+  document.getElementById('blue-dot').classList.remove('pulse');
+  document.getElementById('gps-prompt').classList.add('hidden');
+  document.getElementById('blue-caret').style.visibility='visible';
+  updateBtns('bb-', bc, true);
+
+  blueRenderData = {lat, lon, acc, prec};
+  // Draw immediately if map is ready, otherwise green's next redraw will catch it
+  if (map) {
+    updateBlueBox(lat, lon, prec);
+    updateBlueDot(lat, lon, acc);
+  }
+}
+
+function updateGreen(lat, lon) {
+  greenLL = {lat,lon};
+  const prec = map ? zoomToPrecision(lat, lon) : 10;
+  const bc = Math.min(prec+3, 10);
+  greenBright = bc;
+  greenBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  setDisplay('green-code', greenBare, bc);
+  document.getElementById('green-ll').textContent = fmtLL(lat,lon);
+  updateBtns('gb-', bc, true);
+  updateGreenBox(lat, lon, prec);
+}
+
+function updateRed(lat, lon) {
+  redLL = {lat,lon};
+  const prec = map ? zoomToPrecision(lat, lon) : 10;
+  const bc = Math.min(prec+3, 10);
+  redBright = bc;
+  redBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  setDisplay('red-code', redBare, bc);
+  document.getElementById('red-ll').textContent = fmtLL(lat,lon);
+  updateBtns('rb-', bc, true);
+  updateRedBox(lat, lon, prec);
+}
+
+function placePin(lat, lon) {
+  const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6)"></div>`,iconSize:[14,14],iconAnchor:[7,7]});
+  if (redMkr) { redMkr.setLatLng([lat,lon]); redMkr.setIcon(icon); }
+  else redMkr = L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
+  updateRed(lat,lon);
+}
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+function toast(msg,dur=2200){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>el.classList.remove('show'),dur)}
+
+/* ================================================================
+   SHARE / COPY
+   ================================================================ */
+function getBare(color) {
+  if (color==='blue')  return blueBare;
+  if (color==='green') return greenBare;
+  return redBare;
+}
+
+function doShare(color, mode) {
+  const bare = getBare(color);
+  if (!bare) { toast('Nothing to share yet'); return; }
+  const bc = color==='blue' ? blueBright : color==='green' ? greenBright : redBright;
+  const brightBare = bare.slice(0, bc);
+  // Build dotted bright string (same logic as renderCode)
+  let dotted = '#' + brightBare;
+  if (bc >= 3) {
+    const n = bc;
+    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(brightBare, n), n-1);
+    let bd = '#';
+    for (let i=0; i<n; i++) {
+      bd += brightBare[i];
+      const pos = i+1;
+      if ((pos===rp1||pos===rp2) && pos < bc) bd += '.';
+    }
+    dotted = bd;
+  }
+  let text;
+  if (mode==='#') { copyText(dotted); return; }
+  if (mode==='$') text = '$' + brightBare.slice(3);
+  else            text = '%' + brightBare.slice(5);
+  const shareText = text+'\nhttps://hashsite.org';
+  if (navigator.share) navigator.share({title:'Hashsite location',text:shareText}).catch(()=>copyText(text));
+  else copyText(text);
+}
+
+function copyText(t){
+  navigator.clipboard.writeText(t).then(()=>toast('Copied  '+t)).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copied  '+t);
+  });
+}
+
+/* ================================================================
+   GREEN EDIT (tap to type a hashsite)
+   ================================================================ */
+function focusGreenEdit() {
+  const inp = document.getElementById('green-edit');
+  inp.value = greenBare ? '#'+greenBare : '';
+  inp.style.cssText = 'position:absolute;left:-9999px;opacity:0;width:1px;height:1px';
+  inp.focus();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('green-edit');
+  inp.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter') return;
+    const bb = hsps2bbox(this.value.trim());
+    if (bb) { map.setView([bb.lat_c,bb.lon_c],Math.max(map.getZoom(),15)); this.blur(); }
+    else { document.getElementById('green-code').classList.add('shake'); setTimeout(()=>document.getElementById('green-code').classList.remove('shake'),320); toast('Not a valid hashsite'); }
+  });
+  const rinp = document.getElementById('red-edit');
+  rinp.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter') return;
+    const bb = hsps2bbox(this.value.trim());
+    if (bb) { placePin(bb.lat_c,bb.lon_c); map.setView([bb.lat_c,bb.lon_c],Math.max(map.getZoom(),15)); this.blur(); }
+    else { document.getElementById('red-code').classList.add('shake'); setTimeout(()=>document.getElementById('red-code').classList.remove('shake'),320); toast('Not a valid hashsite'); }
+  });
+});
+
+/* ================================================================
+   MAP
+   ================================================================ */
+function initMap() {
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true});
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19,
   }).addTo(map);
-  log('circleMarker added: ' + JSON.stringify(dot.getLatLng()));
 
-  const box = L.rectangle([[lat-0.01, lon-0.01],[lat+0.01, lon+0.01]], {
-    color: '#3a8fff', weight: 2, fillColor: '#3a8fff', fillOpacity: 0.1
-  }).addTo(map);
-  log('rectangle added');
+  // Dark overlay instead of CSS filter — avoids WebKit stacking context bug
+  const darkener = document.createElement('div');
+  darkener.id = 'map-darkener';
+  document.getElementById('map').appendChild(darkener);
 
-}, function(err) {
-  log('GPS ERROR code=' + err.code + ' msg=' + err.message);
-}, {enableHighAccuracy: true, timeout: 20000});
+  const onMove = () => { const c=map.getCenter(); updateGreen(c.lat,c.lng); };
+  map.on('move', onMove);
+  map.on('zoom', onMove);
+  onMove();
+
+  map.on('click', e => { placePin(e.latlng.lat,e.latlng.lng); toast('#'+ll2hsps(e.latlng.lat,e.latlng.lng,10).replace(/^#/,'')); });
+}
+
+/* ================================================================
+   GPS
+   ================================================================ */
+let watchId=null;
+
+function requestGPS() {
+  if (!navigator.geolocation) { showGpsMsg('GPS not available'); return; }
+  showGpsMsg('Locating…');
+  navigator.geolocation.getCurrentPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000});
+}
+
+function startWatch() {
+  if (watchId!==null) return;
+  watchId = navigator.geolocation.watchPosition(onFix, onGpsErr, {enableHighAccuracy:true,timeout:20000,maximumAge:0});
+}
+
+function onFix(pos) {
+  const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;
+  if (firstFix) {
+    firstFix = false;
+    startWatch();
+    // Pan to location FIRST so markers are added while in view
+    const prec = acc ? accToPrec(lat, lon, acc) : 5;
+    const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+    const z = zoomForPrec[Math.min(prec, 10) - 1] || 14;
+    map.setView([lat, lon], z);
+  }
+  updateBlue(lat,lon,acc);
+}
+
+function onGpsErr(err) {
+  document.getElementById('blue-dot').classList.remove('pulse');
+  showGpsMsg(err.code===1?'🚫 Location denied (err 1) — tap to retry':'⚠ GPS error (err '+err.code+') — tap to retry');
+}
+
+function showGpsMsg(msg) {
+  const p=document.getElementById('gps-prompt');
+  p.classList.remove('hidden');
+  p.innerHTML = msg.startsWith('Locating') ? msg :
+    `<svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>${msg}`;
+}
+
+/* ================================================================
+   PWA
+   ================================================================ */
+let dp=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('install-btn').style.display='block'});
+document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.prompt();dp.userChoice.then(()=>{dp=null;document.getElementById('install-btn').style.display='none'})}});
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+initMap();
+// Wait for two animation frames so Leaflet fully renders its pane DOM
+// before any GPS fix tries to call .addTo(map)
+// Fire GPS at page load — on iOS this may show the permission prompt automatically
+// if the site hasn't been denied before
+requestGPS();
 </script>
 </body>
 </html>
