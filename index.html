@@ -183,7 +183,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
     <div id="tl-logo"><span class="hash">#</span>hashsite</div>
     <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.3.742pm</span>
+    <span id="tl-ver">v4.3.747pm</span>
   </a>
 
   <!-- BLUE -->
@@ -788,17 +788,16 @@ function startWatch() {
 
 function onFix(pos) {
   const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;
-  console.log("[blue] onFix lat="+lat+" lon="+lon+" acc="+acc);
-  updateBlue(lat,lon,acc);
   if (firstFix) {
     firstFix = false;
     startWatch();
-    // Zoom to a level appropriate for the accuracy of the first fix
+    // Pan to location FIRST so markers are added while in view
     const prec = acc ? accToPrec(lat, lon, acc) : 5;
-    const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18]; // prec 1..10 -> zoom
+    const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
     const z = zoomForPrec[Math.min(prec, 10) - 1] || 14;
     map.setView([lat, lon], z);
   }
+  updateBlue(lat,lon,acc);
 }
 
 function onGpsErr(err) {
