@@ -196,7 +196,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
           Tap to enable location
         </span>
       </div>
-      <div class="latlon" id="blue-ll"></div>
+      <div class="latlon" id="blue-ll" style="cursor:pointer" onclick="flyToBlue()" title="Tap to fly here"></div>
     </div>
     <div class="share-caret" id="blue-caret" style="visibility:hidden">
       <div class="caret-row caret-mid">
@@ -360,7 +360,7 @@ function renderCode(bare10, brightCount) {
   for (const ch of brightStr) {
     if (ch === '.') {
       // dot: same color as surrounding chars, wider letter-spacing via margin
-      html += '<span style="margin:0 0.12em;opacity:1">.</span>';
+      html += '<span style="margin:0 -0.18em;opacity:1">.</span>';
       continue;
     }
     const bi = bareIdx++;
@@ -416,6 +416,7 @@ function accToPrec(lat, lon, acc) {
    STATE
    ================================================================ */
 let map=null, firstFix=true, toastTmr=null;
+let blueUpdateCount=0, blueLastUpdate=null;
 let blueLL=null, greenLL=null, redLL=null;
 let blueMkr=null, blueAccCirc=null;
 let redMkr=null;
@@ -465,6 +466,7 @@ function shiftBboxToMap(bbox) {
   // The codec always returns lon in [-180,180). When the map is panned past
   // ±180, Leaflet's center lon can be e.g. 185 or -200. Shift bbox by the
   // nearest multiple of 360 so it aligns with the visible map area.
+  if (!map) return bbox;
   const mapLon = map.getCenter().lng;
   const cellMid = (bbox.lon_w + bbox.lon_e) / 2;
   const shift = Math.round((mapLon - cellMid) / 360) * 360;
@@ -580,15 +582,27 @@ function updateRedBox(lat, lon, prec) {
 /* ================================================================
    STRIP UPDATES
    ================================================================ */
+
+function flyToBlue() {
+  if (!blueLL || !map) return;
+  const prec = blueBright || 5;
+  const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+  const z = Math.max(map.getZoom(), zoomForPrec[Math.min(prec,10)-1] || 14);
+  map.setView([blueLL.lat, blueLL.lon], z);
+}
 function updateBlue(lat, lon, acc) {
+  // Guard: if map isn't ready yet (can happen if GPS fires before map init),
+  // store and retry after a short delay
+  if (!map) { setTimeout(()=>updateBlue(lat,lon,acc), 200); return; }
   blueLL = {lat,lon};
-  // Precision comes from GPS accuracy, not map zoom
   const prec = acc ? accToPrec(lat, lon, acc) : 10;
   const bc = prec; // no +3 fudge — accuracy is already the truth
   blueBright = bc;
   blueBare = ll2hsps(lat,lon,10).replace(/^#/,'');
   setDisplay('blue-code', blueBare, bc);
-  document.getElementById('blue-ll').textContent = fmtLL(lat,lon)+(acc?`  ±${Math.round(acc)}m`:'');
+  blueUpdateCount++;
+  blueLastUpdate = Date.now();
+  document.getElementById('blue-ll').textContent = fmtLL(lat,lon)+(acc?`  ±${Math.round(acc)}m`:'')+(blueUpdateCount>1?`  #${blueUpdateCount}`:'');
   document.getElementById('blue-dot').classList.remove('pulse');
   document.getElementById('gps-prompt').classList.add('hidden');
   document.getElementById('blue-caret').style.visibility='visible';
@@ -796,6 +810,7 @@ document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.p
    BOOT
    ================================================================ */
 initMap();
+// GPS starts after map is ready — marker/box creation requires map to exist
 requestGPS();
 </script>
 </body>
