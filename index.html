@@ -92,6 +92,24 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .strip.red   .code-display { color:#ff7a6a; }
 /* raised chars: same size, 2px up */
 .code-display .sup{position:relative;top:-2px}
+
+/* Edit inputs overlay the code display when active */
+.edit-input {
+  position:absolute;
+  left:0; right:0; top:0; bottom:0;
+  font-family:var(--mono); font-size:15px; font-weight:600;
+  letter-spacing:.04em; line-height:1;
+  background:rgba(0,0,0,0.85);
+  border:none; outline:none;
+  color:var(--text);
+  padding:0 4px;
+  display:none;
+  width:100%;
+  z-index:10;
+}
+.edit-input.active { display:block; }
+.strip-main { position:relative; }
+
 /* dim chars */
 /* dim dots within bright region */
 /* placeholder text */
@@ -192,7 +210,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
     <div id="tl-logo"><span class="hash">#</span>hashsite</div>
     <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.3.840pm</span>
+    <span id="tl-ver">v4.6.231pm</span>
   </a>
 
   <!-- BLUE -->
@@ -229,9 +247,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="strip-icon"><div class="dot"></div></div>
     <div class="strip-main">
       <div class="code-display" id="green-code" style="cursor:text" onclick="focusGreenEdit()"></div>
-      <input id="green-edit" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
-      <div class="latlon" id="green-ll"></div>
+      <div id="green-luhn" style="font-size:9px;font-family:var(--mono);height:10px;line-height:10px;color:#ff4a3a;letter-spacing:.04em"></div>
+      <input id="green-edit" class="edit-input" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="hashsite, lat/lon, or place name…"/>
+      <div class="latlon" id="green-ll" style="cursor:pointer" onclick="focusGreenEdit()" title="Tap to enter location"></div>
     </div>
     <div class="share-caret">
       <div class="caret-row caret-mid">
@@ -255,9 +273,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="strip-icon"><div class="dot"></div></div>
     <div class="strip-main">
       <div class="code-display placeholder" id="red-code">Tap map to drop pin</div>
-      <input id="red-edit" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-        style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"/>
-      <div class="latlon" id="red-ll"></div>
+      <div id="red-luhn" style="font-size:9px;font-family:var(--mono);height:10px;line-height:10px;color:#ff4a3a;letter-spacing:.04em"></div>
+      <input id="red-edit" class="edit-input" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="hashsite, lat/lon, or place name…"/>
+      <div class="latlon" id="red-ll" style="cursor:pointer" onclick="focusRedEdit()" title="Tap to enter location"></div>
     </div>
     <div class="share-caret">
       <div class="caret-row caret-mid">
@@ -758,23 +776,140 @@ function copyText(t){
 function focusGreenEdit() {
   const inp = document.getElementById('green-edit');
   inp.value = greenBare ? '#'+greenBare : '';
-  inp.style.cssText = 'position:absolute;left:-9999px;opacity:0;width:1px;height:1px';
+  inp.classList.add('active');
   inp.focus();
+  inp.select();
 }
+/* ================================================================
+   UNIVERSAL INPUT PARSER
+   Accepts: hashsite code, lat/lon in many formats, place name
+   ================================================================ */
+
+function parseLatLon(s) {
+  // Try decimal degrees: "35.085, -106.65" or "35.085 -106.65"
+  const dec = s.match(/^\s*(-?\d+\.?\d*)\s*[,\s]\s*(-?\d+\.?\d*)\s*$/);
+  if (dec) {
+    const lat = parseFloat(dec[1]), lon = parseFloat(dec[2]);
+    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return {lat, lon};
+  }
+  // Try with N/S/E/W: "35.085°N, 106.65°W" or "35.085N 106.65W"
+  const dms = s.match(/(-?\d+\.?\d*)\s*°?\s*([NSns])\s*[,\s]\s*(\d+\.?\d*)\s*°?\s*([EWew])/);
+  if (dms) {
+    let lat = parseFloat(dms[1]) * (/[Ss]/.test(dms[2]) ? -1 : 1);
+    let lon = parseFloat(dms[3]) * (/[Ww]/.test(dms[4]) ? -1 : 1);
+    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) return {lat, lon};
+  }
+  return null;
+}
+
+async function geocodeName(name) {
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?q=' +
+      encodeURIComponent(name) + '&format=json&limit=1';
+    const res = await fetch(url, {headers:{'Accept-Language':'en'}});
+    const data = await res.json();
+    if (data && data.length > 0) {
+      return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), name: data[0].display_name};
+    }
+  } catch(e) {}
+  return null;
+}
+
+async function resolveInput(val, color) {
+  const s = val.trim();
+  if (!s) return;
+
+  // 1. Try as hashsite
+  const bb = hsps2bbox(s);
+  if (bb) return {lat: bb.lat_c, lon: bb.lon_c};
+
+  // 2. Try as lat/lon
+  const ll = parseLatLon(s);
+  if (ll) return ll;
+
+  // 3. Try geocoding
+  toast('Looking up "' + s + '"…', 5000);
+  const geo = await geocodeName(s);
+  if (geo) {
+    toast(geo.name.split(',').slice(0,2).join(','));
+    return {lat: geo.lat, lon: geo.lon};
+  }
+
+  return null;
+}
+
+function focusRedEdit() {
+  const inp = document.getElementById('red-edit');
+  inp.value = redBare ? '#'+redBare : '';
+  inp.classList.add('active');
+  inp.focus();
+  inp.select();
+}
+
+/* Luhn check indicator */
+function updateLuhnIndicator(elId, val) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const bare = val.replace(/^#/,'').replace(/\^.*$/,'').replace(/\./g,'');
+  const dots = (val.match(/\./g)||[]).length;
+  // Only show indicator if dots are present
+  if (dots < 2) { el.textContent = ''; return; }
+  // Check luhn
+  const ok = (function() {
+    const n = bare.length;
+    if (n < 3) return false;
+    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(bare, n), n-1);
+    // Find actual dot positions in val
+    let bareIdx = 0, dotPositions = [];
+    for (const ch of val.replace(/^#/,'').replace(/\^.*$/,'')) {
+      if (ch === '.') dotPositions.push(bareIdx);
+      else bareIdx++;
+    }
+    return dotPositions.length === 2 && dotPositions[0] === rp1 && dotPositions[1] === rp2;
+  })();
+  el.textContent = ok ? '' : '⚠ re-check';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const inp = document.getElementById('green-edit');
-  inp.addEventListener('keydown', function(e) {
-    if (e.key!=='Enter') return;
-    const bb = hsps2bbox(this.value.trim());
-    if (bb) { map.setView([bb.lat_c,bb.lon_c],Math.max(map.getZoom(),15)); this.blur(); }
-    else { document.getElementById('green-code').classList.add('shake'); setTimeout(()=>document.getElementById('green-code').classList.remove('shake'),320); toast('Not a valid hashsite'); }
+  // Green edit input
+  const ginp = document.getElementById('green-edit');
+  ginp.addEventListener('input', function() {
+    updateLuhnIndicator('green-luhn', this.value);
   });
+  ginp.addEventListener('blur', function() { this.classList.remove('active'); });
+  ginp.addEventListener('keydown', async function(e) {
+    if (e.key !== 'Enter') return;
+    const result = await resolveInput(this.value, 'green');
+    if (result) {
+      this.classList.remove('active');
+      map.setView([result.lat, result.lon], Math.max(map.getZoom(), 14));
+      this.blur();
+    } else {
+      document.getElementById('green-code').classList.add('shake');
+      setTimeout(()=>document.getElementById('green-code').classList.remove('shake'), 320);
+      toast('Could not find that location');
+    }
+  });
+
+  // Red edit input
   const rinp = document.getElementById('red-edit');
-  rinp.addEventListener('keydown', function(e) {
-    if (e.key!=='Enter') return;
-    const bb = hsps2bbox(this.value.trim());
-    if (bb) { placePin(bb.lat_c,bb.lon_c); map.setView([bb.lat_c,bb.lon_c],Math.max(map.getZoom(),15)); this.blur(); }
-    else { document.getElementById('red-code').classList.add('shake'); setTimeout(()=>document.getElementById('red-code').classList.remove('shake'),320); toast('Not a valid hashsite'); }
+  rinp.addEventListener('input', function() {
+    updateLuhnIndicator('red-luhn', this.value);
+  });
+  rinp.addEventListener('blur', function() { this.classList.remove('active'); });
+  rinp.addEventListener('keydown', async function(e) {
+    if (e.key !== 'Enter') return;
+    const result = await resolveInput(this.value, 'red');
+    if (result) {
+      this.classList.remove('active');
+      placePin(result.lat, result.lon);
+      map.setView([result.lat, result.lon], Math.max(map.getZoom(), 14));
+      this.blur();
+    } else {
+      document.getElementById('red-code').classList.add('shake');
+      setTimeout(()=>document.getElementById('red-code').classList.remove('shake'), 320);
+      toast('Could not find that location');
+    }
   });
 });
 
