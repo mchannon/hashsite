@@ -34,8 +34,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #titlebar{
   height:var(--title-h);min-height:var(--title-h);
   background:#0c0c18;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;cursor:pointer;user-select:none;text-decoration:none;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;
+  flex-shrink:0;text-decoration:none;
+  position:relative;padding:0 10px;
 }
 #titlebar:hover{background:#111128}
 #tl-logo{
@@ -47,10 +48,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #tl-tag{
   font-size:10px;font-weight:500;color:#b8b8e0;
   letter-spacing:.04em;margin-left:10px;font-family:var(--ui);
+  flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  min-width:0;
 }
 #tl-ver{
-  font-size:8px;font-weight:500;color:#b8b8e0;
-  letter-spacing:.04em;margin-left:8px;font-family:var(--mono);
+  font-size:10px;font-weight:500;color:#b8b8e0;
+  letter-spacing:.04em;font-family:var(--ui);white-space:nowrap;
 }
 
 /* ── STRIPS ── */
@@ -207,15 +210,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <body>
 <div id="app">
 
-  <a id="titlebar" href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener">
-    <div id="tl-logo"><span class="hash">#</span>hashsite</div>
-    <span id="tl-tag">open geocoding · no api key · no rent</span>
-    <span id="tl-ver">v4.6.231pm</span>
-  </a>
+  <div id="titlebar">
+    <a href="https://github.com/mchannon/hashsite/blob/master/README.md" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;flex:1;min-width:0">
+      <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
+      <span id="tl-tag">open geocoding · no api key · no rent</span>
+    </a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.714pm ©2026 Matt Channon</span></a>
+  </div>
 
   <!-- BLUE -->
   <div class="strip blue" style="cursor:pointer" onclick="requestGPS()" title="Tap to refresh location">
-    <div class="strip-icon"><div class="dot pulse" id="blue-dot"></div></div>
+    <div class="strip-icon" style="cursor:pointer" onclick="flyToBlue()"><div class="dot pulse" id="blue-dot"></div></div>
     <div class="strip-main">
       <div class="code-display" id="blue-code">
         <span id="gps-prompt" onclick="requestGPS()">
@@ -225,20 +230,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       </div>
       <div class="latlon" id="blue-ll" style="cursor:pointer" onclick="flyToBlue()" title="Tap to fly here"></div>
     </div>
-    <div class="share-caret" id="blue-caret" style="visibility:hidden">
-      <div class="caret-row caret-mid">
-        <button class="sbtn apex" id="bb-dollar" onclick="doShare('blue','$')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
-        </button>
-      </div>
-      <div class="caret-row">
-        <button class="sbtn" id="bb-hash" onclick="doShare('blue','#')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
-        </button>
-        <button class="sbtn" id="bb-pct" onclick="doShare('blue','%')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
-        </button>
-      </div>
+    <span id="dist-bg-text" style="font-size:18px;font-family:var(--mono);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:0 6px;background:linear-gradient(to right,#3a8fff,#00d97e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></span>
+    <div id="blue-caret" style="visibility:hidden;padding-left:8px;flex-shrink:0">
+      <button class="sbtn" id="bb-hash" onclick="event.stopPropagation();doShare('blue','#')" title="Copy location">
+        <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
+      </button>
     </div>
   </div>
 
@@ -251,6 +247,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <input id="green-edit" class="edit-input" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="hashsite, lat/lon, or place name…"/>
       <div class="latlon" id="green-ll" style="cursor:pointer" onclick="focusGreenEdit()" title="Tap to enter location"></div>
     </div>
+    <span id="dist-gr-text" style="font-size:18px;font-family:var(--mono);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:0 6px;background:linear-gradient(to right,#00d97e,#ff4a3a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></span>
     <div class="share-caret">
       <div class="caret-row caret-mid">
         <button class="sbtn apex" id="gb-dollar" onclick="doShare('green','$')">
@@ -270,13 +267,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
   <!-- RED -->
   <div class="strip red">
-    <div class="strip-icon"><div class="dot"></div></div>
+    <div class="strip-icon" style="cursor:pointer" onclick="flyToRed()"><div class="dot"></div></div>
     <div class="strip-main">
       <div class="code-display placeholder" id="red-code">Tap map to drop pin</div>
       <div id="red-luhn" style="font-size:9px;font-family:var(--mono);height:10px;line-height:10px;color:#ff4a3a;letter-spacing:.04em"></div>
       <input id="red-edit" class="edit-input" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="hashsite, lat/lon, or place name…"/>
       <div class="latlon" id="red-ll" style="cursor:pointer" onclick="focusRedEdit()" title="Tap to enter location"></div>
     </div>
+    <span id="dist-rb-text" style="font-size:18px;font-family:var(--mono);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:0 6px;background:linear-gradient(to right,#ff4a3a,#3a8fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></span>
     <div class="share-caret">
       <div class="caret-row caret-mid">
         <button class="sbtn apex off" id="rb-dollar" onclick="doShare('red','$')">
@@ -652,12 +650,67 @@ function getMetersPerPixel(lat) {
    STRIP UPDATES
    ================================================================ */
 
+
+/* ================================================================
+   DISTANCE BARS
+   ================================================================ */
+function haversineM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function fmtDist(meters) {
+  const miles = meters / 1609.344;
+  if (miles < 0.1) return Math.round(meters) + ' m';
+  if (miles < 10)  return miles.toFixed(2) + ' mi';
+  return miles.toFixed(1) + ' mi';
+}
+
+function updateDistBars() {
+  const bgt = document.getElementById('dist-bg-text');
+  const grt = document.getElementById('dist-gr-text');
+  const rbt = document.getElementById('dist-rb-text');
+
+  if (bgt) {
+    if (blueLL && greenLL) {
+      const d = haversineM(blueLL.lat, blueLL.lon, greenLL.lat, greenLL.lon);
+      bgt.textContent = '↔ ' + fmtDist(d);
+    } else {
+      bgt.textContent = '';
+    }
+  }
+
+  if (grt) {
+    if (greenLL && redLL) {
+      const d = haversineM(greenLL.lat, greenLL.lon, redLL.lat, redLL.lon);
+      grt.textContent = '↔ ' + fmtDist(d);
+    } else {
+      grt.textContent = '';
+    }
+  }
+  if (rbt) {
+    if (redLL && blueLL) {
+      const d = haversineM(redLL.lat, redLL.lon, blueLL.lat, blueLL.lon);
+      rbt.textContent = '↔ ' + fmtDist(d);
+    } else {
+      rbt.textContent = '';
+    }
+  }
+}
 function flyToBlue() {
   if (!blueLL || !map) return;
   const prec = blueBright || 5;
   const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
   const z = Math.max(map.getZoom(), zoomForPrec[Math.min(prec,10)-1] || 14);
   map.setView([blueLL.lat, blueLL.lon], z);
+}
+
+function flyToRed() {
+  if (!redLL || !map) return;
+  map.setView([redLL.lat, redLL.lon], Math.max(map.getZoom(), 14));
 }
 function updateBlue(lat, lon, acc) {
   console.log('[blue] updateBlue called lat='+lat+' lon='+lon+' acc='+acc+' map='+!!map);
@@ -685,6 +738,7 @@ function updateBlue(lat, lon, acc) {
   updateBtns('bb-', bc, true);
 
   blueRenderData = {lat, lon, acc, prec};
+  updateDistBars();
   // Draw immediately if map is ready, otherwise green's next redraw will catch it
   if (map) {
     updateBlueBox(lat, lon, prec);
@@ -702,6 +756,7 @@ function updateGreen(lat, lon) {
   document.getElementById('green-ll').textContent = fmtLL(lat,lon);
   updateBtns('gb-', bc, true);
   updateGreenBox(lat, lon, prec);
+  updateDistBars();
 }
 
 function updateRed(lat, lon) {
@@ -714,6 +769,7 @@ function updateRed(lat, lon) {
   document.getElementById('red-ll').textContent = fmtLL(lat,lon);
   updateBtns('rb-', bc, true);
   updateRedBox(lat, lon, prec);
+  updateDistBars();
 }
 
 function placePin(lat, lon) {
@@ -883,7 +939,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (result) {
       this.classList.remove('active');
       map.setView([result.lat, result.lon], Math.max(map.getZoom(), 14));
-      this.blur();
+      this.blur(); // map move event handles updateGreen
     } else {
       document.getElementById('green-code').classList.add('shake');
       setTimeout(()=>document.getElementById('green-code').classList.remove('shake'), 320);
@@ -902,8 +958,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const result = await resolveInput(this.value, 'red');
     if (result) {
       this.classList.remove('active');
-      placePin(result.lat, result.lon);
       map.setView([result.lat, result.lon], Math.max(map.getZoom(), 14));
+      map.once('moveend', () => placePin(result.lat, result.lon));
       this.blur();
     } else {
       document.getElementById('red-code').classList.add('shake');
