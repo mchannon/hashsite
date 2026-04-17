@@ -215,7 +215,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
       <span id="tl-tag">open geocoding · no api key · no rent</span>
     </a>
-    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.714pm ©2026 Matt Channon</span></a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm ©2026 Matt Channon</span></a>
   </div>
 
   <!-- BLUE -->
@@ -477,9 +477,9 @@ function updateBtns(prefix, brightCount, hasCode) {
   const dollar = document.getElementById(prefix+'dollar');
   const pct    = document.getElementById(prefix+'pct');
   if (!hash) return;
-  hash.classList.toggle('off',   !hasCode);
-  dollar.classList.toggle('off', !hasCode || brightCount < 6);
-  pct.classList.toggle('off',    !hasCode || brightCount < 8);
+  hash.classList.toggle('off', !hasCode);
+  if (dollar) dollar.classList.toggle('off', !hasCode || brightCount < 6);
+  if (pct)    pct.classList.toggle('off',    !hasCode || brightCount < 8);
 }
 
 /* ================================================================
