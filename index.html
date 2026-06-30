@@ -219,7 +219,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
       <span id="tl-tag">open geocoding · no api key · no rent</span>
     </a>
-    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm-v7 ©2026 Matt Channon</span></a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.521pm ©2026 Matt Channon</span></a>
   </div>
 
   <!-- BLUE -->
@@ -485,7 +485,7 @@ function updateBtns(prefix, brightCount, hasCode) {
    ================================================================ */
 function makeBox(bbox) {
   console.log("[blue] makeBox called bbox="+JSON.stringify(bbox));
-  const b = shiftBboxToMap(bbox);
+  const b = displayBbox(bbox);
   return L.rectangle([[b.lat_s,b.lon_w],[b.lat_n,b.lon_e]],
     {interactive:false, color:'#ffffff', weight:2, opacity:.8,
      fillColor:'#ffffff', fillOpacity:.1}).addTo(map);
@@ -510,14 +510,41 @@ function shiftBboxToMap(bbox) {
   };
 }
 
-function setBox(box, bbox) {
+function displayBbox(bbox, minPx=22) {
+  // At high precision the true Hashsite cell can be only a few screen pixels.
+  // Keep the visual rectangle large enough to see without changing the code,
+  // the decoded center, or the true sharing precision.
   const b = shiftBboxToMap(bbox);
+  if (!map) return b;
+
+  const nw = map.latLngToLayerPoint([b.lat_n, b.lon_w]);
+  const se = map.latLngToLayerPoint([b.lat_s, b.lon_e]);
+  const cx = (nw.x + se.x) / 2;
+  const cy = (nw.y + se.y) / 2;
+  const w = Math.max(Math.abs(se.x - nw.x), minPx);
+  const h = Math.max(Math.abs(se.y - nw.y), minPx);
+
+  const p1 = L.point(cx - w/2, cy - h/2);
+  const p2 = L.point(cx + w/2, cy + h/2);
+  const ll1 = map.layerPointToLatLng(p1);
+  const ll2 = map.layerPointToLatLng(p2);
+
+  return {
+    lat_s: Math.min(ll1.lat, ll2.lat),
+    lat_n: Math.max(ll1.lat, ll2.lat),
+    lon_w: Math.min(ll1.lng, ll2.lng),
+    lon_e: Math.max(ll1.lng, ll2.lng),
+  };
+}
+
+function setBox(box, bbox) {
+  const b = displayBbox(bbox);
   box.setBounds([[b.lat_s, b.lon_w],[b.lat_n, b.lon_e]]);
 }
 
 function setLbl(lbl, bbox, code, color) {
   if (!map) return;
-  const sb = shiftBboxToMap(bbox);
+  const sb = displayBbox(bbox);
   lbl.setOpacity(1);
   lbl.setLatLng([sb.lat_n, sb.lon_w]);
   lbl.setIcon(L.divIcon({
