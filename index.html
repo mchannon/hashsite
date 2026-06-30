@@ -157,6 +157,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 .sbtn.apex{height:26px;transform:translateY(-3px)}
 .sbtn:hover,.sbtn:active{background:rgba(255,255,255,.24);color:#fff}
+.sbtn.emoji{font-size:14px;line-height:1;padding:0 6px}
 .sbtn.off{opacity:.22;pointer-events:none}
 .si{width:11px;height:11px;flex-shrink:0}
 
@@ -231,9 +232,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div class="latlon" id="blue-ll" style="cursor:pointer" onclick="flyToBlue()" title="Tap to fly here"></div>
     </div>
     <span id="dist-bg-text" style="font-size:18px;font-family:var(--mono);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:0 6px;background:linear-gradient(to right,#3a8fff,#00d97e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></span>
-    <div id="blue-caret" style="visibility:hidden;padding-left:8px;flex-shrink:0">
-      <button class="sbtn" id="bb-hash" onclick="event.stopPropagation();doShare('blue','#')" title="Copy location">
-        <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
+    <div id="blue-caret" style="visibility:hidden;padding-left:8px;flex-shrink:0;display:flex;gap:4px">
+      <button class="sbtn emoji" id="bb-copy" onclick="event.stopPropagation();doShare('blue','copy')" title="Copy Hashsite">
+        📋
+      </button>
+      <button class="sbtn emoji" id="bb-sms" onclick="event.stopPropagation();doShare('blue','sms')" title="Text Hashsite">
+        💬
       </button>
     </div>
   </div>
@@ -249,18 +253,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
     <span id="dist-gr-text" style="font-size:18px;font-family:var(--mono);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:0 6px;background:linear-gradient(to right,#00d97e,#ff4a3a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></span>
     <div class="share-caret">
-      <div class="caret-row caret-mid">
-        <button class="sbtn apex" id="gb-dollar" onclick="doShare('green','$')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
-        </button>
-      </div>
       <div class="caret-row">
-        <button class="sbtn" id="gb-hash" onclick="doShare('green','#')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
-        </button>
-        <button class="sbtn" id="gb-pct" onclick="doShare('green','%')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
-        </button>
+        <button class="sbtn emoji" id="gb-copy" onclick="doShare('green','copy')" title="Copy Hashsite">📋</button>
+        <button class="sbtn emoji" id="gb-sms" onclick="doShare('green','sms')" title="Text Hashsite">💬</button>
       </div>
     </div>
   </div>
@@ -276,18 +271,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
     <span id="dist-rb-text" style="font-size:18px;font-family:var(--mono);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:0 6px;background:linear-gradient(to right,#ff4a3a,#3a8fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></span>
     <div class="share-caret">
-      <div class="caret-row caret-mid">
-        <button class="sbtn apex off" id="rb-dollar" onclick="doShare('red','$')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>$
-        </button>
-      </div>
       <div class="caret-row">
-        <button class="sbtn off" id="rb-hash" onclick="doShare('red','#')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>#
-        </button>
-        <button class="sbtn off" id="rb-pct" onclick="doShare('red','%')">
-          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>%
-        </button>
+        <button class="sbtn emoji off" id="rb-copy" onclick="doShare('red','copy')" title="Copy Hashsite">📋</button>
+        <button class="sbtn emoji off" id="rb-sms" onclick="doShare('red','sms')" title="Text Hashsite">💬</button>
       </div>
     </div>
   </div>
@@ -473,13 +459,10 @@ function setDisplay(elId, bare10, brightCount) {
 }
 
 function updateBtns(prefix, brightCount, hasCode) {
-  const hash   = document.getElementById(prefix+'hash');
-  const dollar = document.getElementById(prefix+'dollar');
-  const pct    = document.getElementById(prefix+'pct');
-  if (!hash) return;
-  hash.classList.toggle('off', !hasCode);
-  if (dollar) dollar.classList.toggle('off', !hasCode || brightCount < 6);
-  if (pct)    pct.classList.toggle('off',    !hasCode || brightCount < 8);
+  const copy = document.getElementById(prefix+'copy');
+  const sms  = document.getElementById(prefix+'sms');
+  if (copy) copy.classList.toggle('off', !hasCode);
+  if (sms)  sms.classList.toggle('off',  !hasCode);
 }
 
 /* ================================================================
@@ -793,37 +776,134 @@ function getBare(color) {
   return redBare;
 }
 
-function doShare(color, mode) {
-  const bare = getBare(color);
-  if (!bare) { toast('Nothing to share yet'); return; }
-  const bc = color==='blue' ? blueBright : color==='green' ? greenBright : redBright;
-  const brightBare = bare.slice(0, bc);
-  // Build dotted bright string (same logic as renderCode)
+function getBright(color) {
+  if (color==='blue')  return blueBright;
+  if (color==='green') return greenBright;
+  return redBright;
+}
+
+function getLL(color) {
+  if (color==='blue')  return blueLL;
+  if (color==='green') return greenLL;
+  return redLL;
+}
+
+function dottedHash(bare, brightCount) {
+  if (!bare) return null;
+  const brightBare = bare.slice(0, brightCount);
   let dotted = '#' + brightBare;
-  if (bc >= 3) {
-    const n = bc;
-    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(brightBare, n), n-1);
+  if (brightCount >= 3) {
+    const [rp1,rp2] = hs_combo_idx(hs_luhn_idx(brightBare, brightCount), brightCount-1);
     let bd = '#';
-    for (let i=0; i<n; i++) {
+    for (let i=0; i<brightCount; i++) {
       bd += brightBare[i];
       const pos = i+1;
-      if ((pos===rp1||pos===rp2) && pos < bc) bd += '.';
+      if ((pos===rp1||pos===rp2) && pos < brightCount) bd += '.';
     }
     dotted = bd;
   }
-  let text;
-  if (mode==='#') { copyText(dotted); return; }
-  if (mode==='$') text = '$' + brightBare.slice(3);
-  else            text = '%' + brightBare.slice(5);
-  const shareText = text+'\nhttps://hashsite.org';
-  if (navigator.share) navigator.share({title:'Hashsite location',text:shareText}).catch(()=>copyText(text));
-  else copyText(text);
+  return dotted;
+}
+
+function cleanHashInput(value) {
+  if (!value) return null;
+  let s = String(value).trim();
+  s = s.replace(/^https?:\/\/(?:www\.)?hashsite\.org\/?/i, '');
+  if (s.includes('#')) s = s.slice(s.lastIndexOf('#') + 1);
+  s = s.replace(/^#/, '').replace(/\./g, '').replace(/\^.*$/, '');
+  s = s.replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+  return s || null;
+}
+
+function mapsDirectionsUrl(ll) {
+  if (!ll) return null;
+  return 'https://www.google.com/maps/dir/?api=1&destination=' +
+    encodeURIComponent(ll.lat.toFixed(7) + ',' + ll.lon.toFixed(7));
+}
+
+function siteOriginNoSlash() {
+  return window.location.origin || 'https://hashsite.org';
+}
+
+function buildSingleHashsiteUrl(bare, brightCount) {
+  const brightBare = bare.slice(0, brightCount);
+  return siteOriginNoSlash() + '#' + brightBare;
+}
+
+function buildContextHashsiteUrl() {
+  const params = new URLSearchParams();
+  if (greenBare) params.set('g', greenBare.slice(0, greenBright));
+  if (redBare)   params.set('r', redBare.slice(0, redBright));
+  if (map)       params.set('z', String(Math.round(map.getZoom())));
+  return siteOriginNoSlash() + '?' + params.toString();
+}
+
+function buildSmsMessage(color) {
+  const bare = getBare(color);
+  const bc = getBright(color);
+  const code = dottedHash(bare, bc);
+  const ll = getLL(color);
+  const maps = mapsDirectionsUrl(ll);
+
+  const useContext = color === 'red' && greenBare && redBare;
+  const hashsiteUrl = useContext ? buildContextHashsiteUrl() : buildSingleHashsiteUrl(bare, bc);
+
+  const lines = [];
+  if (useContext) {
+    lines.push('Go here:');
+    lines.push('');
+    lines.push('Approach/reference: ' + dottedHash(greenBare, greenBright));
+    lines.push('Destination: ' + dottedHash(redBare, redBright));
+  } else if (color === 'blue') {
+    lines.push('My location: ' + code);
+  } else if (color === 'green') {
+    lines.push('Reference point: ' + code);
+  } else {
+    lines.push('Go here: ' + code);
+  }
+  lines.push('');
+  lines.push('Hashsite:');
+  lines.push(hashsiteUrl);
+  if (maps) {
+    lines.push('');
+    lines.push(color === 'red' ? 'Directions to destination:' : 'Directions:');
+    lines.push(maps);
+  }
+  return lines.join('\n');
+}
+
+function smsUrl(message) {
+  const sep = /iPad|iPhone|iPod/i.test(navigator.userAgent) ? '&' : '?';
+  return 'sms:' + sep + 'body=' + encodeURIComponent(message);
+}
+
+function doShare(color, mode) {
+  const bare = getBare(color);
+  if (!bare) { toast('Nothing to share yet'); return; }
+  const bc = getBright(color);
+  const dotted = dottedHash(bare, bc);
+
+  if (mode === 'copy') { copyText(dotted); return; }
+  if (mode === 'sms') {
+    const msg = buildSmsMessage(color);
+    window.location.href = smsUrl(msg);
+    setTimeout(() => toast('Text message prepared'), 250);
+    return;
+  }
+
+  copyText(dotted);
 }
 
 function copyText(t){
-  navigator.clipboard.writeText(t).then(()=>toast('Copied  '+t)).catch(()=>{
-    const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copied  '+t);
-  });
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(()=>toast('Copied  '+t)).catch(()=>fallbackCopyText(t));
+  } else {
+    fallbackCopyText(t);
+  }
+}
+
+function fallbackCopyText(t) {
+  const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copied  '+t);
 }
 
 /* ================================================================
@@ -875,8 +955,9 @@ async function resolveInput(val, color) {
   const s = val.trim();
   if (!s) return;
 
-  // 1. Try as hashsite
-  const bb = hsps2bbox(s);
+  // 1. Try as hashsite, including pasted hashsite.org#... links
+  const cleanHash = cleanHashInput(s);
+  const bb = cleanHash ? hsps2bbox('#' + cleanHash) : hsps2bbox(s);
   if (bb) return {lat: bb.lat_c, lon: bb.lon_c};
 
   // 2. Try as lat/lon
@@ -892,6 +973,66 @@ async function resolveInput(val, color) {
   }
 
   return null;
+}
+
+function zoomForHashPrecision(hash) {
+  const clean = cleanHashInput(hash);
+  const n = clean ? Math.max(1, Math.min(clean.length, 10)) : 10;
+  const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+  return zoomForPrec[n-1] || 14;
+}
+
+function hashToCenter(hash) {
+  const clean = cleanHashInput(hash);
+  if (!clean) return null;
+  const bb = hsps2bbox('#' + clean);
+  if (!bb) return null;
+  return {lat: bb.lat_c, lon: bb.lon_c, bare: clean};
+}
+
+function getInitialUrlState() {
+  const params = new URLSearchParams(window.location.search || '');
+  const qGreen = cleanHashInput(params.get('g'));
+  const qRed = cleanHashInput(params.get('r'));
+  const qZoom = Number(params.get('z'));
+
+  if (qGreen || qRed) {
+    return {
+      source: 'query',
+      green: qGreen || qRed,
+      red: qRed || qGreen,
+      zoom: Number.isFinite(qZoom) && qZoom > 0 ? qZoom : null,
+    };
+  }
+
+  const frag = decodeURIComponent(window.location.hash || '').trim();
+  const fHash = cleanHashInput(frag);
+  if (fHash && hsps2bbox('#' + fHash)) {
+    return {source: 'fragment', green: fHash, red: fHash, zoom: null};
+  }
+
+  return {source: 'default', green: null, red: null, zoom: null};
+}
+
+function applyInitialUrlState() {
+  if (!map) return false;
+  const state = getInitialUrlState();
+  if (state.source === 'default') return false;
+
+  const g = hashToCenter(state.green);
+  const r = hashToCenter(state.red);
+  if (!g && !r) return false;
+
+  const center = g || r;
+  const z = state.zoom || zoomForHashPrecision(center.bare);
+  map.setView([center.lat, center.lon], z);
+
+  // A direct hashsite.org#... link means: show this place, with green and red
+  // both on the same Hashsite. Blue remains the viewer's device location only.
+  if (r) placePin(r.lat, r.lon);
+
+  updateDistBars();
+  return true;
 }
 
 function focusRedEdit() {
@@ -1049,6 +1190,7 @@ document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.p
    BOOT
    ================================================================ */
 initMap();
+applyInitialUrlState();
 // Wait for two animation frames so Leaflet fully renders its pane DOM
 // before any GPS fix tries to call .addTo(map)
 // Fire GPS at page load — on iOS this may show the permission prompt automatically
