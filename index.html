@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#0a0a0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -216,7 +219,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
       <span id="tl-tag">open geocoding · no api key · no rent</span>
     </a>
-    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm-v5 ©2026 Matt Channon</span></a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm-v6 ©2026 Matt Channon</span></a>
   </div>
 
   <!-- BLUE -->
@@ -400,19 +403,23 @@ function zoomToPrecision(lat, lon) {
   const bounds = map.getBounds();
   const latSpan = bounds.getNorth() - bounds.getSouth();
   const lonSpan = bounds.getEast()  - bounds.getWest();
-  // Be a little more willing to show the next Hashsite character.  The prior
-  // 0.375 threshold made 9-char precision appear during a pinch/overzoom but
-  // often fall back to 8 after Leaflet snapped the zoom at gesture end.
-  const tLat = latSpan * 0.75;
-  const tLon = lonSpan * 0.75;
-  let best = 1;
+  const tLat = latSpan * 0.375;
+  const tLon = lonSpan * 0.375;
+  let picked = 10;
   for (let n=1; n<=10; n++) {
     const bb = hsps2bbox(ll2hsps(lat, lon, n));
     if (!bb) continue;
-    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) best = n;
-    else break;
+    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) { picked = n; break; }
   }
-  return best;
+
+  // At high overzoom levels, allow a stable 9th/10th character instead of
+  // briefly showing it during pinch and then snapping display back to 8.
+  // This keeps the conservative bbox sizing at ordinary zooms while making
+  // the deepest mobile zoom levels useful.
+  const z = map.getZoom();
+  if (z >= 19 && picked < 9) picked = 9;
+  if (z >= 21 && picked < 10) picked = 10;
+  return picked;
 }
 
 
@@ -1163,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
    MAP
    ================================================================ */
 function initMap() {
-  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,maxZoom:22,zoomSnap:0.25,zoomDelta:0.5,wheelPxPerZoomLevel:80});
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,maxZoom:22});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxNativeZoom:19,maxZoom:22,
   }).addTo(map);
