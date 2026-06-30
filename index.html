@@ -219,7 +219,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
       <span id="tl-tag">open geocoding · no api key · no rent</span>
     </a>
-    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm-v6 ©2026 Matt Channon</span></a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm-v7 ©2026 Matt Channon</span></a>
   </div>
 
   <!-- BLUE -->
@@ -400,26 +400,27 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
    ZOOM → PRECISION using actual codec bbox sizes
    ================================================================ */
 function zoomToPrecision(lat, lon) {
+  const z = map.getZoom();
+
+  // High-zoom precision must be stable after touch release. The viewport-size
+  // heuristic below can jump from 7 directly to 9 near the deepest zooms,
+  // because Leaflet settles to whole zoom levels after a pinch. Reserve exact
+  // integer zoom bands for 8/9/10 so each depth has a steady resting place.
+  if (z >= 21) return 10;
+  if (z >= 19) return 9;
+  if (z >= 18) return 8;
+
   const bounds = map.getBounds();
   const latSpan = bounds.getNorth() - bounds.getSouth();
   const lonSpan = bounds.getEast()  - bounds.getWest();
   const tLat = latSpan * 0.375;
   const tLon = lonSpan * 0.375;
-  let picked = 10;
   for (let n=1; n<=10; n++) {
     const bb = hsps2bbox(ll2hsps(lat, lon, n));
     if (!bb) continue;
-    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) { picked = n; break; }
+    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) return n;
   }
-
-  // At high overzoom levels, allow a stable 9th/10th character instead of
-  // briefly showing it during pinch and then snapping display back to 8.
-  // This keeps the conservative bbox sizing at ordinary zooms while making
-  // the deepest mobile zoom levels useful.
-  const z = map.getZoom();
-  if (z >= 19 && picked < 9) picked = 9;
-  if (z >= 21 && picked < 10) picked = 10;
-  return picked;
+  return 10;
 }
 
 
@@ -1248,6 +1249,7 @@ document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.p
 /* ================================================================
    BOOT
    ================================================================ */
+console.log('Hashsite build v7 stable-8-zoom');
 initMap();
 applyInitialUrlState();
 window.addEventListener('hashchange', () => applyInitialUrlState());
