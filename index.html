@@ -687,7 +687,7 @@ function updateDistBars() {
 function flyToBlue() {
   if (!blueLL || !map) return;
   const prec = blueBright || 5;
-  const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+  const zoomForPrec = [2,4,6,8,10,12,14,16,18,20];
   const z = Math.max(map.getZoom(), zoomForPrec[Math.min(prec,10)-1] || 14);
   map.setView([blueLL.lat, blueLL.lon], z);
 }
@@ -730,10 +730,12 @@ function updateBlue(lat, lon, acc) {
   }
 }
 
-function updateGreen(lat, lon) {
+function updateGreen(lat, lon, forcedPrec) {
   greenLL = {lat,lon};
-  const prec = map ? zoomToPrecision(lat, lon) : 10;
-  const bc = Math.min(prec+3, 10);
+  const prec = forcedPrec || (map ? zoomToPrecision(lat, lon) : 10);
+  // Normal map-center display gets a +3 readable preview; explicit typed/URL
+  // Hashsites preserve the precision the sender typed.
+  const bc = forcedPrec ? Math.min(forcedPrec, 10) : Math.min(prec+3, 10);
   greenBright = bc;
   greenBare = ll2hsps(lat,lon,10).replace(/^#/,'');
   setDisplay('green-code', greenBare, bc);
@@ -743,10 +745,12 @@ function updateGreen(lat, lon) {
   updateDistBars();
 }
 
-function updateRed(lat, lon) {
+function updateRed(lat, lon, forcedPrec) {
   redLL = {lat,lon};
-  const prec = map ? zoomToPrecision(lat, lon) : 10;
-  const bc = Math.min(prec+3, 10);
+  const prec = forcedPrec || (map ? zoomToPrecision(lat, lon) : 10);
+  // Red pins created from a typed/shared Hashsite should keep that Hashsite's
+  // precision instead of being recomputed from the current map zoom.
+  const bc = forcedPrec ? Math.min(forcedPrec, 10) : Math.min(prec+3, 10);
   redBright = bc;
   redBare = ll2hsps(lat,lon,10).replace(/^#/,'');
   setDisplay('red-code', redBare, bc);
@@ -756,11 +760,11 @@ function updateRed(lat, lon) {
   updateDistBars();
 }
 
-function placePin(lat, lon) {
+function placePin(lat, lon, forcedPrec) {
   const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6)"></div>`,iconSize:[14,14],iconAnchor:[7,7]});
   if (redMkr) { redMkr.setLatLng([lat,lon]); redMkr.setIcon(icon); }
   else redMkr = L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
-  updateRed(lat,lon);
+  updateRed(lat,lon,forcedPrec);
 }
 
 /* ================================================================
@@ -959,7 +963,7 @@ async function resolveInput(val, color) {
   // 1. Try as hashsite, including pasted hashsite.org#... links
   const cleanHash = cleanHashInput(s);
   const bb = cleanHash ? hsps2bbox('#' + cleanHash) : hsps2bbox(s);
-  if (bb) return {lat: bb.lat_c, lon: bb.lon_c};
+  if (bb) return {lat: bb.lat_c, lon: bb.lon_c, precision: cleanHash ? Math.max(1, Math.min(cleanHash.length, 10)) : null};
 
   // 2. Try as lat/lon
   const ll = parseLatLon(s);
@@ -979,7 +983,8 @@ async function resolveInput(val, color) {
 function zoomForHashPrecision(hash) {
   const clean = cleanHashInput(hash);
   const n = clean ? Math.max(1, Math.min(clean.length, 10)) : 10;
-  const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+  // Overzoom past OSM native tiles so 9-character Hashsites are reachable/useful.
+  const zoomForPrec = [2,4,6,8,10,12,14,16,18,20];
   return zoomForPrec[n-1] || 14;
 }
 
@@ -988,7 +993,7 @@ function hashToCenter(hash) {
   if (!clean) return null;
   const bb = hsps2bbox('#' + clean);
   if (!bb) return null;
-  return {lat: bb.lat_c, lon: bb.lon_c, bare: clean};
+  return {lat: bb.lat_c, lon: bb.lon_c, bare: clean, precision: Math.max(1, Math.min(clean.length, 10))};
 }
 
 function getInitialUrlState() {
@@ -1030,16 +1035,17 @@ function applyInitialUrlState() {
   initialUrlStateApplied = true;
 
   if (g && r && (Math.abs(g.lat-r.lat) > 1e-10 || Math.abs(g.lon-r.lon) > 1e-10)) {
-    if (r) placePin(r.lat, r.lon);
+    if (r) placePin(r.lat, r.lon, r.precision);
     const bounds = L.latLngBounds([[g.lat, g.lon], [r.lat, r.lon]]);
     if (state.zoom) map.setView([g.lat, g.lon], state.zoom);
     else map.fitBounds(bounds, {padding:[45,45], maxZoom:zoomForHashPrecision(r.bare || g.bare)});
-    updateGreen(g.lat, g.lon);
+    updateGreen(g.lat, g.lon, g.precision);
   } else {
     const center = g || r;
     const z = state.zoom || zoomForHashPrecision(center.bare);
     map.setView([center.lat, center.lon], z);
-    if (r) placePin(r.lat, r.lon);
+    if (g) updateGreen(g.lat, g.lon, g.precision);
+    if (r) placePin(r.lat, r.lon, r.precision);
   }
 
   updateDistBars();
@@ -1090,8 +1096,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const result = await resolveInput(this.value, 'green');
     if (result) {
       this.classList.remove('active');
-      map.setView([result.lat, result.lon], Math.max(map.getZoom(), 14));
-      this.blur(); // map move event handles updateGreen
+      map.setView([result.lat, result.lon], Math.max(map.getZoom(), result.precision ? zoomForHashPrecision('#' + 'X'.repeat(result.precision)) : 14));
+      if (result.precision) updateGreen(result.lat, result.lon, result.precision);
+      this.blur(); // map move event handles updateGreen; explicit Hashsite preserves typed precision here
     } else {
       document.getElementById('green-code').classList.add('shake');
       setTimeout(()=>document.getElementById('green-code').classList.remove('shake'), 320);
@@ -1110,8 +1117,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const result = await resolveInput(this.value, 'red');
     if (result) {
       this.classList.remove('active');
-      map.setView([result.lat, result.lon], Math.max(map.getZoom(), 14));
-      map.once('moveend', () => placePin(result.lat, result.lon));
+      map.setView([result.lat, result.lon], Math.max(map.getZoom(), result.precision ? zoomForHashPrecision('#' + 'X'.repeat(result.precision)) : 14));
+      placePin(result.lat, result.lon, result.precision);
       this.blur();
     } else {
       document.getElementById('red-code').classList.add('shake');
@@ -1125,9 +1132,9 @@ document.addEventListener('DOMContentLoaded', () => {
    MAP
    ================================================================ */
 function initMap() {
-  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true});
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,maxZoom:21});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxZoom:19,
+    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxNativeZoom:19,maxZoom:21,
   }).addTo(map);
 
   // Dark overlay instead of CSS filter — avoids WebKit stacking context bug
@@ -1172,7 +1179,7 @@ function onFix(pos) {
     // Blue should appear as the viewer/device location while green/red stay in frame.
     if (!initialUrlStateApplied) {
       const prec = acc ? accToPrec(lat, lon, acc) : 5;
-      const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+      const zoomForPrec = [2,4,6,8,10,12,14,16,18,20];
       const z = zoomForPrec[Math.min(prec, 10) - 1] || 14;
       map.setView([lat, lon], z);
     }
@@ -1205,6 +1212,8 @@ document.getElementById('install-btn').addEventListener('click',()=>{if(dp){dp.p
    ================================================================ */
 initMap();
 applyInitialUrlState();
+window.addEventListener('hashchange', () => applyInitialUrlState());
+window.addEventListener('popstate', () => applyInitialUrlState());
 // Wait for two animation frames so Leaflet fully renders its pane DOM
 // before any GPS fix tries to call .addTo(map)
 // Fire GPS at page load — on iOS this may show the permission prompt automatically
