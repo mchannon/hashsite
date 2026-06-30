@@ -219,7 +219,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
       <span id="tl-tag">open geocoding · no api key · no rent</span>
     </a>
-    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.521pm ©2026 Matt Channon</span></a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.545pm ©2026 Matt Channon</span></a>
   </div>
 
   <!-- BLUE -->
@@ -242,6 +242,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <button class="sbtn emoji" id="bb-sms" onclick="event.stopPropagation();doShare('blue','sms')" title="Text Hashsite">
         💬
       </button>
+      <button class="sbtn emoji" id="bb-map" onclick="event.stopPropagation();doShare('blue','map')" title="Open in Google Maps">
+        🗺️
+      </button>
     </div>
   </div>
 
@@ -259,6 +262,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div class="caret-row">
         <button class="sbtn emoji" id="gb-copy" onclick="doShare('green','copy')" title="Copy Hashsite">📋</button>
         <button class="sbtn emoji" id="gb-sms" onclick="doShare('green','sms')" title="Text Hashsite">💬</button>
+        <button class="sbtn emoji" id="gb-map" onclick="doShare('green','map')" title="Open in Google Maps">🗺️</button>
       </div>
     </div>
   </div>
@@ -277,6 +281,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div class="caret-row">
         <button class="sbtn emoji off" id="rb-copy" onclick="doShare('red','copy')" title="Copy Hashsite">📋</button>
         <button class="sbtn emoji off" id="rb-sms" onclick="doShare('red','sms')" title="Text Hashsite">💬</button>
+        <button class="sbtn emoji off" id="rb-map" onclick="doShare('red','map')" title="Open in Google Maps">🗺️</button>
       </div>
     </div>
   </div>
@@ -476,8 +481,10 @@ function setDisplay(elId, bare10, brightCount) {
 function updateBtns(prefix, brightCount, hasCode) {
   const copy = document.getElementById(prefix+'copy');
   const sms  = document.getElementById(prefix+'sms');
+  const mapBtn = document.getElementById(prefix+'map');
   if (copy) copy.classList.toggle('off', !hasCode);
   if (sms)  sms.classList.toggle('off',  !hasCode);
+  if (mapBtn) mapBtn.classList.toggle('off', !hasCode);
 }
 
 /* ================================================================
@@ -941,6 +948,12 @@ function doShare(color, mode) {
     const msg = buildSmsMessage(color);
     window.location.href = smsUrl(msg);
     setTimeout(() => toast('Text message prepared'), 250);
+    return;
+  }
+  if (mode === 'map') {
+    const maps = mapsDirectionsUrl(getLL(color));
+    if (!maps) { toast('No map point yet'); return; }
+    window.location.href = maps;
     return;
   }
 
