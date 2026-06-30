@@ -436,6 +436,7 @@ function accToPrec(lat, lon, acc) {
    STATE
    ================================================================ */
 let map=null, firstFix=true, toastTmr=null;
+let initialUrlStateApplied=false;
 let blueUpdateCount=0, blueLastUpdate=null;
 let blueRenderData=null;
 let blueLL=null, greenLL=null, redLL=null;
@@ -1023,13 +1024,23 @@ function applyInitialUrlState() {
   const r = hashToCenter(state.red);
   if (!g && !r) return false;
 
-  const center = g || r;
-  const z = state.zoom || zoomForHashPrecision(center.bare);
-  map.setView([center.lat, center.lon], z);
-
   // A direct hashsite.org#... link means: show this place, with green and red
   // both on the same Hashsite. Blue remains the viewer's device location only.
-  if (r) placePin(r.lat, r.lon);
+  // A structured ?g=...&r=... link restores the direction-giving context.
+  initialUrlStateApplied = true;
+
+  if (g && r && (Math.abs(g.lat-r.lat) > 1e-10 || Math.abs(g.lon-r.lon) > 1e-10)) {
+    if (r) placePin(r.lat, r.lon);
+    const bounds = L.latLngBounds([[g.lat, g.lon], [r.lat, r.lon]]);
+    if (state.zoom) map.setView([g.lat, g.lon], state.zoom);
+    else map.fitBounds(bounds, {padding:[45,45], maxZoom:zoomForHashPrecision(r.bare || g.bare)});
+    updateGreen(g.lat, g.lon);
+  } else {
+    const center = g || r;
+    const z = state.zoom || zoomForHashPrecision(center.bare);
+    map.setView([center.lat, center.lon], z);
+    if (r) placePin(r.lat, r.lon);
+  }
 
   updateDistBars();
   return true;
@@ -1157,11 +1168,14 @@ function onFix(pos) {
   if (firstFix) {
     firstFix = false;
     startWatch();
-    // Pan to location FIRST so markers are added while in view
-    const prec = acc ? accToPrec(lat, lon, acc) : 5;
-    const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
-    const z = zoomForPrec[Math.min(prec, 10) - 1] || 14;
-    map.setView([lat, lon], z);
+    // On a shared/hash URL, do not let the viewer's GPS hijack the map view.
+    // Blue should appear as the viewer/device location while green/red stay in frame.
+    if (!initialUrlStateApplied) {
+      const prec = acc ? accToPrec(lat, lon, acc) : 5;
+      const zoomForPrec = [2,4,6,8,10,12,13,14,16,17,18];
+      const z = zoomForPrec[Math.min(prec, 10) - 1] || 14;
+      map.setView([lat, lon], z);
+    }
   }
   updateBlue(lat,lon,acc);
 }
