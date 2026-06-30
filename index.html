@@ -216,7 +216,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="tl-logo" style="flex-shrink:0"><span class="hash">#</span>hashsite</div>
       <span id="tl-tag">open geocoding · no api key · no rent</span>
     </a>
-    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm ©2026 Matt Channon</span></a>
+    <a href="https://mattchannon.com" target="_blank" rel="noopener" style="text-decoration:none;flex-shrink:0;margin-left:8px"><span id="tl-ver">v4.17.747pm-v5 ©2026 Matt Channon</span></a>
   </div>
 
   <!-- BLUE -->
@@ -400,14 +400,19 @@ function zoomToPrecision(lat, lon) {
   const bounds = map.getBounds();
   const latSpan = bounds.getNorth() - bounds.getSouth();
   const lonSpan = bounds.getEast()  - bounds.getWest();
-  const tLat = latSpan * 0.375;
-  const tLon = lonSpan * 0.375;
+  // Be a little more willing to show the next Hashsite character.  The prior
+  // 0.375 threshold made 9-char precision appear during a pinch/overzoom but
+  // often fall back to 8 after Leaflet snapped the zoom at gesture end.
+  const tLat = latSpan * 0.75;
+  const tLon = lonSpan * 0.75;
+  let best = 1;
   for (let n=1; n<=10; n++) {
     const bb = hsps2bbox(ll2hsps(lat, lon, n));
     if (!bb) continue;
-    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) return n;
+    if ((bb.lat_n-bb.lat_s) <= tLat || (bb.lon_e-bb.lon_w) <= tLon) best = n;
+    else break;
   }
-  return 10;
+  return best;
 }
 
 
@@ -437,6 +442,7 @@ function accToPrec(lat, lon, acc) {
    ================================================================ */
 let map=null, firstFix=true, toastTmr=null;
 let initialUrlStateApplied=false;
+let suppressGreenAutoUpdate=false;
 let blueUpdateCount=0, blueLastUpdate=null;
 let blueRenderData=null;
 let blueLL=null, greenLL=null, redLL=null;
@@ -730,14 +736,21 @@ function updateBlue(lat, lon, acc) {
   }
 }
 
-function updateGreen(lat, lon, forcedPrec) {
+function mergeForcedBare(lat, lon, forcedBare) {
+  const canonical = ll2hsps(lat, lon, 10).replace(/^#/,'');
+  const clean = cleanHashInput(forcedBare);
+  if (!clean) return canonical;
+  return (clean + canonical.slice(clean.length)).slice(0, 10);
+}
+
+function updateGreen(lat, lon, forcedPrec, forcedBare) {
   greenLL = {lat,lon};
   const prec = forcedPrec || (map ? zoomToPrecision(lat, lon) : 10);
   // Normal map-center display gets a +3 readable preview; explicit typed/URL
-  // Hashsites preserve the precision the sender typed.
+  // Hashsites preserve the precision and exact prefix the sender typed.
   const bc = forcedPrec ? Math.min(forcedPrec, 10) : Math.min(prec+3, 10);
   greenBright = bc;
-  greenBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  greenBare = mergeForcedBare(lat, lon, forcedBare);
   setDisplay('green-code', greenBare, bc);
   document.getElementById('green-ll').textContent = fmtLL(lat,lon);
   updateBtns('gb-', bc, true);
@@ -745,14 +758,14 @@ function updateGreen(lat, lon, forcedPrec) {
   updateDistBars();
 }
 
-function updateRed(lat, lon, forcedPrec) {
+function updateRed(lat, lon, forcedPrec, forcedBare) {
   redLL = {lat,lon};
   const prec = forcedPrec || (map ? zoomToPrecision(lat, lon) : 10);
   // Red pins created from a typed/shared Hashsite should keep that Hashsite's
-  // precision instead of being recomputed from the current map zoom.
+  // precision and exact prefix instead of being recomputed from the current map zoom.
   const bc = forcedPrec ? Math.min(forcedPrec, 10) : Math.min(prec+3, 10);
   redBright = bc;
-  redBare = ll2hsps(lat,lon,10).replace(/^#/,'');
+  redBare = mergeForcedBare(lat, lon, forcedBare);
   setDisplay('red-code', redBare, bc);
   document.getElementById('red-ll').textContent = fmtLL(lat,lon);
   updateBtns('rb-', bc, true);
@@ -760,11 +773,11 @@ function updateRed(lat, lon, forcedPrec) {
   updateDistBars();
 }
 
-function placePin(lat, lon, forcedPrec) {
+function placePin(lat, lon, forcedPrec, forcedBare) {
   const icon = L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 12px var(--red),0 2px 6px rgba(0,0,0,.6)"></div>`,iconSize:[14,14],iconAnchor:[7,7]});
   if (redMkr) { redMkr.setLatLng([lat,lon]); redMkr.setIcon(icon); }
   else redMkr = L.marker([lat,lon],{icon,zIndexOffset:500}).addTo(map);
-  updateRed(lat,lon,forcedPrec);
+  updateRed(lat,lon,forcedPrec,forcedBare);
 }
 
 /* ================================================================
@@ -963,7 +976,7 @@ async function resolveInput(val, color) {
   // 1. Try as hashsite, including pasted hashsite.org#... links
   const cleanHash = cleanHashInput(s);
   const bb = cleanHash ? hsps2bbox('#' + cleanHash) : hsps2bbox(s);
-  if (bb) return {lat: bb.lat_c, lon: bb.lon_c, precision: cleanHash ? Math.max(1, Math.min(cleanHash.length, 10)) : null};
+  if (bb) return {lat: bb.lat_c, lon: bb.lon_c, precision: cleanHash ? Math.max(1, Math.min(cleanHash.length, 10)) : null, bare: cleanHash || null};
 
   // 2. Try as lat/lon
   const ll = parseLatLon(s);
@@ -1035,17 +1048,17 @@ function applyInitialUrlState() {
   initialUrlStateApplied = true;
 
   if (g && r && (Math.abs(g.lat-r.lat) > 1e-10 || Math.abs(g.lon-r.lon) > 1e-10)) {
-    if (r) placePin(r.lat, r.lon, r.precision);
+    if (r) placePin(r.lat, r.lon, r.precision, r.bare);
     const bounds = L.latLngBounds([[g.lat, g.lon], [r.lat, r.lon]]);
     if (state.zoom) map.setView([g.lat, g.lon], state.zoom);
     else map.fitBounds(bounds, {padding:[45,45], maxZoom:zoomForHashPrecision(r.bare || g.bare)});
-    updateGreen(g.lat, g.lon, g.precision);
+    updateGreen(g.lat, g.lon, g.precision, g.bare);
   } else {
     const center = g || r;
     const z = state.zoom || zoomForHashPrecision(center.bare);
     map.setView([center.lat, center.lon], z);
-    if (g) updateGreen(g.lat, g.lon, g.precision);
-    if (r) placePin(r.lat, r.lon, r.precision);
+    if (g) updateGreen(g.lat, g.lon, g.precision, g.bare);
+    if (r) placePin(r.lat, r.lon, r.precision, r.bare);
   }
 
   updateDistBars();
@@ -1095,10 +1108,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key !== 'Enter') return;
     const result = await resolveInput(this.value, 'green');
     if (result) {
+      e.preventDefault();
+      e.stopPropagation();
       this.classList.remove('active');
-      map.setView([result.lat, result.lon], Math.max(map.getZoom(), result.precision ? zoomForHashPrecision('#' + 'X'.repeat(result.precision)) : 14));
-      if (result.precision) updateGreen(result.lat, result.lon, result.precision);
-      this.blur(); // map move event handles updateGreen; explicit Hashsite preserves typed precision here
+      const z = Math.max(map.getZoom(), result.bare ? zoomForHashPrecision(result.bare) : 14);
+      suppressGreenAutoUpdate = true;
+      map.setView([result.lat, result.lon], z);
+      updateGreen(result.lat, result.lon, result.precision, result.bare);
+      map.once('moveend', () => {
+        updateGreen(result.lat, result.lon, result.precision, result.bare);
+        suppressGreenAutoUpdate = false;
+      });
+      setTimeout(() => { suppressGreenAutoUpdate = false; }, 900);
+      this.blur();
     } else {
       document.getElementById('green-code').classList.add('shake');
       setTimeout(()=>document.getElementById('green-code').classList.remove('shake'), 320);
@@ -1116,9 +1138,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key !== 'Enter') return;
     const result = await resolveInput(this.value, 'red');
     if (result) {
+      e.preventDefault();
+      e.stopPropagation();
       this.classList.remove('active');
-      map.setView([result.lat, result.lon], Math.max(map.getZoom(), result.precision ? zoomForHashPrecision('#' + 'X'.repeat(result.precision)) : 14));
-      placePin(result.lat, result.lon, result.precision);
+      const z = Math.max(map.getZoom(), result.bare ? zoomForHashPrecision(result.bare) : 14);
+      suppressGreenAutoUpdate = true;
+      map.setView([result.lat, result.lon], z);
+      placePin(result.lat, result.lon, result.precision, result.bare);
+      map.once('moveend', () => {
+        placePin(result.lat, result.lon, result.precision, result.bare);
+        suppressGreenAutoUpdate = false;
+      });
+      setTimeout(() => { suppressGreenAutoUpdate = false; }, 900);
       this.blur();
     } else {
       document.getElementById('red-code').classList.add('shake');
@@ -1132,9 +1163,9 @@ document.addEventListener('DOMContentLoaded', () => {
    MAP
    ================================================================ */
 function initMap() {
-  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,maxZoom:21});
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,maxZoom:22,zoomSnap:0.25,zoomDelta:0.5,wheelPxPerZoomLevel:80});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxNativeZoom:19,maxZoom:21,
+    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',maxNativeZoom:19,maxZoom:22,
   }).addTo(map);
 
   // Dark overlay instead of CSS filter — avoids WebKit stacking context bug
@@ -1142,7 +1173,7 @@ function initMap() {
   darkener.id = 'map-darkener';
   document.getElementById('map').appendChild(darkener);
 
-  const onMove = () => { const c=map.getCenter(); updateGreen(c.lat,c.lng); };
+  const onMove = () => { if (suppressGreenAutoUpdate) return; const c=map.getCenter(); updateGreen(c.lat,c.lng); };
   map.on('move', onMove);
   map.on('zoom', onMove);
   onMove();
