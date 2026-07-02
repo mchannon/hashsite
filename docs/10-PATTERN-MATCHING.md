@@ -34,7 +34,11 @@ hashsite closest 62AZZ492 '$00009'
 
 ## Cross-zone example: Chicago
 
-A club in Brighton Park texts `$04H49`.
+A club in Brighton Park texts:
+
+```text
+$04H49
+```
 
 You are in Bridgeport at:
 
@@ -50,6 +54,17 @@ hashsite closest 1XVWQNK82 '$04H49'
 ```
 
 A naive substitution of your first 3 chars would produce a wrong Wisconsin-ish answer. Geographic search correctly crosses the band boundary.
+
+## Uses
+
+Pattern matching can support:
+
+- vanity locations
+- memorable suffixes
+- scavenger hunts
+- place branding
+- human-friendly short endings near real places
+- puzzle/game/tour workflows
 
 ---
 

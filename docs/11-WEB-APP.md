@@ -39,6 +39,17 @@ Opening a shared Hashsite should feel like opening a location card, not accident
 
 The sender should be able to see what the recipient will see before sending a link.
 
+## Current web app identity
+
+The app title bar should reinforce the core product:
+
+```text
+#hashsite
+open geocoding · no api key · no rent
+```
+
+The app is the map interface. The code is the durable object.
+
 ---
 
 [README](../README.md) | Prev: [10. Pattern matching and suffixes](10-PATTERN-MATCHING.md) | Next: [12. Design and build philosophy](12-DESIGN-BUILD-PHILOSOPHY.md)

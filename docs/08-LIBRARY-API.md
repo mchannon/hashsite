@@ -73,7 +73,7 @@ int    hs_midpoint3d   (const char *a, double a_alt, const char *b, double b_alt
 
 ```c
 typedef struct {
-    double lat, lon, alt_m;
+    double lat, lon, alt_m;         /* alt_m = HS_ALT_NONE if absent */
     char   code[HS_MAXLEN + 1];
     int    nchars;
 } hs_waypoint;

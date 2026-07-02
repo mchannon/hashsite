@@ -1,10 +1,10 @@
 # 12. Design and build philosophy
 
-[README](../README.md) | Prev: [11. Web app behavior](11-WEB-APP.md) | Next: [13. Roadmap, license, and companion work](13-ROADMAP-LICENSE-COMPANIONS.md)
+[README](../README.md) | Prev: [11. Web app behavior](11-WEB-APP.md) | Next: [13. Word mode and legacy ideas](13-WORD-MODE-AND-LEGACY-IDEAS.md)
 
 ---
 
-## Design notes
+## Design principles
 
 ### Fractal by default
 
@@ -26,6 +26,10 @@ Altitude belongs in the format family.
 
 Hashsite can import other coordinate formats instead of pretending they do not exist.
 
+### The map is an interface
+
+The short code is the durable object.
+
 ## Build philosophy
 
 Hashsite is written in plain C with a small, readable public API.
@@ -39,7 +43,7 @@ The project aims for:
 - library-first design
 - CLI visibility for testing and demos
 
-Suitable targets include:
+This makes it suitable for:
 
 - servers
 - command-line utilities
@@ -51,4 +55,4 @@ Suitable targets include:
 
 ---
 
-[README](../README.md) | Prev: [11. Web app behavior](11-WEB-APP.md) | Next: [13. Roadmap, license, and companion work](13-ROADMAP-LICENSE-COMPANIONS.md)
+[README](../README.md) | Prev: [11. Web app behavior](11-WEB-APP.md) | Next: [13. Word mode and legacy ideas](13-WORD-MODE-AND-LEGACY-IDEAS.md)

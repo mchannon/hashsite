@@ -45,13 +45,24 @@ hashsite fromutm "18T 583960 4507523"
 # -> Hashsite from UTM, spherical approximation, about ~50m tolerance
 ```
 
-Supported: Geohash, Plus Code / OLC, Maidenhead, GARS, GEOREF, DMS, DDM, NMEA GGA, NMEA RMC, and UTM.
+Supported systems:
 
-## Notes on output
+- Geohash
+- Plus Codes / OLC
+- Maidenhead
+- GARS
+- GEOREF
+- DMS
+- DDM
+- NMEA GGA
+- NMEA RMC
+- UTM
+
+## Output caution
 
 Some imports return exact-looking Hashsites from inherently coarse source systems.
 
-The output precision should be understood as:
+The output should be understood as:
 
 ```text
 source format precision × requested Hashsite precision

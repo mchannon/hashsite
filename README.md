@@ -6,14 +6,14 @@
 
 **Open geocoding. Can be done with pencil and paper. Works offline. No API key. No rent. Locations that work for humans.**
 
-A C library, CLI, web app, and coordinate format for encoding real-world locations as short, human-shareable alphadecimal strings. Compact, hierarchical, 3D-native, and free to implement within the license terms.
+Hashsite is a C library, CLI, web app, and coordinate format for encoding real-world locations as short, human-shareable alphadecimal strings.
 
 | Code | Lat, Lon | Notes |
 |---|---|---|
 | `#7BA2` | 35.22°N, 101.76°W | Potter County, TX — 4-char, ~40km precision |
 | `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Cadillac Ranch, Amarillo TX — 9-char, ~5m precision |
-| `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same, 2m above street level |
-| `$FC64W` | 34.927°N, 101.663°W | From `#7BA2CSoDZ`: prefix = first 3 chars (`7BA`), nearest 8-char ending `FC64W` → `#7BAFC64W` |
+| `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same horizontal point, 2m above street level |
+| `$FC64W` | 34.927°N, 101.663°W | From `#7BA2CSoDZ`: nearest 8-char code ending `FC64W` → `#7BAFC64W` |
 | `#7BGPSDMUTc4729#pFCDCsEN4Ld1T^2` | 33.628°N, 101.905°W | Hashpath: gate → code → parking → stairs → door +2m |
 | `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
 
@@ -22,10 +22,10 @@ A C library, CLI, web app, and coordinate format for encoding real-world locatio
 | Topic | Page |
 |---|---|
 | 1. Why Hashsite? | [`docs/01-WHY-HASHSITE.md`](docs/01-WHY-HASHSITE.md) |
-| 2. Format, codes, and precision rubric | [`docs/02-FORMAT-CODES-PRECISION.md`](docs/02-FORMAT-CODES-PRECISION.md) |
+| 2. Format, codes, and precision | [`docs/02-FORMAT-CODES-PRECISION.md`](docs/02-FORMAT-CODES-PRECISION.md) |
 | 3. Grid structure and hierarchy | [`docs/03-GRID-STRUCTURE.md`](docs/03-GRID-STRUCTURE.md) |
 | 4. Altitude and 3D | [`docs/04-ALTITUDE-AND-3D.md`](docs/04-ALTITUDE-AND-3D.md) |
-| 5. Checksum dots and readability | [`docs/05-CHECKSUM-DOTS.md`](docs/05-CHECKSUM-DOTS.md) |
+| 5. Readability, checksums, and dots | [`docs/05-READABILITY-CHECKSUMS-DOTS.md`](docs/05-READABILITY-CHECKSUMS-DOTS.md) |
 | 6. Hashpaths | [`docs/06-HASHPATHS.md`](docs/06-HASHPATHS.md) |
 | 7. CLI reference with outputs | [`docs/07-CLI-REFERENCE.md`](docs/07-CLI-REFERENCE.md) |
 | 8. Library API | [`docs/08-LIBRARY-API.md`](docs/08-LIBRARY-API.md) |
@@ -33,8 +33,8 @@ A C library, CLI, web app, and coordinate format for encoding real-world locatio
 | 10. Pattern matching and suffixes | [`docs/10-PATTERN-MATCHING.md`](docs/10-PATTERN-MATCHING.md) |
 | 11. Web app behavior | [`docs/11-WEB-APP.md`](docs/11-WEB-APP.md) |
 | 12. Design and build philosophy | [`docs/12-DESIGN-BUILD-PHILOSOPHY.md`](docs/12-DESIGN-BUILD-PHILOSOPHY.md) |
-| 13. Roadmap, license, and companion work | [`docs/13-ROADMAP-LICENSE-COMPANIONS.md`](docs/13-ROADMAP-LICENSE-COMPANIONS.md) |
-| Preserved original README material | [below](#preserved-original-readme-material) |
+| 13. Word mode and legacy ideas | [`docs/13-WORD-MODE-AND-LEGACY-IDEAS.md`](docs/13-WORD-MODE-AND-LEGACY-IDEAS.md) |
+| 14. Roadmap, W3WNKER, license, and companions | [`docs/14-ROADMAP-W3WNKER-LICENSE-COMPANIONS.md`](docs/14-ROADMAP-W3WNKER-LICENSE-COMPANIONS.md) |
 
 ## Quick start
 
@@ -61,11 +61,8 @@ Hashpath is the live companion product for multi-step real-world instructions: p
 
 <https://hashpath.org>
 
-## Preserved original README material
-
-The material below is the original README body, preserved rather than erased.
-
 <!-- HASHSITE_MENU_END -->
+
 
 
 

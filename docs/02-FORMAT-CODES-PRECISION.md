@@ -1,4 +1,4 @@
-# 2. Format, codes, and precision rubric
+# 2. Format, codes, and precision
 
 [README](../README.md) | Prev: [1. Why Hashsite?](01-WHY-HASHSITE.md) | Next: [3. Grid structure and hierarchy](03-GRID-STRUCTURE.md)
 
@@ -19,6 +19,26 @@ with lowercase `o` substituted for uppercase `O` to reduce the most common visua
 
 Input is case-insensitive.
 
+## Canonical and accepted forms
+
+Supported forms include:
+
+```text
+#<CODE>^
+<CODE>
+#<C.OD.E>^
+#<CODE>^<ALT>
+#WP1#WP2#WP3
+```
+
+Where:
+
+- `#` is an optional visual marker that says “this is a Hashsite”
+- `^` is an optional terminator and/or altitude separator
+- dots are optional readability/checksum helpers
+- altitude comes after `^`
+- multiple `#...` sequences can be concatenated as a hashpath
+
 ## Examples
 
 | Code | Lat, Lon | Notes |
@@ -27,6 +47,7 @@ Input is case-insensitive.
 | `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Cadillac Ranch, Amarillo TX — 9-char, ~5m precision |
 | `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same horizontal point, 2m above street level |
 | `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
+| `#F.6NZ^J` | location + vertical component | 1 meter below street level |
 
 ## Precision
 
@@ -34,16 +55,16 @@ Each character subdivides the current cell. Approximate equatorial precision:
 
 | Characters | Cell size | Use |
 |---|---:|---|
-| 1 | 7000 km | Continental |
-| 2 | 1200 km | Country |
-| 3 | 200 km | Metro area |
-| 4 | 40 km | City |
-| 5 | 5 km | District |
-| 6 | 1000 m | Neighborhood |
-| 7 | 200 m | City block |
-| 8 | 25 m | Building entrance |
-| 9 | 5 m | Person-scale |
-| 10 | 1 m | Sub-meter |
+| 1 | ~7000 km | Continental |
+| 2 | ~1200 km | Country |
+| 3 | ~200 km | Metro area |
+| 4 | ~40 km | City |
+| 5 | ~5 km | District |
+| 6 | ~1000 m | Neighborhood |
+| 7 | ~200 m | City block |
+| 8 | ~25 m | Building entrance |
+| 9 | ~5 m | Person-scale |
+| 10 | ~1 m | Sub-meter |
 
 Cells narrow toward the poles. Use:
 
@@ -53,7 +74,7 @@ hashsite precision N lat
 
 for latitude-aware dimensions.
 
-## The precision rubric
+## Precision is a deliberate output choice
 
 The number of characters encodes the desired precision tolerance, not the precision of the input coordinates.
 
@@ -66,6 +87,12 @@ Use:
 - 8 characters for property, entrance, trailhead
 - 9 characters for person-scale points, delivery, gate, pickup
 - 10 characters for sub-meter or inspection/survey use
+
+## Alphadecimal rubric
+
+Hashsite is a 36-symbol alphadecimal coordinate system.
+
+The purpose of using all digits and letters is compactness. Dropping symbols to avoid every possible visual ambiguity would make codes longer. Hashsite instead keeps the full alphabet and provides readability aids such as `o`/`0` handling and optional checksum dots.
 
 ---
 
