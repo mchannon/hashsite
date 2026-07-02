@@ -1,4 +1,8 @@
-# Roadmap
+# 12. Roadmap
+
+[README](../README.md) | Prev: [11. Design principles](11-DESIGN-PRINCIPLES.md) | Next: [13. Companion product: Hashpath](13-COMPANION-HASHPATH.md)
+
+---
 
 Possible project directions:
 
@@ -13,3 +17,7 @@ Possible project directions:
 - more visual grid illustrations
 - package/CLI distribution
 - companion Hashpath integration
+
+---
+
+[README](../README.md) | Prev: [11. Design principles](11-DESIGN-PRINCIPLES.md) | Next: [13. Companion product: Hashpath](13-COMPANION-HASHPATH.md)

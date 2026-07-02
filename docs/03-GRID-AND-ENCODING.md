@@ -1,4 +1,8 @@
-# Grid and encoding model
+# 3. Grid and encoding model
+
+[README](../README.md) | Prev: [2. Code format, alphabet, precision, and rubric](02-CODES-AND-RUBRIC.md) | Next: [4. Altitude / 3D locations](04-ALTITUDE.md)
+
+---
 
 Hashsite begins with global spatial subdivision and then refines the current cell.
 
@@ -27,3 +31,7 @@ For polar zones, it uses a variable row/column strategy to avoid absurdly narrow
 From the third character onward, Hashsite uses regular 6×6 subdivision.
 
 Each new character divides the current cell into 36 children.
+
+---
+
+[README](../README.md) | Prev: [2. Code format, alphabet, precision, and rubric](02-CODES-AND-RUBRIC.md) | Next: [4. Altitude / 3D locations](04-ALTITUDE.md)

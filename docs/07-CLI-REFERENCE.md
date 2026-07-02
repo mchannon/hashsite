@@ -1,4 +1,8 @@
-# CLI reference
+# 7. CLI reference
+
+[README](../README.md) | Prev: [6. Hashpaths in the Hashsite library](06-HASHPATHS-IN-HASHSITE.md) | Next: [8. Library API](08-LIBRARY-API.md)
+
+---
 
 Build:
 
@@ -43,3 +47,7 @@ hashsite luhn 7B663IHXB8
 hashsite luhncheck "7B6.63IH.XB8"
 hashsite closest 7BA2CSoDZ '$FC64W'
 ```
+
+---
+
+[README](../README.md) | Prev: [6. Hashpaths in the Hashsite library](06-HASHPATHS-IN-HASHSITE.md) | Next: [8. Library API](08-LIBRARY-API.md)

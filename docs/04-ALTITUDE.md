@@ -1,4 +1,8 @@
-# Altitude / 3D locations
+# 4. Altitude / 3D locations
+
+[README](../README.md) | Prev: [3. Grid and encoding model](03-GRID-AND-ENCODING.md) | Next: [5. Dots and readability checks](05-DOTS-AND-READABILITY.md)
+
+---
 
 Hashsite is 3D-native.
 
@@ -33,3 +37,7 @@ Examples:
 ^I1I = +1.5 m
 ^IJI = -1.5 m
 ```
+
+---
+
+[README](../README.md) | Prev: [3. Grid and encoding model](03-GRID-AND-ENCODING.md) | Next: [5. Dots and readability checks](05-DOTS-AND-READABILITY.md)

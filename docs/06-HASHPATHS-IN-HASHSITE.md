@@ -1,4 +1,8 @@
-# Hashpaths in the Hashsite library
+# 6. Hashpaths in the Hashsite library
+
+[README](../README.md) | Prev: [5. Dots and readability checks](05-DOTS-AND-READABILITY.md) | Next: [7. CLI reference](07-CLI-REFERENCE.md)
+
+---
 
 Hashsite includes path-aware behavior.
 
@@ -23,3 +27,7 @@ The first waypoint is full. Later spatial segments can encode only what differs 
 For the companion product and current procedural-direction docs, see Hashpath:
 
 <https://hashpath.org>
+
+---
+
+[README](../README.md) | Prev: [5. Dots and readability checks](05-DOTS-AND-READABILITY.md) | Next: [7. CLI reference](07-CLI-REFERENCE.md)

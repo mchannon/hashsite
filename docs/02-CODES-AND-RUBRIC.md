@@ -1,4 +1,8 @@
-# Code format, alphabet, precision, and rubric
+# 2. Code format, alphabet, precision, and rubric
+
+[README](../README.md) | Prev: [1. What is a Hashsite?](01-WHAT-IS-A-HASHSITE.md) | Next: [3. Grid and encoding model](03-GRID-AND-ENCODING.md)
+
+---
 
 This is the core Hashsite material.
 
@@ -83,3 +87,7 @@ Hashsite is prefix-hierarchical.
 ```
 
 Removing characters zooms out. Adding characters zooms in.
+
+---
+
+[README](../README.md) | Prev: [1. What is a Hashsite?](01-WHAT-IS-A-HASHSITE.md) | Next: [3. Grid and encoding model](03-GRID-AND-ENCODING.md)

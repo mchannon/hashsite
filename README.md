@@ -21,23 +21,21 @@ The code is the durable object.
 
 ## Start here
 
-Hashsite has outgrown a single infinite-scroll README. This README is the front door; the deeper material is split into topic pages.
-
 | Topic | Page |
 |---|---|
-| What Hashsite is | [`docs/01-WHAT-IS-A-HASHSITE.md`](docs/01-WHAT-IS-A-HASHSITE.md) |
-| Code format, alphabet, precision, and rubric | [`docs/02-CODES-AND-RUBRIC.md`](docs/02-CODES-AND-RUBRIC.md) |
-| Grid and encoding model | [`docs/03-GRID-AND-ENCODING.md`](docs/03-GRID-AND-ENCODING.md) |
-| Altitude / 3D locations | [`docs/04-ALTITUDE.md`](docs/04-ALTITUDE.md) |
-| Dots and readability checks | [`docs/05-DOTS-AND-READABILITY.md`](docs/05-DOTS-AND-READABILITY.md) |
-| Hashpaths in the Hashsite library | [`docs/06-HASHPATHS-IN-HASHSITE.md`](docs/06-HASHPATHS-IN-HASHSITE.md) |
-| CLI reference | [`docs/07-CLI-REFERENCE.md`](docs/07-CLI-REFERENCE.md) |
-| Library API | [`docs/08-LIBRARY-API.md`](docs/08-LIBRARY-API.md) |
-| Coordinate import and interoperability | [`docs/09-COORDINATE-IMPORT.md`](docs/09-COORDINATE-IMPORT.md) |
-| Web app behavior | [`docs/10-WEB-APP.md`](docs/10-WEB-APP.md) |
-| Design principles | [`docs/11-DESIGN-PRINCIPLES.md`](docs/11-DESIGN-PRINCIPLES.md) |
-| Roadmap | [`docs/12-ROADMAP.md`](docs/12-ROADMAP.md) |
-| Companion product: Hashpath | [`docs/13-COMPANION-HASHPATH.md`](docs/13-COMPANION-HASHPATH.md) |
+| 1. What Hashsite is | [`docs/01-WHAT-IS-A-HASHSITE.md`](docs/01-WHAT-IS-A-HASHSITE.md) |
+| 2. Code format, alphabet, precision, and rubric | [`docs/02-CODES-AND-RUBRIC.md`](docs/02-CODES-AND-RUBRIC.md) |
+| 3. Grid and encoding model | [`docs/03-GRID-AND-ENCODING.md`](docs/03-GRID-AND-ENCODING.md) |
+| 4. Altitude / 3D locations | [`docs/04-ALTITUDE.md`](docs/04-ALTITUDE.md) |
+| 5. Dots and readability checks | [`docs/05-DOTS-AND-READABILITY.md`](docs/05-DOTS-AND-READABILITY.md) |
+| 6. Hashpaths in the Hashsite library | [`docs/06-HASHPATHS-IN-HASHSITE.md`](docs/06-HASHPATHS-IN-HASHSITE.md) |
+| 7. CLI reference | [`docs/07-CLI-REFERENCE.md`](docs/07-CLI-REFERENCE.md) |
+| 8. Library API | [`docs/08-LIBRARY-API.md`](docs/08-LIBRARY-API.md) |
+| 9. Coordinate import and interoperability | [`docs/09-COORDINATE-IMPORT.md`](docs/09-COORDINATE-IMPORT.md) |
+| 10. Web app behavior | [`docs/10-WEB-APP.md`](docs/10-WEB-APP.md) |
+| 11. Design principles | [`docs/11-DESIGN-PRINCIPLES.md`](docs/11-DESIGN-PRINCIPLES.md) |
+| 12. Roadmap | [`docs/12-ROADMAP.md`](docs/12-ROADMAP.md) |
+| 13. Companion product: Hashpath | [`docs/13-COMPANION-HASHPATH.md`](docs/13-COMPANION-HASHPATH.md) |
 | Preserved original README material | [below](#preserved-original-readme-material) |
 
 ## One-minute version
@@ -92,9 +90,10 @@ Hashsite gives places compact codes. Hashpath carries procedures around places: 
 
 ## Preserved original README material
 
-The material below is the original README body, preserved rather than erased. The topic pages above make that material easier to navigate, but the older explanation remains part of the project record.
+The material below is the original README body, preserved rather than erased.
 
 <!-- HASHSITE_MENU_END -->
+
 
 ![Hashsite banner](img/hashsitebanner.png)
 

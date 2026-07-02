@@ -1,4 +1,8 @@
-# What is a Hashsite?
+# 1. What is a Hashsite?
+
+[README](../README.md) | Next: [2. Code format, alphabet, precision, and rubric](02-CODES-AND-RUBRIC.md)
+
+---
 
 A Hashsite is a compact alphadecimal code for a real-world place.
 
@@ -13,3 +17,7 @@ Hashsite exists because people often need to communicate exact places without re
 A Hashsite should be short, offline-capable, hierarchical, human-shareable, machine-decodable, usable in 2D and 3D, and independent of rented APIs.
 
 Hashsite is not just a web app. It is also a coordinate format, C library, and CLI toolkit.
+
+---
+
+[README](../README.md) | Next: [2. Code format, alphabet, precision, and rubric](02-CODES-AND-RUBRIC.md)
