@@ -4,76 +4,51 @@
 
 ![Hashsite banner](img/hashsitebanner.png)
 
-**Open geocoding. Short letters and numbers for real-world places. Offline-capable. No API key. No rent.**
+**Open geocoding. Can be done with pencil and paper. Works offline. No API key. No rent. Locations that work for humans.**
 
-Hashsite encodes real-world locations as compact, human-shareable alphadecimal strings.
+A C library, CLI, web app, and coordinate format for encoding real-world locations as short, human-shareable alphadecimal strings. Compact, hierarchical, 3D-native, and free to implement within the license terms.
 
-A Hashsite can be short enough to text, print, speak, write on a sticky note, put in a QR code, or paste into another system:
-
-```text
-#7BA2CSoDZ
-#7B6.63IH.XB8
-#7BA2CSoDZ^2
-```
-
-The map app is the interface.  
-The code is the durable object.
+| Code | Lat, Lon | Notes |
+|---|---|---|
+| `#7BA2` | 35.22°N, 101.76°W | Potter County, TX — 4-char, ~40km precision |
+| `#7BA2CSoDZ` | 35.2220°N, 101.8310°W | Cadillac Ranch, Amarillo TX — 9-char, ~5m precision |
+| `#7BA2CSoDZ^2` | 35.2220°N, 101.8310°W | Same, 2m above street level |
+| `$FC64W` | 34.927°N, 101.663°W | From `#7BA2CSoDZ`: prefix = first 3 chars (`7BA`), nearest 8-char ending `FC64W` → `#7BAFC64W` |
+| `#7BGPSDMUTc4729#pFCDCsEN4Ld1T^2` | 33.628°N, 101.905°W | Hashpath: gate → code → parking → stairs → door +2m |
+| `#7B6.63IH.XB8` | 35.1240°N, 106.5692°W | Albuquerque — 10-char, ~1m precision, with checksum dots |
 
 ## Start here
 
 | Topic | Page |
 |---|---|
-| 1. What Hashsite is | [`docs/01-WHAT-IS-A-HASHSITE.md`](docs/01-WHAT-IS-A-HASHSITE.md) |
-| 2. Code format, alphabet, precision, and rubric | [`docs/02-CODES-AND-RUBRIC.md`](docs/02-CODES-AND-RUBRIC.md) |
-| 3. Grid and encoding model | [`docs/03-GRID-AND-ENCODING.md`](docs/03-GRID-AND-ENCODING.md) |
-| 4. Altitude / 3D locations | [`docs/04-ALTITUDE.md`](docs/04-ALTITUDE.md) |
-| 5. Dots and readability checks | [`docs/05-DOTS-AND-READABILITY.md`](docs/05-DOTS-AND-READABILITY.md) |
-| 6. Hashpaths in the Hashsite library | [`docs/06-HASHPATHS-IN-HASHSITE.md`](docs/06-HASHPATHS-IN-HASHSITE.md) |
-| 7. CLI reference | [`docs/07-CLI-REFERENCE.md`](docs/07-CLI-REFERENCE.md) |
+| 1. Why Hashsite? | [`docs/01-WHY-HASHSITE.md`](docs/01-WHY-HASHSITE.md) |
+| 2. Format, codes, and precision rubric | [`docs/02-FORMAT-CODES-PRECISION.md`](docs/02-FORMAT-CODES-PRECISION.md) |
+| 3. Grid structure and hierarchy | [`docs/03-GRID-STRUCTURE.md`](docs/03-GRID-STRUCTURE.md) |
+| 4. Altitude and 3D | [`docs/04-ALTITUDE-AND-3D.md`](docs/04-ALTITUDE-AND-3D.md) |
+| 5. Checksum dots and readability | [`docs/05-CHECKSUM-DOTS.md`](docs/05-CHECKSUM-DOTS.md) |
+| 6. Hashpaths | [`docs/06-HASHPATHS.md`](docs/06-HASHPATHS.md) |
+| 7. CLI reference with outputs | [`docs/07-CLI-REFERENCE.md`](docs/07-CLI-REFERENCE.md) |
 | 8. Library API | [`docs/08-LIBRARY-API.md`](docs/08-LIBRARY-API.md) |
-| 9. Coordinate import and interoperability | [`docs/09-COORDINATE-IMPORT.md`](docs/09-COORDINATE-IMPORT.md) |
-| 10. Web app behavior | [`docs/10-WEB-APP.md`](docs/10-WEB-APP.md) |
-| 11. Design principles | [`docs/11-DESIGN-PRINCIPLES.md`](docs/11-DESIGN-PRINCIPLES.md) |
-| 12. Roadmap | [`docs/12-ROADMAP.md`](docs/12-ROADMAP.md) |
-| 13. Companion product: Hashpath | [`docs/13-COMPANION-HASHPATH.md`](docs/13-COMPANION-HASHPATH.md) |
+| 9. Coordinate import with outputs | [`docs/09-COORDINATE-IMPORT.md`](docs/09-COORDINATE-IMPORT.md) |
+| 10. Pattern matching and suffixes | [`docs/10-PATTERN-MATCHING.md`](docs/10-PATTERN-MATCHING.md) |
+| 11. Web app behavior | [`docs/11-WEB-APP.md`](docs/11-WEB-APP.md) |
+| 12. Design and build philosophy | [`docs/12-DESIGN-BUILD-PHILOSOPHY.md`](docs/12-DESIGN-BUILD-PHILOSOPHY.md) |
+| 13. Roadmap, license, and companion work | [`docs/13-ROADMAP-LICENSE-COMPANIONS.md`](docs/13-ROADMAP-LICENSE-COMPANIONS.md) |
 | Preserved original README material | [below](#preserved-original-readme-material) |
 
-## One-minute version
+## Quick start
 
-Hashsite is a coordinate format, library, CLI, and web app for turning real-world locations into short alphadecimal codes.
+```bash
+gcc -O2 hashsite.c -lm -o hashsite
+./hashsite test
+```
 
-It is meant to be:
-
-- compact
-- offline-capable
-- hierarchical
-- human-handleable
-- machine-decodable
-- 2D and 3D aware
-- open to implement
-- useful without renting an API
-
-## Examples
-
-| Code | Meaning |
-|---|---|
-| `#7BA2` | Potter County, TX area — coarse, 4-character Hashsite |
-| `#7BA2CSoDZ` | Cadillac Ranch / Amarillo-area point — person-scale precision |
-| `#7BA2CSoDZ^2` | Same horizontal point, 2m above street level |
-| `#7B6.63IH.XB8` | Albuquerque-area point with readability/checksum dots |
-| `#7BGPSDMUTc4729#pFCDCsEN4Ld1T^2` | Multi-waypoint Hashpath-style arrival sequence |
-
-## Why not just use latitude/longitude or a map URL?
-
-Latitude/longitude is universal but awkward for humans.
-
-Map URLs work, but they are long, opaque, app-specific, and full of noise.
-
-Hashsite gives the place itself a compact handle:
-
-```text
-real place → short code
-short code → real place
+```bash
+hashsite encode 35.222 -101.831 9     # -> #7BA2CSoDZ
+hashsite decode 7BA2CSoDZ             # -> lat=35.222... lon=-101.831...
+hashsite distance 7B663I 76B82D       # -> 2905.986 km
+hashsite frommaidenhead FN31pr        # -> #7703K1QN
+hashsite fromnmea '$GPGGA,...'        # -> hashsite + altitude from GPS device
 ```
 
 ## Live app
@@ -82,9 +57,7 @@ short code → real place
 
 ## Companion product
 
-Hashpath is the live companion product for multi-step real-world instructions.
-
-Hashsite gives places compact codes. Hashpath carries procedures around places: parking, gates, doors, codes, dropoff points, exits, and other arrival details.
+Hashpath is the live companion product for multi-step real-world instructions: parking, gates, doors, codes, dropoff points, exits, and other arrival details.
 
 <https://hashpath.org>
 
@@ -93,6 +66,7 @@ Hashsite gives places compact codes. Hashpath carries procedures around places: 
 The material below is the original README body, preserved rather than erased.
 
 <!-- HASHSITE_MENU_END -->
+
 
 
 ![Hashsite banner](img/hashsitebanner.png)
